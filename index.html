@@ -562,6 +562,8 @@
   .kit-copy{margin-left:auto;border:1px solid var(--line);background:var(--panel);color:var(--steel);font-size:11px;font-weight:600;padding:4px 12px;border-radius:4px;cursor:pointer}
   .kit-copy:hover{border-color:var(--focus);color:var(--focus)}
   .kit-body{margin:0;padding:12px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto}
+  .finals.attach{margin-top:16px;border:1px solid var(--line);border-radius:6px;padding:13px 15px;background:var(--panel-2)}
+  .finals.attach .finals-head{color:var(--ink)}
 </style>
 
 <header class="topbar">
@@ -2699,7 +2701,7 @@ function buildStructure(s){
 }
 function buildStories(s){
   const intro=s.camp.storiesIntro?'<p class="why" style="margin-bottom:10px">'+s.camp.storiesIntro+'</p>':'';
-  return intro+'<ul class="plain">'+s.camp.stories.map(x=>'<li>'+x+'</li>').join("")+'</ul>';
+  return intro+'<ul class="plain">'+s.camp.stories.map(x=>'<li>'+x+'</li>').join("")+'</ul>'+attachHTML(s,"stories","Story assets","attach the Story frames / graphics for this section");
 }
 function buildAdaptations(s){
   const A=s.camp.adaptations;
@@ -3010,6 +3012,7 @@ function renderDetail(){
 
   // asset cards
   el.querySelectorAll(".asset-card").forEach(card=>bindCard(card, s));
+  el.querySelectorAll('.attach').forEach(node=>bindAttach(node, s, node.dataset.key));
 
   el.querySelectorAll('.kit-copy').forEach(b=>b.addEventListener('click',()=>{
     const src=el.querySelector('#kit-'+b.dataset.kit); if(!src) return;
@@ -3041,14 +3044,10 @@ function fileIcon(f){
   if(/\.(pptx?|key)$/i.test(f.name)) return "📊";
   return "📎";
 }
-function finalsHTML(s,a){
-  if(!campApproved(s.id)) return "";
-  const files = filesOf(s.id,a.id);
-  const chips = files.map(f=>{
+function fileChips(files){
+  return files.map(f=>{
     const isImg = /^image\//.test(f.type) || /\.(png|jpe?g|gif|webp|avif)$/i.test(f.name);
-    const thumb = isImg
-      ? '<img src="'+f.url+'" alt="" loading="lazy">'
-      : '<span class="doc">'+fileIcon(f)+'</span>';
+    const thumb = isImg ? '<img src="'+f.url+'" alt="" loading="lazy">' : '<span class="doc">'+fileIcon(f)+'</span>';
     return '<div class="final-chip">'+
       '<a class="fc-open" href="'+f.url+'" target="_blank" rel="noopener">'+thumb+'</a>'+
       '<span class="fc-name" title="'+esc(f.name)+'">'+esc(f.name)+'</span>'+
@@ -3056,6 +3055,40 @@ function finalsHTML(s,a){
       '<button class="fc-x" data-rmpath="'+esc(f.path)+'" title="Remove" aria-label="Remove">×</button>'+
     '</div>';
   }).join("");
+}
+function attachHTML(s, key, label, hint){
+  const files=filesOf(s.id,key);
+  return '<div class="finals attach" data-key="'+key+'" data-label="'+esc(label)+'" data-hint="'+esc(hint||"")+'">'+
+    '<div class="finals-head">'+esc(label)+' <span class="finals-count">'+files.length+'</span>'+
+      (hint?'<span class="finals-sub">'+esc(hint)+'</span>':'')+'</div>'+
+    (files.length?'<div class="finals-list">'+fileChips(files)+'</div>':'')+
+    '<label class="drop"><input type="file" class="final-input" hidden multiple accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx">'+
+      '<span class="drop-plus">⬆</span> Add asset <span class="drop-types">image · video · PDF</span></label>'+
+    '<div class="drop-hint" aria-live="polite"></div>'+
+  '</div>';
+}
+function bindAttach(node, s, key){
+  if(!node) return;
+  const fi=node.querySelector('.final-input'); const hint=node.querySelector('.drop-hint');
+  if(fi){
+    fi.addEventListener('change', async ()=>{ const files=[...fi.files]; fi.value=""; for(const f of files){ if(hint)hint.textContent="Uploading "+f.name+"…"; await uploadFinal(s.id,key,f);} if(hint)hint.textContent=""; refreshAttach(s,key); });
+    const label=node.querySelector('.drop');
+    ['dragover','dragenter'].forEach(ev=>label.addEventListener(ev,e=>{ e.preventDefault(); label.classList.add('over'); }));
+    ['dragleave','drop'].forEach(ev=>label.addEventListener(ev,e=>{ e.preventDefault(); label.classList.remove('over'); }));
+    label.addEventListener('drop', async e=>{ const files=[...(e.dataTransfer?.files||[])]; for(const f of files){ if(hint)hint.textContent="Uploading "+f.name+"…"; await uploadFinal(s.id,key,f);} if(hint)hint.textContent=""; refreshAttach(s,key); });
+  }
+  node.querySelectorAll('.fc-x').forEach(b=>b.addEventListener('click', async ()=>{ await removeFinal(s.id,key,b.dataset.rmpath); refreshAttach(s,key); }));
+}
+function refreshAttach(s,key){
+  const node=document.querySelector('.attach[data-key="'+key+'"]'); if(!node) return;
+  const label=node.getAttribute('data-label')||"Assets"; const hint=node.getAttribute('data-hint')||"";
+  const wrap=document.createElement('div'); wrap.innerHTML=attachHTML(s,key,label,hint); const nn=wrap.firstChild;
+  node.replaceWith(nn); bindAttach(nn,s,key);
+}
+function finalsHTML(s,a){
+  if(!campApproved(s.id)) return "";
+  const files = filesOf(s.id,a.id);
+  const chips = fileChips(files);
   return '<div class="finals">'+
     '<div class="finals-head">Uploaded final'+(files.length!==1?"s":"")+' <span class="finals-count">'+files.length+'</span>'+
       '<span class="finals-sub">the real designed asset, reviewed against the mockup above</span></div>'+
