@@ -522,7 +522,7 @@
       <div class="score sched"><div class="n" id="score-scheduled">0</div><div class="l">Scheduled</div></div>
       <div class="score ok"><div class="n" id="score-approved">0</div><div class="l">Approved</div></div>
       <div class="score warn"><div class="n" id="score-revise">0</div><div class="l">Needs work</div></div>
-      <div class="score pend"><div class="n" id="score-pending">63</div><div class="l">Pending</div></div>
+      <div class="score pend"><div class="n" id="score-pending">64</div><div class="l">Pending</div></div>
     </div>
     <span class="mode-badge off" id="mode-badge">Demo mode</span>
     <button class="export-btn" id="export-btn">Copy feedback summary</button>
@@ -530,7 +530,7 @@
 </header>
 
 <div class="lede">
-  <h1>11 campaigns · 63 drafted assets — review each one</h1>
+  <h1>11 campaigns · 64 drafted assets — review each one</h1>
   <p>The workflow runs in three steps: <b>approve the campaign direction</b> first, then <b>approve each asset</b>, then <b>mark approved assets scheduled</b>. Open a campaign to read the full brief — platform, strategy, message hierarchy, structure, landing page, visual direction, compliance guardrails, and metrics — then work the drafted assets under Platform Adaptations. Add a note on any section or asset; “Copy feedback summary” packages everything to send back. All of it saves automatically in your browser.</p>
 </div>
 
@@ -1843,6 +1843,7 @@ const STRANDS = [
       },
       stack:[
         {name:"Launch urgency (first 2 weeks)", code:"FEELIT15", use:"15% off the lineup during the launch window — spikes the initial push and gives Week 1–2 posts a deadline."},
+        {name:"Launch close (final week)", code:"LASTCALL", use:"“Feel It Work launch pricing ends Sunday” — a hard final-week deadline for the warmest, most-retargeted audience; pair with a bundle bonus. Education without a deadline lets people postpone indefinitely."},
         {name:"Order-value threshold", mechanism:"Automatic · no code", use:"Free shipping over $50 site-wide — nudges single-jar buyers ($29.95) to add a second jar or step up to a duo. The main AOV lever alongside the bundles."},
         {name:"Marketplace win-back", code:"COMEDIRECT", use:"15% off for past marketplace buyers, emailed to the reactivation list. If using pack inserts, keep them in SportPharm direct shipments only — never inside marketplace orders (can violate their terms)."},
         {name:"Referral", mechanism:"Give 15% / Get 15%", use:"Friend gets 15% off their first order, referrer earns a reward — grows the owned audience the pivot depends on."},
@@ -1857,13 +1858,13 @@ const STRANDS = [
       product:"WasabiRub ($29.95), IcetraRub 16% menthol cooling cream ($39.95), and WasabiRub Super Hot ($39.95) — pharmacist-formulated, TruShield Certified, and available direct at sportpharm.com. Save with the Fire & Ice, OG Heat, and Recovery duos.",
       brand:"Formulated by pharmacists. Trusted by athletes. Bought direct from the people who made it."
     },
-    structureNote:"An aggressive, offer-driven push: educate on why the rub works, help people find their sensation, then convert to a direct purchase — every asset ends at sportpharm.com.",
+    structureNote:"An aggressive, offer-driven push: educate on why the rub works, help people find their sensation, then convert to a direct purchase — every asset ends at sportpharm.com. Build the welcome, cart/browse-abandon, and post-purchase flows BEFORE launch — for a direct pivot they are core infrastructure, not post-launch add-ons.",
     structure:[
       {phase:"Week 1 · Meet the rub", what:"Lead with WasabiRub and the lineup; establish 'feel it work' and the direct-store CTA.", posts:["Post 1 — Hero reel: Feel It Work","Post 2 — Meet the lineup carousel (Wasabi / Icetra / Super Hot)"]},
       {phase:"Week 2 · Why it works", what:"Triple-action education plus the cool and max-heat options.", posts:["Post 3 — WasabiRub triple-action carousel","Post 4 — IcetraRub cooling spotlight","Post 5 — WasabiRub Super Hot spotlight"]},
       {phase:"Week 3 · Find your rub", what:"Cool-to-heat guidance and bundles to lift order value.", posts:["Post 6 — Cool → Heat: which rub is right for you?","Post 7 — Bundle & save (Fire & Ice / OG Heat / Recovery)"]},
       {phase:"Week 4 · Proof & pharmacists", what:"Team credibility and the pharmacist voice.", posts:["Post 8 — Trusted by pros & pharmacists","Post 9 — Ask Brandon: why triple-action, and how to use it"]},
-      {phase:"Week 5 · Buy direct", what:"Conversion push: direct-store CTA, email sequence, retargeting.", posts:["Post 10 — Buy direct at sportpharm.com","Post 11 — Email sequence","Post 12 — Stories: polls, quiz & shop links"]}
+      {phase:"Week 5 · Buy direct (with a deadline)", what:"Conversion push with real urgency — “Feel It Work launch pricing ends Sunday” (LASTCALL) — aimed at the warmest, most-retargeted audience so they can’t defer.", posts:["Post 10 — Campaign close: launch pricing ends Sunday","Post 11 — Email sequence","Post 12 — Stories: polls, quiz & shop links"]}
     ],
     storiesIntro:"Run Stories throughout to make it interactive and shoppable, with a Shop link sticker on every product frame. The full Stories package is drafted as an approvable asset below.",
     stories:[
@@ -1875,13 +1876,14 @@ const STRANDS = [
     adaptations:[
       {ch:"instagram", items:["'Feel it work' reels and application demos","Shoppable product carousels and the 3-jar lineup","Cool-vs-heat visual language","Story quizzes/polls with Shop stickers","UGC and athlete demos"], cadence:"3–4 feed posts + daily shoppable Stories."},
       {ch:"facebook", items:["Community and sport-parent education","Longer captions with the direct-store link","Bundle offers and reviews","Retargeting past visitors and buyers to the store"], cadence:"2–3 posts/week + always-on retargeting."},
-      {ch:"email", items:["Owned channel — the whole point of the pivot","Lineup intro, which-rub guide, bundle/offer","Cart and browse abandonment","Past-buyer reactivation"]},
+      {ch:"email", items:["Owned channel — the whole point of the pivot","Lineup intro, which-rub guide, bundle/offer","Cart + browse abandonment flows (core — build before launch)","Past-buyer reactivation"]},
       {ch:"linkedin", items:["Trainer/team angle: order direct, team bundles","Pharmacist-formulated credibility","Team Trifecta / WasabiRub Team Bundle for programs"], cadence:"1–2 posts/week."}
     ],
     landingHero:{
-      h:"Feel it work.",
-      d:"WasabiRub — triple-action sports relief you feel the moment you rub it in. Pharmacist-formulated, TruShield Certified, now direct from the people who made it.",
-      buttons:["Shop WasabiRub — $29.95","Shop the lineup"]
+      h:"Three sensations. One rub.",
+      d:"WasabiRub's triple-action — menthol cools, capsaicin quiets the ache, methyl salicylate goes deep. Pharmacist-formulated, TruShield Certified. Feel it work — direct at sportpharm.com.",
+      buttons:["Shop WasabiRub — $29.95","Shop the lineup"],
+      note:"Money-copy: lead with the differentiator (triple-action) \u2014 it's the reason to choose us over a drugstore rub. A/B this headline against the punchier \u201CThree sensations. One rub. Feel it work.\u201D and keep the dek to one line."
     },
     landing:[
       {t:"The triple-action difference", d:"Menthol cools, capsaicin desensitizes, methyl salicylate works deep — what most rubs don't combine."},
@@ -1942,7 +1944,7 @@ const STRANDS = [
     },
     metrics:[
       {goal:"Direct revenue (primary)", kpi:"sportpharm.com revenue for the three rubs; share of rub revenue direct vs. marketplace; new-customer direct orders"},
-      {goal:"Conversion", kpi:"Sessions → add-to-cart → checkout; product-page conversion by UTM; ROAS on paid social; welcome-offer opt-ins and redemption by code"},
+      {goal:"Conversion", kpi:"Sessions → add-to-cart → checkout; product-page conversion by UTM; ROAS on paid social; welcome-offer opt-ins and redemption by code; recovered-cart-flow revenue"},
       {goal:"Order value", kpi:"Bundle attach rate; average order value lift from Fire & Ice / OG Heat / Recovery duos"},
       {goal:"Owned audience", kpi:"Email/SMS captures; repeat-purchase rate; reactivated past marketplace buyers"},
       {goal:"Review cadence", kpi:"Weekly during the push, watching direct-revenue share and ROAS"}
@@ -2047,17 +2049,17 @@ const STRANDS = [
         "“Why buy direct from sportpharm.com?”"
       ],
       note:"Keep answers within OTC label indications; end on the direct-store CTA." },
-    { id:"w10", type:"staticpv", title:"Post 10 · Buy direct", week:"Week 5", chs:["Instagram","Facebook"], eye:"SportPharm",
-      big:"Straight from the\npharmacists who made it.",
+    { id:"w10", type:"staticpv", title:"Post 10 · Campaign close — launch pricing ends Sunday", week:"Week 5", chs:["Instagram","Facebook","Email"], eye:"SportPharm · Final week",
+      big:"Launch pricing\nends Sunday.",
       items:[
-        "The full lineup + bundles, in one place",
-        "WasabiRub $29.95 · IcetraRub $39.95 · Super Hot $39.95",
-        "First order ships free — join with code FREESHIP1",
-        "Pharmacist-formulated · TruShield Certified",
-        "Order direct at sportpharm.com"
+        "Feel It Work launch pricing — last chance",
+        "Use LASTCALL before Sunday midnight",
+        "WasabiRub $29.95 · duos from $59.99",
+        "First order still ships free (FREESHIP1)",
+        "Shop before it ends — sportpharm.com"
       ],
-      cta:"Shop now — sportpharm.com",
-      note:"Primary conversion asset; pair with retargeting to store visitors." },
+      cta:"Shop before Sunday — sportpharm.com",
+      note:"Aim at the warmest retargeting audiences and the email list — the hard deadline is the point. Set LASTCALL to expire Sunday midnight; pair with a final-week bundle bonus." },
     { id:"w11", type:"email", title:"Post 11 · Email sequence — 3 sends", week:"Weeks 1–5", chs:["Email"],
       emails:[
         {s:"Welcome — your first order ships free", d:"Welcome flow triggered by signup: free shipping on order #1 via FREESHIP1 (or 10% off, WELCOME10). Meet WasabiRub + the lineup, one tap to shop."},
@@ -2092,7 +2094,14 @@ const STRANDS = [
         "The full lineup, direct at sportpharm.com"
       ],
       cta:"Join & shop — sportpharm.com",
-      note:"Mirrors the on-site signup pop-up; this is the primary email/SMS capture creative. Confirm free-ship cost vs. 10% before committing." }
+      note:"Mirrors the on-site signup pop-up; this is the primary email/SMS capture creative. Confirm free-ship cost vs. 10% before committing." },
+    { id:"w14", type:"email", title:"Post 14 · Cart-abandon flow — 3 emails (core, build before launch)", week:"Pre-launch infrastructure", chs:["Email"],
+      emails:[
+        {s:"Left something in your cart?", d:"Email 1 (~1 hr): plain reminder with the item image and a one-tap return to checkout. No discount yet — most people just got distracted."},
+        {s:"“Will I actually feel it?”", d:"Email 2 (~24 hr): answer the #1 objection with a real customer review + the triple-action explainer (menthol cools, capsaicin quiets, methyl salicylate goes deep)."},
+        {s:"Here’s free shipping to finish up", d:"Email 3 (~48 hr): small incentive to recover the near-miss — free shipping (FREESHIP1) or 10% (WELCOME10)."}
+      ],
+      note:"For a direct-store pivot this is CORE, not optional — build it before launch. Add a parallel browse-abandon flow (viewed a product, didn’t add to cart) and a post-purchase repeat flow (AGAIN10). This is where direct revenue leaks, and where a 3-part flow recovers a meaningful share of near-misses." }
   ]
 }
 ];
@@ -2526,7 +2535,8 @@ function buildAdaptations(s){
 function buildLanding(s){
   const h=s.camp.landingHero;
   const hero=h?'<div class="landing-hero"><h4>'+esc(h.h)+'</h4><p>'+esc(h.d)+'</p><div class="btns">'+h.buttons.map(b=>'<span>'+esc(b)+'</span>').join("")+'</div></div>':'';
-  return hero+'<ol class="landing">'+s.camp.landing.map(l=>'<li><div><b>'+l.t+'</b>'+(l.d?'<p>'+l.d+'</p>':'')+'</div></li>').join("")+'</ol>';
+  const hnote=(h&&h.note)?'<p class="guard-note" style="margin:-6px 0 16px">'+esc(h.note)+'</p>':'';
+  return hero+hnote+'<ol class="landing">'+s.camp.landing.map(l=>'<li><div><b>'+l.t+'</b>'+(l.d?'<p>'+l.d+'</p>':'')+'</div></li>').join("")+'</ol>';
 }
 function buildVisual(s){
   const v=s.camp.visual;
