@@ -682,10 +682,11 @@
   <div class="login-card">
     <div class="lw">SportPharm</div>
     <h3>Content Studio — Campaign Review</h3>
-    <p>Sign in to review campaigns and upload finals. Enter your email and we'll send a one-time sign-in link.</p>
+    <p>Sign in with your work email and password.</p>
     <form id="login-form">
-      <input id="login-email" type="email" placeholder="you@cleark12.com" autocomplete="email" required>
-      <button type="submit">Send sign-in link</button>
+      <input id="login-email" type="email" placeholder="you@sportpharm.com" autocomplete="email" required>
+      <input id="login-pass" type="password" placeholder="Password" autocomplete="current-password" required>
+      <button type="submit">Sign in</button>
     </form>
     <p class="login-msg"></p>
   </div>
@@ -2677,10 +2678,12 @@ function wireLogin(){
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
     const email = document.getElementById('login-email').value.trim();
-    if(!email) return;
-    msg.textContent = "Sending…";
-    const { error } = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.href.split('#')[0] } });
-    msg.textContent = error ? ("Error: "+error.message) : "Check your email for a sign-in link, then reopen this page.";
+    const password = document.getElementById('login-pass').value;
+    if(!email || !password) return;
+    msg.textContent = "Signing in…";
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if(error){ msg.textContent = "Couldn't sign in: "+error.message; }
+    else { msg.textContent = "Signed in — loading…"; location.reload(); }
   });
 }
 
