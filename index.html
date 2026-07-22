@@ -564,6 +564,10 @@
   .kit-body{margin:0;padding:12px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto}
   .finals.attach{margin-top:16px;border:1px solid var(--line);border-radius:6px;padding:13px 15px;background:var(--panel-2)}
   .finals.attach .finals-head{color:var(--ink)}
+  .lp-banner{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--panel-2);border:1px solid var(--line);border-left:4px solid var(--focus);border-radius:4px;padding:11px 16px;margin:16px 0 0;font-size:13px}
+  .lp-banner b{font-family:var(--display);text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;color:var(--focus)}
+  .lp-banner a{color:var(--focus);font-weight:600;word-break:break-all}
+  .lp-banner span{color:var(--steel)}
 </style>
 
 <header class="topbar">
@@ -1860,6 +1864,7 @@ const STRANDS = [
   campaign:"SportPharm Feel It Work Campaign",
   prio:"Revenue priority",
   channels:["IG","FB","Email","LinkedIn"],
+  landingUrl:"https://wasabirub-campaign.kennady-nickell.chatgpt.site/",
   camp:{
     platformTag:"Feel It Work.",
     platform:[
@@ -2728,7 +2733,8 @@ function buildLanding(s){
   const h=s.camp.landingHero;
   const hero=h?'<div class="landing-hero"><h4>'+esc(h.h)+'</h4><p>'+esc(h.d)+'</p><div class="btns">'+h.buttons.map(b=>'<span>'+esc(b)+'</span>').join("")+'</div></div>':'';
   const hnote=(h&&h.note)?'<p class="guard-note" style="margin:-6px 0 16px">'+esc(h.note)+'</p>':'';
-  return hero+hnote+'<ol class="landing">'+s.camp.landing.map(l=>'<li><div><b>'+l.t+'</b>'+(l.d?'<p>'+l.d+'</p>':'')+'</div></li>').join("")+'</ol>';
+  const mock=s.landingUrl?'<p class="why" style="margin:0 0 14px"><b>Live mockup being explored:</b> <a href="'+s.landingUrl+'" target="_blank" rel="noopener" style="color:var(--focus);font-weight:600;word-break:break-all">'+s.landingUrl+'</a></p>':'';
+  return hero+hnote+mock+'<ol class="landing">'+s.camp.landing.map(l=>'<li><div><b>'+l.t+'</b>'+(l.d?'<p>'+l.d+'</p>':'')+'</div></li>').join("")+'</ol>';
 }
 function buildVisual(s){
   const v=s.camp.visual;
@@ -2957,6 +2963,7 @@ function renderDetail(){
     _secs.map(o=>'<button data-jump="'+o.x.key+'">'+SECNAV_SHORT[o.x.key]+'</button>').join("")+
   '</nav>'+
   '<div class="detail-body">'+
+    (s.landingUrl?'<div class="lp-banner"><b>Potential landing page</b><a href="'+s.landingUrl+'" target="_blank" rel="noopener">'+s.landingUrl+'</a><span>\u2014 opens in a new tab to preview</span></div>':'')+
     campBannerHTML(s)+
     _secs.map(o=>secShell(s, o.x.key, o.x.label, o.inner)).join("")+
     '<div class="review-box"><p class="sec-label" style="margin-top:0">Overall notes on this campaign</p>'+
