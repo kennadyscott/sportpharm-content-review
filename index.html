@@ -495,6 +495,13 @@
   .login-card button{background:var(--red-deep);color:#fff;border:0;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12px;padding:12px;border-radius:6px;cursor:pointer}
   .login-card button:hover{background:var(--red)}
   .login-card .login-msg{font-size:12.5px;color:var(--focus);margin-top:12px;min-height:16px}
+
+  .sharelink{margin-left:8px;background:none;border:1px solid var(--line);color:var(--steel);font-size:11px;font-weight:600;padding:4px 10px;border-radius:12px;cursor:pointer}
+  .sharelink:hover{border-color:var(--focus);color:var(--focus)}
+  body.solo .rail{display:none}
+  body.solo .lede{display:none}
+  body.solo .wrap{grid-template-columns:1fr}
+  body.solo #mode-badge{display:none}
 </style>
 
 <header class="topbar">
@@ -1944,6 +1951,8 @@ async function boot(){
     badge.className = "mode-badge off";
     await loadCache();
   }
+  const _solo = new URLSearchParams(location.search).get('c');
+  if(_solo && STRANDS.some(s=>s.id===_solo)){ soloMode = true; activeId = _solo; document.body.classList.add('solo'); }
   renderRail();
   renderDetail();
 }
@@ -1956,6 +1965,7 @@ function campApproved(sid){ return !!store.get(sid+":__campaign").approved; }
 
 let activeId = STRANDS[0].id;
 let pendingOnly = false;
+let soloMode = false;
 
 /* ---------- rail ---------- */
 function renderRail(){
@@ -1993,7 +2003,7 @@ function renderRailSoft(){
 function setN(id,v){ const e=document.getElementById(id); if(e)e.textContent=v; }
 function updateScores(){
   let sc=0,a=0,r=0,p=0;
-  STRANDS.forEach(s=>s.assets.forEach(x=>{
+  STRANDS.filter(s=>!soloMode||s.id===activeId).forEach(s=>s.assets.forEach(x=>{
     const st=statusOf(s.id,x.id);
     if(st==="scheduled")sc++; else if(st==="approved")a++; else if(st==="revise")r++; else p++;
   }));
@@ -2359,7 +2369,8 @@ function renderDetail(){
     '<p class="strand-eyebrow">'+s.title+'</p>'+
     '<h2>'+s.campaign+'</h2>'+
     '<div class="meta-row"><span class="chip prio">'+s.prio+'</span>'+s.channels.map(c=>'<span class="chip">'+c+'</span>').join("")+
-    '<span class="chip">'+reviewed+'/'+s.assets.length+' assets reviewed</span></div>'+
+    '<span class="chip">'+reviewed+'/'+s.assets.length+' assets reviewed</span>'+
+    '<button class="sharelink" id="sharelink">\u{1F517} Copy review link</button></div>'+
   '</div>'+
   '<nav class="secnav" aria-label="Campaign sections">'+
     SECTIONS.map(x=>'<button data-jump="'+x.key+'">'+SECNAV_SHORT[x.key]+'</button>').join("")+
@@ -2378,6 +2389,12 @@ function renderDetail(){
   if(ca) ca.addEventListener("click",()=>{ store.set(activeId+":__campaign",{approved:true}); renderDetail(); renderRail(); toast("Campaign direction approved — asset review unlocked."); });
   const cr=el.querySelector("#camp-reopen");
   if(cr) cr.addEventListener("click",()=>{ store.set(activeId+":__campaign",{approved:false}); renderDetail(); renderRail(); });
+
+  const sl=el.querySelector("#sharelink");
+  if(sl) sl.addEventListener("click",()=>{
+    const url=location.origin+location.pathname+"?c="+activeId;
+    navigator.clipboard.writeText(url).then(()=>toast("Review link copied for \u201C"+s.campaign+"\u201D."),()=>toast(url));
+  });
 
   // section jump nav
   el.querySelectorAll("[data-jump]").forEach(b=>{
@@ -2497,14 +2514,15 @@ function refreshFinals(s, aid){
 
 /* ---------- export ---------- */
 document.getElementById("export-btn").addEventListener("click",()=>{
+  const SRC = soloMode ? STRANDS.filter(s=>s.id===activeId) : STRANDS;
   let SC=0,A=0,R=0,P=0;
-  STRANDS.forEach(s=>s.assets.forEach(x=>{
+  SRC.forEach(s=>s.assets.forEach(x=>{
     const st=statusOf(s.id,x.id);
     if(st==="scheduled")SC++; else if(st==="approved")A++; else if(st==="revise")R++; else P++;
   }));
   const lines=["SPORTPHARM CAMPAIGN REVIEW — FEEDBACK SUMMARY",
     "Assets — Scheduled: "+SC+" · Approved: "+A+" · Needs changes: "+R+" · Pending: "+P, ""];
-  STRANDS.forEach((s,i)=>{
+  SRC.forEach((s,i)=>{
     lines.push((i+1)+". "+s.campaign.toUpperCase()+"  [DIRECTION: "+(campApproved(s.id)?"APPROVED":"PENDING")+"]");
     s.assets.forEach(a=>{
       const st=statusOf(s.id,a.id), n=notesOf(s.id,a.id).trim();
