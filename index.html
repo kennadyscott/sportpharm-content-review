@@ -667,6 +667,28 @@
   .cmt-save:hover{background:var(--red)}
   .cmt-save.reply-save{background:var(--panel);color:var(--focus);border:1px solid var(--line);padding:6px 12px}
   .cmt-save.reply-save:hover{border-color:var(--focus)}
+  .lp-cta{display:flex;align-items:center;gap:14px;text-decoration:none;background:var(--panel);border:1px solid var(--red);border-left:4px solid var(--red);border-radius:6px;padding:14px 18px;margin:16px 0 0;box-shadow:var(--shadow);transition:transform .1s,box-shadow .1s,background .1s;cursor:pointer}
+  .lp-cta:hover{background:var(--panel-2);transform:translateY(-1px);box-shadow:0 6px 18px rgba(214,32,42,.18)}
+  .lp-cta-ic{font-size:22px;flex:none}
+  .lp-cta-main{display:flex;flex-direction:column;min-width:0;flex:1}
+  .lp-cta-k{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.07em;font-size:11px;color:var(--red)}
+  .lp-cta-url{font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lp-cta-go{flex:none;background:var(--red-deep);color:#fff;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:11px;padding:9px 16px;border-radius:5px;white-space:nowrap}
+  .lp-cta:hover .lp-cta-go{background:var(--red)}
+  .admin-overlay{position:fixed;inset:0;z-index:210;background:rgba(11,20,34,.82);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow:auto}
+  .admin-overlay.show{display:flex}
+  .admin-panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.4);max-width:760px;width:100%}
+  .admin-head{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--line)}
+  .admin-head h3{font-family:var(--display);font-weight:800;font-size:18px;margin:0}
+  #admin-close{background:none;border:1px solid var(--line);color:var(--steel);font-size:12px;font-weight:600;padding:6px 14px;border-radius:4px;cursor:pointer}
+  #admin-close:hover{color:var(--ink);border-color:var(--steel)}
+  #admin-body{padding:20px 22px 26px}
+  .act-feed{display:flex;flex-direction:column;gap:0}
+  .act-item{font-size:12.5px;line-height:1.5;color:var(--ink);display:flex;flex-wrap:wrap;gap:7px;align-items:baseline;border-bottom:1px solid var(--line);padding:7px 0}
+  .act-who{font-weight:700}
+  .act-do{color:var(--steel)}
+  .act-tg{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--steel)}
+  .act-time{margin-left:auto;font-size:11px;color:var(--steel);white-space:nowrap}
 </style>
 
 <header class="topbar">
@@ -681,6 +703,7 @@
       <div class="score pend"><div class="n" id="score-pending">64</div><div class="l">Pending</div></div>
     </div>
     <span class="mode-badge off" id="mode-badge">Demo mode</span>
+    <button class="signout-btn" id="admin-btn" hidden>Admin</button>
     <button class="signout-btn" id="signout-btn" hidden>Sign out</button>
     <button class="export-btn" id="export-btn">Copy feedback summary</button>
   </div>
@@ -713,6 +736,13 @@
       <button type="submit">Sign in</button>
     </form>
     <p class="login-msg"></p>
+  </div>
+</div>
+
+<div class="admin-overlay" id="admin">
+  <div class="admin-panel">
+    <div class="admin-head"><h3>Team activity</h3><button id="admin-close">Close</button></div>
+    <div id="admin-body"></div>
   </div>
 </div>
 
@@ -2711,6 +2741,30 @@ function wireLogin(){
   });
 }
 
+function logActivity(action,target){
+  if(!LIVE) return;
+  var d=store.get("__activity"); var arr=d.items||[];
+  arr.unshift({name:displayName(sessionEmail),email:sessionEmail||"",action:action,target:target||"",ts:new Date().toISOString()});
+  if(arr.length>250) arr=arr.slice(0,250);
+  d.items=arr; store.set("__activity",d);
+}
+function openAdmin(){ var b=document.getElementById("admin-body"); if(b) b.innerHTML=adminHTML(); var o=document.getElementById("admin"); if(o) o.classList.add("show"); }
+function closeAdmin(){ var o=document.getElementById("admin"); if(o) o.classList.remove("show"); }
+function adminHTML(){
+  var people={};
+  function ensure(email,name){ email=email||"(unknown)"; if(!people[email]) people[email]={email:email,name:name||displayName(email),lastSeen:"",visits:0,notes:0,replies:0,actions:0}; return people[email]; }
+  Object.keys(cache).forEach(function(k){ if(k.indexOf("presence:")===0){ var p=cache[k]||{}; var e=ensure(p.email,p.name); e.lastSeen=p.lastSeen||""; e.visits=p.visits||0; } });
+  Object.keys(cache).forEach(function(k){ if(k.indexOf(":thread:")>=0){ ((cache[k].items)||[]).forEach(function(it){ ensure(it.email,it.name).notes++; (it.replies||[]).forEach(function(r){ ensure(r.email,r.name).replies++; }); }); } });
+  var act=(cache["__activity"] && cache["__activity"].items)||[];
+  act.forEach(function(e){ if(e.email && people[e.email]) people[e.email].actions++; });
+  var rows=Object.keys(people).map(function(k){return people[k];}).sort(function(a,b){return (b.lastSeen||"").localeCompare(a.lastSeen||"");});
+  var ph='<div class="mtable-wrap"><table class="mtable"><tr><th>Person</th><th>Last seen</th><th>Visits</th><th>Notes</th><th>Replies</th><th>Actions</th></tr>'+
+    (rows.length?rows.map(function(p){return '<tr><td>'+esc(p.name)+'<div style="font-size:11px;color:var(--steel)">'+esc(p.email)+'</div></td><td>'+(p.lastSeen?esc(fmtTime(p.lastSeen)):"—")+'</td><td class="kpi">'+p.visits+'</td><td class="kpi">'+p.notes+'</td><td class="kpi">'+p.replies+'</td><td class="kpi">'+p.actions+'</td></tr>';}).join(""):'<tr><td colspan="6" style="color:var(--steel)">No sign-ins recorded yet.</td></tr>')+
+    '</table></div>';
+  var feed='<p class="mini-label" style="margin-top:20px">Recent activity</p>'+
+    (act.length?'<div class="act-feed">'+act.slice(0,40).map(function(e){return '<div class="act-item"><span class="act-who">'+esc(e.name||"—")+'</span><span class="act-do">'+esc(e.action)+'</span>'+(e.target?'<span class="act-tg">'+esc(e.target)+'</span>':'')+'<span class="act-time">'+esc(fmtTime(e.ts))+'</span></div>';}).join("")+'</div>':'<p style="color:var(--steel);font-size:13px">No activity logged yet.</p>');
+  return '<p class="why" style="margin-bottom:14px">Who has signed in, and whether they have interacted. Updates as people use the site.</p>'+ph+feed;
+}
 async function boot(){
   const badge = document.getElementById('mode-badge');
   if(isConfigured() && window.supabase){
@@ -2727,6 +2781,10 @@ async function boot(){
     var so=document.getElementById("signout-btn"); if(so){ so.hidden=false; so.addEventListener("click",function(){ sb.auth.signOut().then(function(){ location.reload(); }); }); }
     await loadCache();
     subscribeRealtime();
+    try{ var pk="presence:"+sessionEmail; var pr=store.get(pk); pr.email=sessionEmail; pr.name=displayName(sessionEmail); pr.firstSeen=pr.firstSeen||new Date().toISOString(); pr.lastSeen=new Date().toISOString(); pr.visits=(pr.visits||0)+1; store.set(pk,pr); }catch(e){}
+    var ab=document.getElementById("admin-btn"); if(ab){ ab.hidden=false; ab.addEventListener("click",openAdmin); }
+    var ac=document.getElementById("admin-close"); if(ac) ac.addEventListener("click",closeAdmin);
+    var ao=document.getElementById("admin"); if(ao) ao.addEventListener("click",function(e){ if(e.target===ao) closeAdmin(); });
   } else {
     LIVE = false;
     badge.textContent = isConfigured()? "Loading…" : "Demo mode — not connected";
@@ -2964,14 +3022,14 @@ function bindOneThread(th,sid){
     var ta=th.querySelector('.cmt-new .cmt-input'); var txt=ta.value.trim(); if(!txt) return;
     var d=store.get(sid+":thread:"+tid); d.items=d.items||[];
     d.items.push({name:displayName(sessionEmail),email:sessionEmail||"",text:txt,ts:new Date().toISOString(),replies:[]});
-    store.set(sid+":thread:"+tid,d); refreshThread(sid,tid);
+    store.set(sid+":thread:"+tid,d); logActivity("note", tid); refreshThread(sid,tid);
   });
   th.querySelectorAll('.cmt-replybtn').forEach(function(b){ b.addEventListener('click',function(){ var rb=th.querySelector('.reply-box[data-ci="'+b.dataset.ci+'"]'); rb.hidden=!rb.hidden; if(!rb.hidden) rb.querySelector('textarea').focus(); }); });
   th.querySelectorAll('.reply-save').forEach(function(b){ b.addEventListener('click',function(){
     var rb=th.querySelector('.reply-box[data-ci="'+b.dataset.ci+'"]'); var ta=rb.querySelector('textarea'); var txt=ta.value.trim(); if(!txt) return;
     var d=store.get(sid+":thread:"+tid); var it=d.items[+b.dataset.ci]; it.replies=it.replies||[];
     it.replies.push({name:displayName(sessionEmail),email:sessionEmail||"",text:txt,ts:new Date().toISOString()});
-    store.set(sid+":thread:"+tid,d); refreshThread(sid,tid);
+    store.set(sid+":thread:"+tid,d); logActivity("reply", tid); refreshThread(sid,tid);
   }); });
 }
 function bindThread(root,sid){ root.querySelectorAll('.thread').forEach(function(th){ bindOneThread(th,sid); }); }
@@ -3194,7 +3252,7 @@ function buildCalendar(s){
 }
 function bindCalendar(el,s){
   el.querySelectorAll('#sec-calendar .ci-owner').forEach(function(sel){
-    sel.addEventListener('change',function(){ var a=store.get(s.id+":__assign"); a[sel.dataset.akey]=sel.value; store.set(s.id+":__assign",a); sel.classList.toggle('unset', sel.value===""); });
+    sel.addEventListener('change',function(){ var a=store.get(s.id+":__assign"); a[sel.dataset.akey]=sel.value; store.set(s.id+":__assign",a); logActivity("assigned "+(sel.value||"unassigned"), sel.dataset.akey); sel.classList.toggle('unset', sel.value===""); });
   });
 }
 function campMetaHTML(s){
@@ -3312,7 +3370,7 @@ function bindStrip(strip, card, s, aid){
       btn.addEventListener("click",()=>card.querySelector(".anotes").classList.toggle("open"));
     } else {
       btn.addEventListener("click",()=>{
-        const k=aKey(s.id,aid); const d=store.get(k); d.status=act; store.set(k,d);
+        const k=aKey(s.id,aid); const d=store.get(k); d.status=act; store.set(k,d); logActivity("asset "+act, aid);
         rerenderCard(s,aid); renderRailSoft(); updateHeadCount(s);
       });
     }
@@ -3375,7 +3433,7 @@ function renderDetail(){
   '</nav>'+
   '<div class="detail-body">'+
     campMetaHTML(s)+
-    (s.landingUrl?'<div class="lp-banner"><b>Potential landing page</b><a href="'+s.landingUrl+'" target="_blank" rel="noopener">'+s.landingUrl+'</a><span>\u2014 opens in a new tab to preview</span></div>':'')+
+    (s.landingUrl?'<a class="lp-cta" href="'+s.landingUrl+'" target="_blank" rel="noopener"><span class="lp-cta-ic">\uD83D\uDDBC\uFE0F</span><span class="lp-cta-main"><span class="lp-cta-k">Potential landing page \u2014 click to preview</span><span class="lp-cta-url">'+s.landingUrl+'</span></span><span class="lp-cta-go">Open preview \u2197</span></a>':'')+
     campBannerHTML(s)+
     _secs.map(o=>secShell(s, o.x.key, o.x.label, o.inner)).join("")+
     '<div class="review-box"><p class="sec-label" style="margin-top:0">Overall notes on this campaign</p>'+commentThreadHTML(s.id,"strand")+'</div>'+
