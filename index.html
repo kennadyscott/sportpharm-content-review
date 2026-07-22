@@ -555,6 +555,13 @@
   .cs-scene{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--display);font-weight:700;font-size:15px;line-height:1.25;text-wrap:balance;padding:14px 0}
   .cs-code{margin:0 auto 10px;background:#fff;color:#101B2D;font-weight:800;font-size:11px;padding:5px 11px;border-radius:6px;letter-spacing:.03em}
   .cs-link{margin:0 auto;background:var(--red);color:#fff;font-weight:700;font-size:11px;padding:7px 14px;border-radius:20px}
+
+  .kit{margin:10px 0 0;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel-2);max-width:660px}
+  .kit-head{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .kit-label{font-family:var(--display);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink)}
+  .kit-copy{margin-left:auto;border:1px solid var(--line);background:var(--panel);color:var(--steel);font-size:11px;font-weight:600;padding:4px 12px;border-radius:4px;cursor:pointer}
+  .kit-copy:hover{border-color:var(--focus);color:var(--focus)}
+  .kit-body{margin:0;padding:12px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto}
 </style>
 
 <header class="topbar">
@@ -1982,6 +1989,82 @@ const STRANDS = [
         {k:"Whitelisting", v:"Ask permission to run their Story/Reel as a Meta Partnership Ad (see Ad 3) — creator content usually converts harder than brand content."},
         {k:"Outreach", v:"Short DM/email + a one-page brief: the code, the link, do/don't, approved claims, and the disclosure requirement."}
       ],
+      outreachKit:{
+        dm:`Hi [Name] — really like what you're doing with [team / your athletes / your content].
+
+I'm with SportPharm, the pharmacists behind WasabiRub — the triple-action rub (menthol + capsaicin + methyl salicylate) a lot of trainers keep in the kit.
+
+We're doing a direct push and would love to work with you: we'll send product and set you up with your own discount code + a commission on every sale it drives. The ask is simple — one authentic Story using it, with a link sticker + your code.
+
+Want me to send the details and get product out to you this week?`,
+        email:{
+          subject:"WasabiRub × [Name] — free product + your own code",
+          body:`Hi [Name],
+
+I'm [Your Name] with SportPharm — the pharmacist-formulated sports rubs (WasabiRub, IcetraRub, Super Hot). We're growing our direct sales at sportpharm.com and would love to partner with you.
+
+The ask is simple:
+• 1–2 Instagram Stories using WasabiRub in a real training / recovery moment
+• A link sticker to your trackable URL + your unique code on screen
+• (Optional, higher tier) a Reel or feed post
+
+What you get:
+• Free product to try and feature
+• [X]% commission on every sale from your code
+• A 15% code for your audience — great for them, easy for you
+
+It's fully trackable, so you'll see exactly what your Story drives, and we handle the setup. One requirement: the post has to be disclosed as a paid partnership (#ad + Meta's Paid Partnership label). It's an FTC rule — non-negotiable — and we'll send approved language so it's effortless.
+
+If you're in, reply and I'll send your code, link, and a quick one-pager, and get product in the mail this week.
+
+Thanks,
+[Your Name]
+SportPharm · sportpharm.com`
+        },
+        brief:`SPORTPHARM × [CREATOR] — WASABIRUB STORY BRIEF
+
+THE ASK
+• 1–2 Instagram Stories using WasabiRub in a real training / recovery setting
+• Add a Link sticker → [your tracked link]
+• Put your code on screen → [YOURCODE] (15% off for your audience)
+• Optional higher tier: a Reel or a feed post
+
+YOUR LINKS & CODE
+• Tracked link: [paste link]
+• Discount code: [YOURCODE]
+• Where it sends: sportpharm.com
+
+WHAT TO SHOW
+• You actually using it — rub it into a shoulder / knee / forearm after a session
+• Keep it real and in your voice; a quick "here's what I use" beats a scripted ad
+• Show the jar/label; it's pharmacist-formulated and triple-action (cools, quiets the ache, works deep)
+
+OK TO SAY (within the label)
+• "Triple-action: menthol, capsaicin, methyl salicylate"
+• "Temporarily relieves minor aches and pains of muscles and joints"
+• "Pharmacist-formulated" · "TruShield Certified"
+• "I use it after training / on sore muscles"
+
+PLEASE DON'T SAY
+• "Cures / heals / fixes injuries" or anything about treating a condition or injury
+• "Anti-inflammatory drug," any medical or diagnosis claim, or guaranteed results
+• That any league or team officially endorses it
+
+DISCLOSURE (required — FTC)
+• Turn on Meta's "Paid partnership" label, AND
+• Add #ad (clearly visible) to the Story
+• Posts without disclosure can't run
+
+TIMELINE
+• Posting window: [dates]
+• Send us a screenshot / screen-record when the Story is live
+
+HOW YOU GET PAID
+• [X]% commission on sales from [YOURCODE], paid [monthly / net-30] via [method]
+• Free product ships this week
+
+Questions? [Your Name] · [email] · SportPharm`
+      },
       note:"Keep every creator within OTC label claims (temporary relief of minor muscle/joint aches) — no cure/heal, no “fixes injuries.” Provide the approved-language sheet up front so their Story stays compliant, and describe pro/team use as use, not endorsement."
     },
     landingHero:{
@@ -2719,6 +2802,9 @@ function creatorStoryHTML(){
     '<div class="cs-link">🔗 SHOP — sportpharm.com</div>'+
   '</div>';
 }
+function kitBlock(label,id,text){
+  return '<div class="kit"><div class="kit-head"><span class="kit-label">'+label+'</span><button class="kit-copy" data-kit="'+id+'">Copy</button></div><pre class="kit-body" id="kit-'+id+'">'+esc(text)+'</pre></div>';
+}
 function buildCreators(s){
   const c=s.camp.creators; if(!c) return "";
   let html="";
@@ -2729,6 +2815,13 @@ function buildCreators(s){
     '<div><p class="mini-label">Example Story</p><div class="stories-wrap" style="justify-content:flex-start">'+creatorStoryHTML()+'</div></div></div>';
   html+='<p class="mini-label">How it runs</p><div class="mtable-wrap"><table class="mtable"><tr><th>Element</th><th>How it works</th></tr>'+
     c.mechanics.map(m=>'<tr><td>'+esc(m.k)+'</td><td>'+esc(m.v)+'</td></tr>').join("")+'</table></div>';
+  if(c.outreachKit){
+    const k=c.outreachKit;
+    html+='<p class="mini-label" style="margin-top:20px">Outreach kit — ready to send</p>';
+    html+=kitBlock("Instagram DM · warm outreach","dm",k.dm);
+    html+=kitBlock("Email · larger creators","email","Subject: "+k.email.subject+"\n\n"+k.email.body);
+    html+=kitBlock("One-page creator brief","brief",k.brief);
+  }
   if(c.note) html+='<p class="guard-note">'+esc(c.note)+'</p>';
   return html;
 }
@@ -2917,6 +3010,15 @@ function renderDetail(){
 
   // asset cards
   el.querySelectorAll(".asset-card").forEach(card=>bindCard(card, s));
+
+  el.querySelectorAll('.kit-copy').forEach(b=>b.addEventListener('click',()=>{
+    const src=el.querySelector('#kit-'+b.dataset.kit); if(!src) return;
+    const done=()=>{ b.textContent='Copied'; setTimeout(()=>{ b.textContent='Copy'; },1500); };
+    navigator.clipboard.writeText(src.textContent).then(()=>{ done(); toast('Copied to clipboard.'); },()=>{
+      const ta=document.createElement('textarea'); ta.value=src.textContent; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); done(); toast('Copied.'); }catch(e){ toast('Copy failed'); } ta.remove();
+    });
+  }));
 
   // strand notes
   const sn = el.querySelector("#strand-notes");
