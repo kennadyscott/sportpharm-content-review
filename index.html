@@ -624,6 +624,26 @@
   .ro-l{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--steel);font-weight:600}
   .ro-n{font-family:var(--display);font-weight:800;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
   @media (max-width:560px){.roi-stats{grid-template-columns:repeat(2,1fr)}.roi-stat:nth-child(2){border-right:0}}
+  .camp-meta{display:grid;grid-template-columns:180px 180px 1fr;gap:14px;align-items:start;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin:16px 0 0}
+  @media (max-width:640px){.camp-meta{grid-template-columns:1fr 1fr}.camp-meta .cm-ext{grid-column:1/-1}}
+  .cm-field{display:flex;flex-direction:column;gap:5px}
+  .cm-field label{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.07em;font-size:10px;color:var(--steel)}
+  .cm-input{border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink);font-family:var(--body);font-size:13px;padding:8px 10px}
+  .cm-input:focus{border-color:var(--focus);outline:none}
+  textarea.cm-input{min-height:40px;resize:vertical;line-height:1.4}
+  details.cal-week>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px}
+  details.cal-week>summary::-webkit-details-marker{display:none}
+  .cw-chev{color:#8FA0BA;font-size:12px;transition:transform .15s;flex:none}
+  @media (prefers-reduced-motion: reduce){.cw-chev{transition:none}}
+  details.cal-week[open] .cw-chev{transform:rotate(90deg)}
+  .cw-t{display:flex;flex-direction:column;min-width:0}
+  .cw-t .wk{font-family:var(--display);font-weight:800;font-size:14px;letter-spacing:-.01em}
+  .cw-t .fo{font-size:12px;color:#B9C4D6;margin-top:2px}
+  .cal-item{align-items:center;flex-wrap:wrap}
+  .ci-text{flex:1;min-width:150px}
+  .ci-owner{flex:none;width:118px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink);font-family:var(--body);font-size:12px;padding:4px 8px}
+  .ci-owner:focus{border-color:var(--focus);outline:none}
+  .ci-owner::placeholder{color:var(--steel)}
 </style>
 
 <header class="topbar">
@@ -3060,22 +3080,39 @@ function buildCreators(s){
 const TAGLABEL={post:"Post",reel:"Reel",stories:"Stories",email:"Email",ads:"Meta Ad",creator:"Creator",offer:"Offer",blog:"Blog"};
 function buildCalendar(s){
   const c=s.camp.calendar; if(!c) return "";
+  const asg=store.get(s.id+":__assign");
   let html="";
   if(c.intro) html+='<p class="why" style="margin-bottom:14px">'+c.intro+'</p>';
   html+='<div class="cal-legend">'+Object.keys(TAGLABEL).filter(function(k){return k!=="blog";}).map(function(k){return '<span class="tg '+k+'">'+TAGLABEL[k]+'</span>';}).join("")+'</div>';
   if(c.alwaysOn) html+='<div class="always-on"><span class="ao-k">Always-on — runs under the whole campaign</span><ul>'+c.alwaysOn.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
-  html+=c.weeks.map(function(w){
-    return '<div class="cal-week"><div class="cal-wk-head"><div class="wk">'+esc(w.label)+'</div><div class="fo">'+esc(w.focus)+'</div></div>'+
-      w.days.map(function(day){
+  html+=c.weeks.map(function(w,wi){
+    return '<details class="cal-week" open><summary class="cal-wk-head"><span class="cw-chev">\u25B8</span><span class="cw-t"><span class="wk">'+esc(w.label)+'</span><span class="fo">'+esc(w.focus)+'</span></span></summary>'+
+      w.days.map(function(day,di){
         var weekend=(day.d==="Sat"||day.d==="Sun")?" weekend":"";
         return '<div class="cal-day'+weekend+'"><div class="cal-dname">'+esc(day.d)+'</div><div class="cal-items">'+
-          day.items.map(function(it){return '<div class="cal-item"><span class="tg '+it.t+'">'+(TAGLABEL[it.t]||it.t)+'</span><span>'+esc(it.x)+'</span></div>';}).join("")+
+          day.items.map(function(it,ii){
+            var key="w"+wi+"d"+di+"i"+ii; var owner=asg[key]||"";
+            return '<div class="cal-item"><span class="tg '+it.t+'">'+(TAGLABEL[it.t]||it.t)+'</span><span class="ci-text">'+esc(it.x)+'</span><input class="ci-owner" data-akey="'+key+'" value="'+esc(owner)+'" placeholder="Owner" aria-label="Assign owner"></div>';
+          }).join("")+
         '</div></div>';
       }).join("")+
-    '</div>';
+    '</details>';
   }).join("");
   if(c.note) html+='<p class="guard-note">'+esc(c.note)+'</p>';
   return html;
+}
+function bindCalendar(el,s){
+  el.querySelectorAll('#sec-calendar .ci-owner').forEach(function(inp){
+    inp.addEventListener('input',function(){ var a=store.get(s.id+":__assign"); a[inp.dataset.akey]=inp.value; store.set(s.id+":__assign",a); });
+  });
+}
+function campMetaHTML(s){
+  const m=store.get(s.id+":__meta");
+  return '<div class="camp-meta">'+
+    '<div class="cm-field"><label>Campaign start date</label><input type="date" class="cm-input" data-f="start" value="'+esc(m.start||"")+'"></div>'+
+    '<div class="cm-field"><label>Campaign end date</label><input type="date" class="cm-input" data-f="end" value="'+esc(m.end||"")+'"></div>'+
+    '<div class="cm-field cm-ext"><label>Extension strategy</label><textarea class="cm-input" data-f="ext" placeholder="If it performs, how do we extend? (e.g. hold ROAS > 3x \u2192 extend 2 weeks, swap LASTCALL for an evergreen offer)">'+esc(m.ext||"")+'</textarea></div>'+
+  '</div>';
 }
 const MROWS=[{k:"posts",label:"Organic posts (IG/FB)"},{k:"stories",label:"Stories"},{k:"email",label:"Email"},{k:"ads",label:"Meta Ads"},{k:"creators",label:"Creators"},{k:"site",label:"Site / other"}];
 const MCOLS=[{k:"spend",label:"Spend",money:true},{k:"sessions",label:"Clicks / Sessions"},{k:"orders",label:"Orders"},{k:"revenue",label:"Revenue",money:true}];
@@ -3261,6 +3298,7 @@ function renderDetail(){
     _secs.map(o=>'<button data-jump="'+o.x.key+'">'+SECNAV_SHORT[o.x.key]+'</button>').join("")+
   '</nav>'+
   '<div class="detail-body">'+
+    campMetaHTML(s)+
     (s.landingUrl?'<div class="lp-banner"><b>Potential landing page</b><a href="'+s.landingUrl+'" target="_blank" rel="noopener">'+s.landingUrl+'</a><span>\u2014 opens in a new tab to preview</span></div>':'')+
     campBannerHTML(s)+
     _secs.map(o=>secShell(s, o.x.key, o.x.label, o.inner)).join("")+
@@ -3329,6 +3367,10 @@ function renderDetail(){
   }));
 
   bindResults(el, s);
+  bindCalendar(el, s);
+  el.querySelectorAll('.cm-input').forEach(function(inp){
+    inp.addEventListener('input',function(){ var m=store.get(s.id+":__meta"); m[inp.dataset.f]=inp.value; store.set(s.id+":__meta",m); });
+  });
 
   // strand notes
   const sn = el.querySelector("#strand-notes");
