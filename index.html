@@ -601,6 +601,29 @@
   .cal-items{flex:1;display:flex;flex-direction:column;gap:7px;min-width:0}
   .cal-item{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.42}
   .cal-item .tg{margin-top:1px}
+
+  /* ===== results & ROI tracker ===== */
+  table.m-track{border-collapse:collapse;width:100%;max-width:820px;font-size:13px}
+  .m-track th{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.07em;font-size:10px;color:var(--steel);text-align:left;padding:8px 10px 8px 0;border-bottom:2px solid var(--line)}
+  .m-track td{padding:6px 10px 6px 0;border-bottom:1px solid var(--line)}
+  .m-track td.m-rowlabel{font-weight:600;white-space:nowrap}
+  .m-track tr.m-total td{font-family:var(--display);font-weight:800;color:var(--ink);border-top:2px solid var(--line);border-bottom:0;padding-top:9px;font-variant-numeric:tabular-nums}
+  .m-input{width:100%;min-width:76px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink);font-family:var(--body);font-size:13px;padding:6px 8px;font-variant-numeric:tabular-nums}
+  .m-input:focus{border-color:var(--focus);outline:none}
+  .roi-card{margin-top:18px;border:1px solid var(--line);border-radius:8px;overflow:hidden;max-width:820px;background:var(--panel);box-shadow:var(--shadow)}
+  .roi-stats{display:grid;grid-template-columns:repeat(4,1fr);background:var(--navy)}
+  .roi-stat{padding:14px 16px;text-align:center;border-right:1px solid rgba(255,255,255,.08)}
+  .roi-stat:last-child{border-right:0}
+  .rs-n{font-family:var(--display);font-weight:800;font-size:20px;color:#fff;font-variant-numeric:tabular-nums}
+  .rs-l{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#8FA0BA;margin-top:2px}
+  .roi-stat:first-child .rs-n{color:#4ED598}
+  .roi-margin{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:14px 16px}
+  .roi-margin label{font-size:12.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .roi-margin .m-margin{width:82px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink);font-family:var(--body);font-size:13px;padding:6px 8px;font-variant-numeric:tabular-nums}
+  .roi-out{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .ro-l{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--steel);font-weight:600}
+  .ro-n{font-family:var(--display);font-weight:800;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
+  @media (max-width:560px){.roi-stats{grid-template-columns:repeat(2,1fr)}.roi-stat:nth-child(2){border-right:0}}
 </style>
 
 <header class="topbar">
@@ -2540,9 +2563,10 @@ const SECTIONS = [
   {key:"landing", label:"Landing Page Structure"},
   {key:"visual", label:"Visual Direction"},
   {key:"guardrails", label:"Claim & Compliance Guardrails"},
-  {key:"metrics", label:"Metrics"}
+  {key:"metrics", label:"Metrics"},
+  {key:"results", label:"Results & ROI"}
 ];
-const SECNAV_SHORT = {platform:"Platform", strategy:"Strategy", offers:"Offers", messages:"Messages", structure:"Structure", calendar:"Calendar", stories:"Stories", adaptations:"Adaptations & Assets", paidads:"Meta Ads", creators:"Creators", landing:"Landing Page", visual:"Visual", guardrails:"Guardrails", metrics:"Metrics"};
+const SECNAV_SHORT = {platform:"Platform", strategy:"Strategy", offers:"Offers", messages:"Messages", structure:"Structure", calendar:"Calendar", stories:"Stories", adaptations:"Adaptations & Assets", paidads:"Meta Ads", creators:"Creators", landing:"Landing Page", visual:"Visual", guardrails:"Guardrails", metrics:"Metrics", results:"Results"};
 const DEFAULT_SW = [{c:"#101B2D",l:"Navy #101B2D"},{c:"#D6202A",l:"Red #D6202A"},{c:"#F4F6F9",l:"Off-white",border:true},{c:"#5A6B84",l:"Steel"}];
 
 /* ============ data layer: Supabase (live, shared) with localStorage fallback (demo) ============ */
@@ -3053,9 +3077,63 @@ function buildCalendar(s){
   if(c.note) html+='<p class="guard-note">'+esc(c.note)+'</p>';
   return html;
 }
+const MROWS=[{k:"posts",label:"Organic posts (IG/FB)"},{k:"stories",label:"Stories"},{k:"email",label:"Email"},{k:"ads",label:"Meta Ads"},{k:"creators",label:"Creators"},{k:"site",label:"Site / other"}];
+const MCOLS=[{k:"spend",label:"Spend",money:true},{k:"sessions",label:"Clicks / Sessions"},{k:"orders",label:"Orders"},{k:"revenue",label:"Revenue",money:true}];
+function mData(s){ return store.get(s.id+":__metrics"); }
+function mNum(v){ v=parseFloat(String(v==null?"":v).replace(/[^0-9.\-]/g,"")); return isNaN(v)?0:v; }
+function fmtMoney(n){ return "$"+Math.round(n).toLocaleString(); }
+function setTxt(id,v){ var e=document.getElementById(id); if(e)e.textContent=v; }
+function buildResults(s){
+  const m=mData(s);
+  var rows=MROWS.map(function(r){
+    return '<tr><td class="m-rowlabel">'+r.label+'</td>'+MCOLS.map(function(c){
+      var val=(m[r.k]&&m[r.k][c.k]!=null)?m[r.k][c.k]:"";
+      return '<td><input class="m-input" type="text" inputmode="decimal" data-row="'+r.k+'" data-col="'+c.k+'" value="'+esc(String(val))+'" placeholder="'+(c.money?"$0":"0")+'" aria-label="'+r.label+' '+c.label+'"></td>';
+    }).join("")+'</tr>';
+  }).join("");
+  var totals='<tr class="m-total"><td>Total</td>'+MCOLS.map(function(c){return '<td id="tot-'+c.k+'">—</td>';}).join("")+'</tr>';
+  var table='<div class="mtable-wrap"><table class="m-track"><tr><th>Channel / section</th>'+MCOLS.map(function(c){return '<th>'+c.label+'</th>';}).join("")+'</tr>'+rows+totals+'</table></div>';
+  var roi='<div class="roi-card">'+
+    '<div class="roi-stats">'+
+      '<div class="roi-stat"><div class="rs-n" id="roi-rev">$0</div><div class="rs-l">Revenue</div></div>'+
+      '<div class="roi-stat"><div class="rs-n" id="roi-spend">$0</div><div class="rs-l">Spend</div></div>'+
+      '<div class="roi-stat"><div class="rs-n" id="roi-orders">0</div><div class="rs-l">Orders</div></div>'+
+      '<div class="roi-stat"><div class="rs-n" id="roi-roas">—</div><div class="rs-l">Blended ROAS</div></div>'+
+    '</div>'+
+    '<div class="roi-margin"><label>Gross margin % <input class="m-margin" type="text" inputmode="decimal" value="'+esc(String(m.margin!=null?m.margin:""))+'" placeholder="e.g. 60"></label>'+
+      '<div class="roi-out"><span class="ro-l">Estimated ROI</span><span class="ro-n" id="roi-roi">—</span></div></div>'+
+  '</div>';
+  var note='<p class="guard-note">Log actuals as they come in — totals and ROI update live. ROAS = revenue ÷ spend (gross). Enter your gross margin for a truer ROI: (revenue × margin − spend) ÷ spend. Numbers save automatically (to your browser now; shared once the site is connected to Supabase).</p>';
+  return '<p class="why" style="margin-bottom:12px">Track performance per channel, then roll it up to overall return. Fill in what you have; blanks count as zero.</p>'+table+roi+note;
+}
+function recomputeResults(s){
+  const m=mData(s);
+  var totals={}; MCOLS.forEach(function(c){totals[c.k]=0;});
+  MROWS.forEach(function(r){ MCOLS.forEach(function(c){ totals[c.k]+=mNum(m[r.k]&&m[r.k][c.k]); }); });
+  MCOLS.forEach(function(c){ var el=document.getElementById("tot-"+c.k); if(el) el.textContent=c.money?fmtMoney(totals[c.k]):Math.round(totals[c.k]).toLocaleString(); });
+  var rev=totals.revenue, spend=totals.spend, orders=totals.orders;
+  setTxt("roi-rev",fmtMoney(rev)); setTxt("roi-spend",fmtMoney(spend)); setTxt("roi-orders",Math.round(orders).toLocaleString());
+  setTxt("roi-roas", spend>0?(rev/spend).toFixed(2)+"x":"—");
+  var margin=mNum(m.margin);
+  if(margin>0 && spend>0){ var roi=((rev*(margin/100))-spend)/spend*100; setTxt("roi-roi",(roi>=0?"+":"")+Math.round(roi)+"%"); }
+  else setTxt("roi-roi","—");
+}
+function bindResults(el, s){
+  const sec=el.querySelector('#sec-results'); if(!sec) return;
+  sec.querySelectorAll('.m-input').forEach(function(inp){
+    inp.addEventListener('input',function(){
+      var m=mData(s), rk=inp.dataset.row, ck=inp.dataset.col;
+      if(!m[rk]) m[rk]={}; m[rk][ck]=inp.value; store.set(s.id+":__metrics",m);
+      recomputeResults(s);
+    });
+  });
+  var mg=sec.querySelector('.m-margin');
+  if(mg) mg.addEventListener('input',function(){ var m=mData(s); m.margin=mg.value; store.set(s.id+":__metrics",m); recomputeResults(s); });
+  recomputeResults(s);
+}
 const BUILDERS = {platform:buildPlatform, strategy:buildStrategy, offers:buildOffers, messages:buildMessages, structure:buildStructure, calendar:buildCalendar,
   stories:buildStories, adaptations:buildAdaptations, paidads:buildPaidAds, creators:buildCreators, landing:buildLanding, visual:buildVisual,
-  guardrails:buildGuardrails, metrics:buildMetrics};
+  guardrails:buildGuardrails, metrics:buildMetrics, results:buildResults};
 
 /* ---------- asset cards + workflow ---------- */
 function revStrip(s,a){
@@ -3249,6 +3327,8 @@ function renderDetail(){
       try{ document.execCommand('copy'); done(); toast('Copied.'); }catch(e){ toast('Copy failed'); } ta.remove();
     });
   }));
+
+  bindResults(el, s);
 
   // strand notes
   const sn = el.querySelector("#strand-notes");
