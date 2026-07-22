@@ -502,6 +502,15 @@
   body.solo .lede{display:none}
   body.solo .wrap{grid-template-columns:1fr}
   body.solo #mode-badge{display:none}
+
+  .code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:700;font-size:12px;letter-spacing:.03em;background:var(--panel-2);border:1px dashed var(--red);color:var(--red);padding:2px 8px;border-radius:4px;white-space:nowrap;display:inline-block}
+  .code.alt{margin-left:6px;border-style:dotted;opacity:.85}
+  .mech{color:var(--steel);font-size:12.5px}
+  .offer-hero{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--red);border-radius:5px;padding:15px 18px;margin:0 0 16px;max-width:76ch;box-shadow:var(--shadow)}
+  .offer-hero .oh-k{font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;font-size:10.5px;color:var(--red);margin-bottom:7px;display:block}
+  .offer-hero .oh-offer{font-size:14.5px;line-height:1.5}
+  .offer-hero .oh-code{margin-top:10px}
+  .offer-hero .oh-why{margin:11px 0 0;font-size:13px;color:var(--steel);line-height:1.5}
 </style>
 
 <header class="topbar">
@@ -513,7 +522,7 @@
       <div class="score sched"><div class="n" id="score-scheduled">0</div><div class="l">Scheduled</div></div>
       <div class="score ok"><div class="n" id="score-approved">0</div><div class="l">Approved</div></div>
       <div class="score warn"><div class="n" id="score-revise">0</div><div class="l">Needs work</div></div>
-      <div class="score pend"><div class="n" id="score-pending">62</div><div class="l">Pending</div></div>
+      <div class="score pend"><div class="n" id="score-pending">63</div><div class="l">Pending</div></div>
     </div>
     <span class="mode-badge off" id="mode-badge">Demo mode</span>
     <button class="export-btn" id="export-btn">Copy feedback summary</button>
@@ -521,7 +530,7 @@
 </header>
 
 <div class="lede">
-  <h1>11 campaigns · 62 drafted assets — review each one</h1>
+  <h1>11 campaigns · 63 drafted assets — review each one</h1>
   <p>The workflow runs in three steps: <b>approve the campaign direction</b> first, then <b>approve each asset</b>, then <b>mark approved assets scheduled</b>. Open a campaign to read the full brief — platform, strategy, message hierarchy, structure, landing page, visual direction, compliance guardrails, and metrics — then work the drafted assets under Platform Adaptations. Add a note on any section or asset; “Copy feedback summary” packages everything to send back. All of it saves automatically in your browser.</p>
 </div>
 
@@ -1823,6 +1832,25 @@ const STRANDS = [
         {who:"Coaches & sport parents", cares:"A trusted topical for sore athletes", msg:"Formulated by pharmacists, trusted by pros."}
       ]
     },
+    offers:{
+      intro:"Email/SMS capture is the whole point of the pivot, so the campaign leads with a concrete first-order reason to opt in and buy today. One incentive powers the capture; a small stack handles launch urgency, order value, marketplace win-back, referrals, teams, and repeat purchase. Codes below are suggestions to create in the store — confirm against margins and set one code per order.",
+      primary:{
+        name:"First-order welcome offer",
+        offer:"Free shipping on your first direct order — or 10% off, whichever converts better. Delivered by an email/SMS signup pop-up on sportpharm.com and auto-applied at checkout.",
+        code:"FREESHIP1",
+        alt:"WELCOME10",
+        why:"Shipping cost is the #1 checkout drop-off on low-AOV single-jar orders ($29.95), so free shipping on order #1 is usually the stronger hook — run it against WELCOME10 (10% off) and keep the winner. This is the single biggest lever: it's the reason someone hands over an email and buys on the spot."
+      },
+      stack:[
+        {name:"Launch urgency (first 2 weeks)", code:"FEELIT15", use:"15% off the lineup during the launch window — spikes the initial push and gives Week 1–2 posts a deadline."},
+        {name:"Order-value threshold", mechanism:"Automatic · no code", use:"Free shipping over $50 site-wide — nudges single-jar buyers ($29.95) to add a second jar or step up to a duo. The main AOV lever alongside the bundles."},
+        {name:"Marketplace win-back", code:"COMEDIRECT", use:"15% off for past marketplace buyers, emailed to the reactivation list. If using pack inserts, keep them in SportPharm direct shipments only — never inside marketplace orders (can violate their terms)."},
+        {name:"Referral", mechanism:"Give 15% / Get 15%", use:"Friend gets 15% off their first order, referrer earns a reward — grows the owned audience the pivot depends on."},
+        {name:"Team / trainer", code:"TEAM15", use:"15% off Team Trifecta & WasabiRub Team Bundle — routes B2B and trainer demand to direct."},
+        {name:"Repeat purchase", code:"AGAIN10", use:"10% off a second order within 60 days, on the thank-you page + pack insert — lifts repeat-purchase rate."}
+      ],
+      note:"Set up in the store platform (e.g. Shopify): one code per order (no stacking with bundles), sensible expirations, and exclude already-discounted bundles from FEELIT15 if margins are tight. Track redemption by code as a conversion KPI. WasabiRub at $29.95 leaves room for a ~10% ($3) or free-ship incentive — confirm the exact shipping cost before committing to free-ship-first."
+    },
     messages:{
       emotional:"The rub you actually feel working — from the second you rub it in.",
       educational:"WasabiRub is triple-action: menthol cools on contact, capsaicin desensitizes over hours, and methyl salicylate carries into deep tissue — three mechanisms for temporary relief of minor muscle and joint aches, in one gel.",
@@ -1914,7 +1942,7 @@ const STRANDS = [
     },
     metrics:[
       {goal:"Direct revenue (primary)", kpi:"sportpharm.com revenue for the three rubs; share of rub revenue direct vs. marketplace; new-customer direct orders"},
-      {goal:"Conversion", kpi:"Sessions → add-to-cart → checkout; product-page conversion by UTM; ROAS on paid social"},
+      {goal:"Conversion", kpi:"Sessions → add-to-cart → checkout; product-page conversion by UTM; ROAS on paid social; welcome-offer opt-ins and redemption by code"},
       {goal:"Order value", kpi:"Bundle attach rate; average order value lift from Fire & Ice / OG Heat / Recovery duos"},
       {goal:"Owned audience", kpi:"Email/SMS captures; repeat-purchase rate; reactivated past marketplace buyers"},
       {goal:"Review cadence", kpi:"Weekly during the push, watching direct-revenue share and ROAS"}
@@ -2024,6 +2052,7 @@ const STRANDS = [
       items:[
         "The full lineup + bundles, in one place",
         "WasabiRub $29.95 · IcetraRub $39.95 · Super Hot $39.95",
+        "First order ships free — join with code FREESHIP1",
         "Pharmacist-formulated · TruShield Certified",
         "Order direct at sportpharm.com"
       ],
@@ -2031,9 +2060,9 @@ const STRANDS = [
       note:"Primary conversion asset; pair with retargeting to store visitors." },
     { id:"w11", type:"email", title:"Post 11 · Email sequence — 3 sends", week:"Weeks 1–5", chs:["Email"],
       emails:[
-        {s:"Meet the rub athletes actually feel working", d:"Lineup intro: WasabiRub triple-action + Icetra and Super Hot. Shop-direct CTA."},
-        {s:"Cool, everyday, or max heat? Find your rub", d:"Which-rub guide with the cool-to-heat selector and bundle nudge."},
-        {s:"Buy the pair, save on both", d:"Bundle offer (Fire & Ice / OG Heat / Recovery) + free-shipping threshold if offered."}
+        {s:"Welcome — your first order ships free", d:"Welcome flow triggered by signup: free shipping on order #1 via FREESHIP1 (or 10% off, WELCOME10). Meet WasabiRub + the lineup, one tap to shop."},
+        {s:"Cool, everyday, or max heat? Find your rub", d:"Which-rub guide with the cool-to-heat selector; nudge toward a duo, and free shipping over $50."},
+        {s:"Buy the pair, save on both", d:"Bundle offer (Fire & Ice / OG Heat / Recovery) + FEELIT15 during launch. Plus cart/browse-abandon and past-buyer reactivation (COMEDIRECT)."}
       ],
       note:"Email is the owned channel this pivot is built around; add cart/browse-abandon and past-buyer reactivation flows." },
     { id:"w12", type:"stories", title:"Post 12 · Stories — polls, quiz & shop links", week:"All weeks", chs:["Instagram"],
@@ -2049,10 +2078,21 @@ const STRANDS = [
         "How much do I apply?",
         "Is it TruShield Certified?",
         "Which rub for my sore spot?",
+        "Is there a first-order discount?",
         "Do you have bundles?",
         "How fast does direct shipping arrive?"
       ],
-      note:"Put a Shop sticker on every product frame linking to sportpharm.com." }
+      note:"Put a Shop sticker on every product frame linking to sportpharm.com." },
+    { id:"w13", type:"staticpv", title:"Post 13 · Welcome offer — first order ships free", week:"Weeks 1–5 · always-on", chs:["Instagram","Facebook","Email"], eye:"SportPharm · Welcome offer",
+      big:"Your first order\nships free.",
+      items:[
+        "Join our list — free shipping on order #1 (code FREESHIP1)",
+        "Or 10% off your first order (WELCOME10) — we\u2019re testing which you prefer",
+        "Be first to hear about drops and bundle deals",
+        "The full lineup, direct at sportpharm.com"
+      ],
+      cta:"Join & shop — sportpharm.com",
+      note:"Mirrors the on-site signup pop-up; this is the primary email/SMS capture creative. Confirm free-ship cost vs. 10% before committing." }
   ]
 }
 ];
@@ -2086,6 +2126,7 @@ const STATUS_LABEL = {pending:"Pending", approved:"Approved", revise:"Needs chan
 const SECTIONS = [
   {key:"platform", label:"Campaign Platform"},
   {key:"strategy", label:"The Campaign Strategy"},
+  {key:"offers", label:"Offers & Incentives"},
   {key:"messages", label:"Campaign Message Hierarchy"},
   {key:"structure", label:"Campaign Structure"},
   {key:"stories", label:"Supporting Stories"},
@@ -2095,7 +2136,7 @@ const SECTIONS = [
   {key:"guardrails", label:"Claim & Compliance Guardrails"},
   {key:"metrics", label:"Metrics"}
 ];
-const SECNAV_SHORT = {platform:"Platform", strategy:"Strategy", messages:"Messages", structure:"Structure", stories:"Stories", adaptations:"Adaptations & Assets", landing:"Landing Page", visual:"Visual", guardrails:"Guardrails", metrics:"Metrics"};
+const SECNAV_SHORT = {platform:"Platform", strategy:"Strategy", offers:"Offers", messages:"Messages", structure:"Structure", stories:"Stories", adaptations:"Adaptations & Assets", landing:"Landing Page", visual:"Visual", guardrails:"Guardrails", metrics:"Metrics"};
 const DEFAULT_SW = [{c:"#101B2D",l:"Navy #101B2D"},{c:"#D6202A",l:"Red #D6202A"},{c:"#F4F6F9",l:"Off-white",border:true},{c:"#5A6B84",l:"Steel"}];
 
 /* ============ data layer: Supabase (live, shared) with localStorage fallback (demo) ============ */
@@ -2510,7 +2551,22 @@ function buildMetrics(s){
   return '<div class="mtable-wrap"><table class="mtable"><tr><th>Goal</th><th>What we measure</th></tr>'+
     s.camp.metrics.map(m=>'<tr><td>'+m.goal+'</td><td class="kpi">'+m.kpi+'</td></tr>').join("")+'</table></div>';
 }
-const BUILDERS = {platform:buildPlatform, strategy:buildStrategy, messages:buildMessages, structure:buildStructure,
+function buildOffers(s){
+  const o=s.camp.offers; if(!o) return "";
+  let html="";
+  if(o.intro) html+='<p class="why" style="margin-bottom:14px">'+o.intro+'</p>';
+  const p=o.primary;
+  if(p) html+='<div class="offer-hero"><span class="oh-k">Primary lever · '+esc(p.name)+'</span>'+
+    '<div class="oh-offer">'+p.offer+'</div>'+
+    '<div class="oh-code"><span class="code">'+esc(p.code)+'</span>'+(p.alt?'<span class="code alt">'+esc(p.alt)+'</span>':'')+'</div>'+
+    (p.why?'<p class="oh-why">'+p.why+'</p>':'')+'</div>';
+  html+='<p class="mini-label">Offer stack</p><div class="mtable-wrap"><table class="mtable"><tr><th>Offer</th><th>Suggested code</th><th>What it does · where it runs</th></tr>'+
+    o.stack.map(x=>'<tr><td>'+x.name+'</td><td>'+(x.code?'<span class="code">'+esc(x.code)+'</span>':'<span class="mech">'+esc(x.mechanism||'—')+'</span>')+'</td><td>'+x.use+'</td></tr>').join("")+
+    '</table></div>';
+  if(o.note) html+='<p class="guard-note">'+o.note+'</p>';
+  return html;
+}
+const BUILDERS = {platform:buildPlatform, strategy:buildStrategy, offers:buildOffers, messages:buildMessages, structure:buildStructure,
   stories:buildStories, adaptations:buildAdaptations, landing:buildLanding, visual:buildVisual,
   guardrails:buildGuardrails, metrics:buildMetrics};
 
@@ -2627,6 +2683,7 @@ function renderDetail(){
   const s = STRANDS.find(x=>x.id===activeId);
   const el = document.getElementById("detail");
   const reviewed = s.assets.filter(a=>statusOf(s.id,a.id)!=="pending").length;
+  const _secs = SECTIONS.map(x=>({x, inner:BUILDERS[x.key](s)})).filter(o=>o.inner && (""+o.inner).trim().length);
   el.innerHTML =
   '<div class="detail-head">'+
     '<p class="strand-eyebrow">'+s.title+'</p>'+
@@ -2636,11 +2693,11 @@ function renderDetail(){
     '<button class="sharelink" id="sharelink">\u{1F517} Copy review link</button></div>'+
   '</div>'+
   '<nav class="secnav" aria-label="Campaign sections">'+
-    SECTIONS.map(x=>'<button data-jump="'+x.key+'">'+SECNAV_SHORT[x.key]+'</button>').join("")+
+    _secs.map(o=>'<button data-jump="'+o.x.key+'">'+SECNAV_SHORT[o.x.key]+'</button>').join("")+
   '</nav>'+
   '<div class="detail-body">'+
     campBannerHTML(s)+
-    SECTIONS.map(x=>secShell(s, x.key, x.label, BUILDERS[x.key](s))).join("")+
+    _secs.map(o=>secShell(s, o.x.key, o.x.label, o.inner)).join("")+
     '<div class="review-box"><p class="sec-label" style="margin-top:0">Overall notes on this campaign</p>'+
       '<textarea id="strand-notes" placeholder="Direction, tone, priority — anything that applies to the whole campaign…">'+esc(strandNotes(s.id))+'</textarea>'+
       '<div class="save-row"><span class="save-note" id="strand-save"></span></div>'+
