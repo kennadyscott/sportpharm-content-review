@@ -511,6 +511,50 @@
   .offer-hero .oh-offer{font-size:14.5px;line-height:1.5}
   .offer-hero .oh-code{margin-top:10px}
   .offer-hero .oh-why{margin:11px 0 0;font-size:13px;color:var(--steel);line-height:1.5}
+
+  /* ===== Meta ads ===== */
+  .ad-block{margin-bottom:28px;max-width:840px}
+  .ad-title{font-family:var(--display);font-weight:700;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .ad-num{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#fff;background:var(--red);padding:3px 9px;border-radius:2px}
+  .ad-angle{font-family:var(--body);font-weight:400;font-size:12px;color:var(--steel)}
+  .adwrap{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap}
+  .metaad{width:320px;flex:none;background:#fff;border:1px solid #dadde1;border-radius:8px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;box-shadow:0 1px 3px rgba(16,27,45,.12)}
+  .ma-head{display:flex;align-items:center;gap:8px;padding:10px 12px}
+  .ma-av{width:36px;height:36px;flex:none;background:#101B2D;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--brandserif);font-style:italic;font-weight:700;color:#F0333E;font-size:13px}
+  .ma-id{flex:1}
+  .ma-name{font-weight:600;font-size:13px;color:#050505}
+  .ma-spon{font-size:11px;color:#65676b}
+  .ma-dots{color:#65676b;font-weight:700}
+  .ma-primary{padding:0 12px 10px;font-size:13px;line-height:1.42;color:#050505;white-space:pre-line}
+  .ma-creative{background:#101B2D;color:#fff;padding:26px 18px;position:relative;min-height:148px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+  .ma-creative::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border:12px solid rgba(214,32,42,.3);border-radius:50%}
+  .mac-eye{font-size:9px;text-transform:uppercase;letter-spacing:.18em;font-weight:700;color:#F0333E;margin-bottom:8px}
+  .mac-hook{font-family:var(--display);font-weight:800;font-size:20px;line-height:1.15;letter-spacing:-.01em;text-wrap:balance;max-width:16ch}
+  .mac-brand{position:absolute;bottom:12px;left:18px;height:11px}
+  .ma-linkbar{display:flex;align-items:center;gap:10px;background:#f0f2f5;padding:10px 12px}
+  .ma-lb-txt{flex:1;min-width:0}
+  .ma-domain{font-size:11px;color:#65676b;text-transform:uppercase}
+  .ma-hl{font-weight:700;font-size:13px;color:#050505;line-height:1.25}
+  .ma-desc{font-size:12px;color:#65676b}
+  .ma-cta{flex:none;background:#e4e6eb;color:#050505;font-weight:700;font-size:12px;padding:8px 12px;border-radius:6px}
+  .ma-actions{display:flex;justify-content:space-around;padding:7px 8px;color:#65676b;font-size:12px;font-weight:600;border-top:1px solid #eceef1}
+  .ad-spec{flex:1;min-width:250px}
+  table.spec-t{border-collapse:collapse;width:100%;font-size:12.5px}
+  .spec-t td{padding:6px 12px 6px 0;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.4}
+  .spec-t td:first-child{font-family:var(--display);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--steel);white-space:nowrap;width:92px}
+  .ad-note{font-size:12px;color:var(--steel);font-style:italic;margin:10px 0 0;line-height:1.5}
+
+  /* ===== creator cross-promo ===== */
+  .cr-grid{display:grid;grid-template-columns:1fr auto;gap:26px;align-items:start;max-width:820px;margin-bottom:16px}
+  @media (max-width:640px){.cr-grid{grid-template-columns:1fr}}
+  .creator-phone{width:188px;padding:18px 13px;display:flex;flex-direction:column}
+  .cs-top{display:flex;align-items:center;gap:6px}
+  .cs-av{width:22px;height:22px;flex:none;border-radius:50%;background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}
+  .cs-handle{font-size:11px;font-weight:600}
+  .cs-paid{font-size:8px;background:rgba(0,0,0,.4);padding:2px 6px;border-radius:8px;margin-left:auto}
+  .cs-scene{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--display);font-weight:700;font-size:15px;line-height:1.25;text-wrap:balance;padding:14px 0}
+  .cs-code{margin:0 auto 10px;background:#fff;color:#101B2D;font-weight:800;font-size:11px;padding:5px 11px;border-radius:6px;letter-spacing:.03em}
+  .cs-link{margin:0 auto;background:var(--red);color:#fff;font-weight:700;font-size:11px;padding:7px 14px;border-radius:20px}
 </style>
 
 <header class="topbar">
@@ -1848,6 +1892,7 @@ const STRANDS = [
         {name:"Marketplace win-back", code:"COMEDIRECT", use:"15% off for past marketplace buyers, emailed to the reactivation list. If using pack inserts, keep them in SportPharm direct shipments only — never inside marketplace orders (can violate their terms)."},
         {name:"Referral", mechanism:"Give 15% / Get 15%", use:"Friend gets 15% off their first order, referrer earns a reward — grows the owned audience the pivot depends on."},
         {name:"Team / trainer", code:"TEAM15", use:"15% off Team Trifecta & WasabiRub Team Bundle — routes B2B and trainer demand to direct."},
+        {name:"Creator / affiliate codes", mechanism:"Unique per creator", use:"e.g. COACHJEN15 — 15% off for their audience; attributes sales to each partner and powers the cross-promotion program."},
         {name:"Repeat purchase", code:"AGAIN10", use:"10% off a second order within 60 days, on the thank-you page + pack insert — lifts repeat-purchase rate."}
       ],
       note:"Set up in the store platform (e.g. Shopify): one code per order (no stacking with bundles), sensible expirations, and exclude already-discounted bundles from FEELIT15 if margins are tight. Track redemption by code as a conversion KPI. WasabiRub at $29.95 leaves room for a ~10% ($3) or free-ship incentive — confirm the exact shipping cost before committing to free-ship-first."
@@ -1879,6 +1924,66 @@ const STRANDS = [
       {ch:"email", items:["Owned channel — remarket traffic into direct purchases and drive repeat orders","Lineup intro, which-rub guide, bundle/offer","Cart + browse abandonment flows (core — build before launch)","Past-buyer reactivation"]},
       {ch:"linkedin", items:["Trainer/team angle: order direct, team bundles","Pharmacist-formulated credibility","Team Trifecta / WasabiRub Team Bundle for programs"], cadence:"1–2 posts/week."}
     ],
+    paidAds:{
+      intro:"True paid ads for Meta — built to run as ads (including dark / unpublished posts) that reach beyond our own followers, separate from the organic calendar. All three send to sportpharm.com and are optimized for purchases; repurpose organic creative where noted.",
+      ads:[
+        { name:"Feel It Work", angle:"Cold prospecting · problem → solution",
+          objective:"Sales / Purchase (Advantage+ shopping or manual conversions)",
+          audience:"Broad: US adults 25–55; interests fitness, running, gym, CrossFit, sports recovery; + 1% lookalike of purchasers and site visitors. Let Advantage+ expand.",
+          placement:"Advantage+ placements — IG + FB Feed, Reels, Stories",
+          format:"9:16 / 1:1 short video (repurpose the Feel It Work reel), captions burned in",
+          offer:"FREESHIP1 — first order ships free",
+          creativeEye:"WasabiRub", creativeHook:"Three sensations. One rub.",
+          primaryText:"Most rubs do one thing. WasabiRub does three — menthol cools, capsaicin quiets the ache, methyl salicylate works deep. Pharmacist-formulated, trusted on pro sidelines. Feel it work.\n\nFirst order ships free — direct at sportpharm.com.",
+          headline:"Three sensations. One rub.",
+          description:"Free shipping on your first order.",
+          cta:"Shop Now",
+          note:"Hook in the first 2 seconds; show the gel going on; keep price + Shop CTA on screen. Claims stay within temporary relief of minor muscle/joint aches." },
+        { name:"Why It Feels Different", angle:"Interest / engaged · differentiator",
+          objective:"Sales / Purchase",
+          audience:"Engaged & interest: video viewers 25%+, IG/FB engagers (365d), interests in muscle rubs / topical pain relief, runners, lifters, pickleball; exclude purchasers.",
+          placement:"IG + FB Feed and Reels",
+          format:"Carousel (repurpose the triple-action carousel) or single image",
+          offer:"FREESHIP1 first order · free shipping over $50",
+          creativeEye:"Why it works", creativeHook:"Cool. Quiet the ache. Go deep.",
+          primaryText:"Swipe to see why WasabiRub feels different. Cool on contact. Quiets the ache for hours. Works into deep tissue — one pharmacist-formulated gel. Feel it work at sportpharm.com.",
+          headline:"Why WasabiRub feels different",
+          description:"Triple-action · pharmacist-formulated",
+          cta:"Shop Now",
+          note:"Card 1 must earn the swipe; end card is the Shop CTA. No competitor names — position on our own testing depth." },
+        { name:"Trusted on Pro Sidelines", angle:"Retargeting · proof + deadline",
+          objective:"Sales / Purchase — retargeting",
+          audience:"Warm retargeting: site visitors 30d, product & add-to-cart viewers (exclude purchasers), email + IG engagers. Final week: layer the deadline.",
+          placement:"IG + FB Feed and Stories",
+          format:"UGC / review-style video or testimonial static; final-week variant adds the Sunday-deadline overlay",
+          offer:"LASTCALL (final-week deadline) + FREESHIP1",
+          creativeEye:"Trusted since 1995", creativeHook:"Made by pharmacists. Used on pro sidelines.",
+          primaryText:"Trainers across pro and collegiate sports keep it in the kit — see why, and get yours direct. Feel it work.\n\nLaunch pricing ends Sunday — use LASTCALL at sportpharm.com.",
+          headline:"Trusted on pro sidelines",
+          description:"Launch pricing ends Sunday.",
+          cta:"Shop Now",
+          note:"Describes use, not endorsement — no league logos or marks. Rotate a real customer review as the proof; only run the deadline variant in the final week." }
+      ],
+      note:"Meta compliance: no personal-attribute copy (“do you suffer from…”), no before/after or medical claims, and stay within OTC pain-relief language. Install the Meta pixel + Conversions API and set the catalog/UTMs so purchases attribute to each ad. Exclude recent purchasers from prospecting; use the Paid Partnership label for any creator whitelisting."
+    },
+    creators:{
+      intro:"A high-leverage, low-cost channel: SportPharm already has relationships with trainers and athletes who used the rubs and have an audience. The ask is simple — a Story with a link and a code — and it drives trackable direct sales, not just impressions.",
+      deliverable:"1–2 Instagram Stories using WasabiRub in a real training setting, with a link sticker to their trackable URL and their unique code on screen. Higher-tier partners add a Reel or feed post.",
+      who:[
+        "Past pro & collegiate athletic trainers who have used SportPharm",
+        "Sponsored / affiliated athletes and teams",
+        "PTs, chiros, and strength coaches with engaged followings",
+        "Micro-creators (10k–100k) in the sport-recovery niche — often the best ROI"
+      ],
+      mechanics:[
+        {k:"Comp", v:"Gifted product + affiliate commission on their code; a flat fee for larger creators. Their code gives followers 15% off (ties to the offer stack)."},
+        {k:"Tracking", v:"Unique code per creator (e.g. COACHJEN15) + a UTM link sticker — measure by sales, not impressions."},
+        {k:"Disclosure", v:"Required: Meta Paid Partnership label + #ad / FTC disclosure. Non-negotiable."},
+        {k:"Whitelisting", v:"Ask permission to run their Story/Reel as a Meta Partnership Ad (see Ad 3) — creator content usually converts harder than brand content."},
+        {k:"Outreach", v:"Short DM/email + a one-page brief: the code, the link, do/don't, approved claims, and the disclosure requirement."}
+      ],
+      note:"Keep every creator within OTC label claims (temporary relief of minor muscle/joint aches) — no cure/heal, no “fixes injuries.” Provide the approved-language sheet up front so their Story stays compliant, and describe pro/team use as use, not endorsement."
+    },
     landingHero:{
       h:"Three sensations. One rub.",
       d:"WasabiRub's triple-action — menthol cools, capsaicin quiets the ache, methyl salicylate goes deep. Pharmacist-formulated, TruShield Certified. Feel it work — direct at sportpharm.com.",
@@ -2140,12 +2245,14 @@ const SECTIONS = [
   {key:"structure", label:"Campaign Structure"},
   {key:"stories", label:"Supporting Stories"},
   {key:"adaptations", label:"Platform Adaptations"},
+  {key:"paidads", label:"Paid Ads · Meta"},
+  {key:"creators", label:"Creator Cross-Promotion"},
   {key:"landing", label:"Landing Page Structure"},
   {key:"visual", label:"Visual Direction"},
   {key:"guardrails", label:"Claim & Compliance Guardrails"},
   {key:"metrics", label:"Metrics"}
 ];
-const SECNAV_SHORT = {platform:"Platform", strategy:"Strategy", offers:"Offers", messages:"Messages", structure:"Structure", stories:"Stories", adaptations:"Adaptations & Assets", landing:"Landing Page", visual:"Visual", guardrails:"Guardrails", metrics:"Metrics"};
+const SECNAV_SHORT = {platform:"Platform", strategy:"Strategy", offers:"Offers", messages:"Messages", structure:"Structure", stories:"Stories", adaptations:"Adaptations & Assets", paidads:"Meta Ads", creators:"Creators", landing:"Landing Page", visual:"Visual", guardrails:"Guardrails", metrics:"Metrics"};
 const DEFAULT_SW = [{c:"#101B2D",l:"Navy #101B2D"},{c:"#D6202A",l:"Red #D6202A"},{c:"#F4F6F9",l:"Off-white",border:true},{c:"#5A6B84",l:"Steel"}];
 
 /* ============ data layer: Supabase (live, shared) with localStorage fallback (demo) ============ */
@@ -2576,8 +2683,57 @@ function buildOffers(s){
   if(o.note) html+='<p class="guard-note">'+o.note+'</p>';
   return html;
 }
+function metaAdHTML(ad){
+  return '<div class="metaad">'+
+    '<div class="ma-head"><div class="ma-av">SP</div><div class="ma-id"><div class="ma-name">SportPharm</div><div class="ma-spon">Sponsored · 🌐</div></div><span class="ma-dots">···</span></div>'+
+    '<div class="ma-primary">'+esc(ad.primaryText)+'</div>'+
+    '<div class="ma-creative"><div class="mac-eye">'+esc(ad.creativeEye||"WasabiRub")+'</div><div class="mac-hook">'+esc(ad.creativeHook||ad.headline)+'</div>'+
+      '<img class="mac-brand" src="'+LOGO_WHITE+'" alt="SportPharm"></div>'+
+    '<div class="ma-linkbar"><div class="ma-lb-txt"><div class="ma-domain">SPORTPHARM.COM</div><div class="ma-hl">'+esc(ad.headline)+'</div>'+(ad.description?'<div class="ma-desc">'+esc(ad.description)+'</div>':'')+'</div><span class="ma-cta">'+esc(ad.cta)+'</span></div>'+
+    '<div class="ma-actions"><span>👍 Like</span><span>💬 Comment</span><span>↪ Share</span></div>'+
+  '</div>';
+}
+function buildPaidAds(s){
+  const P=s.camp.paidAds; if(!P) return "";
+  let html="";
+  if(P.intro) html+='<p class="why" style="margin-bottom:18px">'+P.intro+'</p>';
+  html+=P.ads.map((ad,i)=>
+    '<div class="ad-block"><div class="ad-title"><span class="ad-num">Ad '+(i+1)+'</span>'+esc(ad.name)+'<span class="ad-angle">'+esc(ad.angle)+'</span></div>'+
+    '<div class="adwrap">'+metaAdHTML(ad)+
+      '<div class="ad-spec"><table class="spec-t">'+
+        '<tr><td>Objective</td><td>'+esc(ad.objective)+'</td></tr>'+
+        '<tr><td>Audience</td><td>'+esc(ad.audience)+'</td></tr>'+
+        '<tr><td>Placements</td><td>'+esc(ad.placement)+'</td></tr>'+
+        '<tr><td>Format</td><td>'+esc(ad.format)+'</td></tr>'+
+        '<tr><td>Offer</td><td>'+esc(ad.offer)+'</td></tr>'+
+      '</table>'+(ad.note?'<p class="ad-note">'+esc(ad.note)+'</p>':'')+'</div>'+
+    '</div></div>').join("");
+  if(P.note) html+='<p class="guard-note">'+P.note+'</p>';
+  return html;
+}
+function creatorStoryHTML(){
+  return '<div class="sphone creator-phone"><div class="sbar"></div>'+
+    '<div class="cs-top"><span class="cs-av"></span><span class="cs-handle">@coachjen</span><span class="cs-paid">Paid partnership</span></div>'+
+    '<div class="cs-scene">Rubbing in WasabiRub post-session 💪</div>'+
+    '<div class="cs-code">CODE · COACHJEN15</div>'+
+    '<div class="cs-link">🔗 SHOP — sportpharm.com</div>'+
+  '</div>';
+}
+function buildCreators(s){
+  const c=s.camp.creators; if(!c) return "";
+  let html="";
+  if(c.intro) html+='<p class="why" style="margin-bottom:14px">'+c.intro+'</p>';
+  if(c.deliverable) html+='<div class="offer-hero"><span class="oh-k">The ask</span><div class="oh-offer">'+esc(c.deliverable)+'</div></div>';
+  html+='<div class="cr-grid"><div><p class="mini-label">Who to approach</p><ul class="plain">'+
+    c.who.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul></div>'+
+    '<div><p class="mini-label">Example Story</p><div class="stories-wrap" style="justify-content:flex-start">'+creatorStoryHTML()+'</div></div></div>';
+  html+='<p class="mini-label">How it runs</p><div class="mtable-wrap"><table class="mtable"><tr><th>Element</th><th>How it works</th></tr>'+
+    c.mechanics.map(m=>'<tr><td>'+esc(m.k)+'</td><td>'+esc(m.v)+'</td></tr>').join("")+'</table></div>';
+  if(c.note) html+='<p class="guard-note">'+esc(c.note)+'</p>';
+  return html;
+}
 const BUILDERS = {platform:buildPlatform, strategy:buildStrategy, offers:buildOffers, messages:buildMessages, structure:buildStructure,
-  stories:buildStories, adaptations:buildAdaptations, landing:buildLanding, visual:buildVisual,
+  stories:buildStories, adaptations:buildAdaptations, paidads:buildPaidAds, creators:buildCreators, landing:buildLanding, visual:buildVisual,
   guardrails:buildGuardrails, metrics:buildMetrics};
 
 /* ---------- asset cards + workflow ---------- */
