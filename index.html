@@ -2652,6 +2652,7 @@ const SB_CFG = {
   key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsZXVkdmxtdm51dm9pcGdjbWZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NzY1NzksImV4cCI6MjEwMDI1MjU3OX0.lmaqiq3pN1uwybycU1MbnELfQ8kn4z0smFm1LeBsREY"
 };
 let sb = null, LIVE = false, cache = {}, sessionEmail = null;
+const ADMINS = ["kennady@cleark12.com"];  // only these emails see the Admin dashboard
 
 function isConfigured(){ return /^https:\/\/.+\.supabase\.co/.test(SB_CFG.url) && typeof SB_CFG.key==="string" && SB_CFG.key.length>20; }
 
@@ -2748,7 +2749,7 @@ function logActivity(action,target){
   if(arr.length>250) arr=arr.slice(0,250);
   d.items=arr; store.set("__activity",d);
 }
-function openAdmin(){ var b=document.getElementById("admin-body"); if(b) b.innerHTML=adminHTML(); var o=document.getElementById("admin"); if(o) o.classList.add("show"); }
+function openAdmin(){ if(ADMINS.indexOf(sessionEmail)<0) return; var b=document.getElementById("admin-body"); if(b) b.innerHTML=adminHTML(); var o=document.getElementById("admin"); if(o) o.classList.add("show"); }
 function closeAdmin(){ var o=document.getElementById("admin"); if(o) o.classList.remove("show"); }
 function adminHTML(){
   var people={};
@@ -2782,7 +2783,8 @@ async function boot(){
     await loadCache();
     subscribeRealtime();
     try{ var pk="presence:"+sessionEmail; var pr=store.get(pk); pr.email=sessionEmail; pr.name=displayName(sessionEmail); pr.firstSeen=pr.firstSeen||new Date().toISOString(); pr.lastSeen=new Date().toISOString(); pr.visits=(pr.visits||0)+1; store.set(pk,pr); }catch(e){}
-    var ab=document.getElementById("admin-btn"); if(ab){ ab.hidden=false; ab.addEventListener("click",openAdmin); }
+    var isAdmin=ADMINS.indexOf(sessionEmail)>=0;
+    var ab=document.getElementById("admin-btn"); if(ab && isAdmin){ ab.hidden=false; ab.addEventListener("click",openAdmin); }
     var ac=document.getElementById("admin-close"); if(ac) ac.addEventListener("click",closeAdmin);
     var ao=document.getElementById("admin"); if(ao) ao.addEventListener("click",function(e){ if(e.target===ao) closeAdmin(); });
   } else {
