@@ -646,6 +646,8 @@
   .ci-owner::placeholder{color:var(--steel)}
   .signout-btn{background:none;border:1px solid #33445F;color:#B9C4D6;font-size:11px;font-weight:600;padding:6px 12px;border-radius:12px;cursor:pointer;white-space:nowrap}
   .signout-btn:hover{color:#fff;border-color:#5A6B84}
+  select.ci-owner{cursor:pointer;appearance:auto;-webkit-appearance:auto}
+  .ci-owner.unset{color:var(--steel)}
 </style>
 
 <header class="topbar">
@@ -3085,6 +3087,7 @@ function buildCreators(s){
   return html;
 }
 const TAGLABEL={post:"Post",reel:"Reel",stories:"Stories",email:"Email",ads:"Meta Ad",creator:"Creator",offer:"Offer",blog:"Blog"};
+const OWNERS=["Brandon","Jessie","Kennady"];
 function buildCalendar(s){
   const c=s.camp.calendar; if(!c) return "";
   const asg=store.get(s.id+":__assign");
@@ -3099,7 +3102,9 @@ function buildCalendar(s){
         return '<div class="cal-day'+weekend+'"><div class="cal-dname">'+esc(day.d)+'</div><div class="cal-items">'+
           day.items.map(function(it,ii){
             var key="w"+wi+"d"+di+"i"+ii; var owner=asg[key]||"";
-            return '<div class="cal-item"><span class="tg '+it.t+'">'+(TAGLABEL[it.t]||it.t)+'</span><span class="ci-text">'+esc(it.x)+'</span><input class="ci-owner" data-akey="'+key+'" value="'+esc(owner)+'" placeholder="Owner" aria-label="Assign owner"></div>';
+            var extra=(owner && OWNERS.indexOf(owner)<0)?'<option value="'+esc(owner)+'" selected>'+esc(owner)+'</option>':'';
+            var opts='<option value="">Owner</option>'+extra+OWNERS.map(function(o){return '<option value="'+o+'"'+(owner===o?' selected':'')+'>'+o+'</option>';}).join("");
+            return '<div class="cal-item"><span class="tg '+it.t+'">'+(TAGLABEL[it.t]||it.t)+'</span><span class="ci-text">'+esc(it.x)+'</span><select class="ci-owner'+(owner===""?" unset":"")+'" data-akey="'+key+'" aria-label="Assign owner">'+opts+'</select></div>';
           }).join("")+
         '</div></div>';
       }).join("")+
@@ -3109,8 +3114,8 @@ function buildCalendar(s){
   return html;
 }
 function bindCalendar(el,s){
-  el.querySelectorAll('#sec-calendar .ci-owner').forEach(function(inp){
-    inp.addEventListener('input',function(){ var a=store.get(s.id+":__assign"); a[inp.dataset.akey]=inp.value; store.set(s.id+":__assign",a); });
+  el.querySelectorAll('#sec-calendar .ci-owner').forEach(function(sel){
+    sel.addEventListener('change',function(){ var a=store.get(s.id+":__assign"); a[sel.dataset.akey]=sel.value; store.set(s.id+":__assign",a); sel.classList.toggle('unset', sel.value===""); });
   });
 }
 function campMetaHTML(s){
