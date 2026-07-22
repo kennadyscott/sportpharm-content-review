@@ -648,6 +648,25 @@
   .signout-btn:hover{color:#fff;border-color:#5A6B84}
   select.ci-owner{cursor:pointer;appearance:auto;-webkit-appearance:auto}
   .ci-owner.unset{color:var(--steel)}
+  .thread-list{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+  .thread-list:empty{margin-bottom:0}
+  .cmt{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:9px 12px}
+  .cmt.reply{margin-left:18px;margin-top:8px;background:var(--panel-2);border-left:3px solid var(--focus)}
+  .cmt-head{display:flex;align-items:baseline;gap:8px;margin-bottom:3px}
+  .cmt-who{font-family:var(--display);font-weight:700;font-size:12px;color:var(--ink)}
+  .cmt-time{font-size:10.5px;color:var(--steel)}
+  .cmt-body{font-size:13px;line-height:1.5;color:var(--ink)}
+  .cmt-replybtn{background:none;border:0;color:var(--focus);font-size:11px;font-weight:600;cursor:pointer;padding:6px 0 0;margin-top:2px}
+  .cmt-replybtn:hover{text-decoration:underline}
+  .reply-box{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+  .cmt-new{display:flex;flex-direction:column;gap:7px}
+  .thread textarea{width:100%;resize:vertical;min-height:54px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink);font-family:var(--body);font-size:13px;line-height:1.5;padding:8px 10px}
+  .reply-box textarea{min-height:46px}
+  .thread textarea::placeholder{color:var(--steel)}
+  .cmt-save{align-self:flex-start;background:var(--red-deep);color:#fff;border:0;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:11px;padding:8px 16px;border-radius:4px;cursor:pointer}
+  .cmt-save:hover{background:var(--red)}
+  .cmt-save.reply-save{background:var(--panel);color:var(--focus);border:1px solid var(--line);padding:6px 12px}
+  .cmt-save.reply-save:hover{border-color:var(--focus)}
 </style>
 
 <header class="topbar">
@@ -2912,15 +2931,75 @@ const MOCKS = {
 };
 
 /* ---------- section builders (handle both brief shapes) ---------- */
+function displayName(email){
+  if(!email) return "You";
+  var map={"brandonw@sportpharm.com":"Brandon","jessiet@sportpharm.com":"Jessie","kennady@cleark12.com":"Kennady"};
+  if(map[email]) return map[email];
+  var p=email.split("@")[0]; return p.charAt(0).toUpperCase()+p.slice(1);
+}
+function fmtTime(ts){
+  try{ var dt=new Date(ts); return dt.toLocaleDateString(undefined,{month:"short",day:"numeric"})+" "+dt.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}); }catch(e){ return ""; }
+}
+function threadCount(sid,tid){ return ((store.get(sid+":thread:"+tid).items)||[]).length; }
+function commentThreadHTML(sid,tid){
+  var items=(store.get(sid+":thread:"+tid).items)||[];
+  var html='<div class="thread" data-tid="'+esc(tid)+'"><div class="thread-list">';
+  items.forEach(function(it,ci){
+    html+='<div class="cmt"><div class="cmt-head"><span class="cmt-who">'+esc(it.name||"—")+'</span><span class="cmt-time">'+esc(fmtTime(it.ts))+'</span></div>'+
+      '<div class="cmt-body">'+esc(it.text).replace(/\n/g,"<br>")+'</div>';
+    (it.replies||[]).forEach(function(rp){
+      html+='<div class="cmt reply"><div class="cmt-head"><span class="cmt-who">'+esc(rp.name||"—")+'</span><span class="cmt-time">'+esc(fmtTime(rp.ts))+'</span></div><div class="cmt-body">'+esc(rp.text).replace(/\n/g,"<br>")+'</div></div>';
+    });
+    html+='<button class="cmt-replybtn" data-ci="'+ci+'">Reply</button>'+
+      '<div class="reply-box" data-ci="'+ci+'" hidden><textarea placeholder="Reply…"></textarea><button class="cmt-save reply-save" data-ci="'+ci+'">Post reply</button></div>'+
+    '</div>';
+  });
+  html+='</div><div class="cmt-new"><textarea class="cmt-input" placeholder="Add a note…"></textarea><button class="cmt-save cmt-post">Save note</button></div></div>';
+  return html;
+}
+function bindOneThread(th,sid){
+  var tid=th.dataset.tid;
+  var post=th.querySelector('.cmt-post');
+  if(post) post.addEventListener('click',function(){
+    var ta=th.querySelector('.cmt-new .cmt-input'); var txt=ta.value.trim(); if(!txt) return;
+    var d=store.get(sid+":thread:"+tid); d.items=d.items||[];
+    d.items.push({name:displayName(sessionEmail),email:sessionEmail||"",text:txt,ts:new Date().toISOString(),replies:[]});
+    store.set(sid+":thread:"+tid,d); refreshThread(sid,tid);
+  });
+  th.querySelectorAll('.cmt-replybtn').forEach(function(b){ b.addEventListener('click',function(){ var rb=th.querySelector('.reply-box[data-ci="'+b.dataset.ci+'"]'); rb.hidden=!rb.hidden; if(!rb.hidden) rb.querySelector('textarea').focus(); }); });
+  th.querySelectorAll('.reply-save').forEach(function(b){ b.addEventListener('click',function(){
+    var rb=th.querySelector('.reply-box[data-ci="'+b.dataset.ci+'"]'); var ta=rb.querySelector('textarea'); var txt=ta.value.trim(); if(!txt) return;
+    var d=store.get(sid+":thread:"+tid); var it=d.items[+b.dataset.ci]; it.replies=it.replies||[];
+    it.replies.push({name:displayName(sessionEmail),email:sessionEmail||"",text:txt,ts:new Date().toISOString()});
+    store.set(sid+":thread:"+tid,d); refreshThread(sid,tid);
+  }); });
+}
+function bindThread(root,sid){ root.querySelectorAll('.thread').forEach(function(th){ bindOneThread(th,sid); }); }
+function refreshThread(sid,tid){
+  var th=document.querySelector('.thread[data-tid="'+tid+'"]'); if(!th) return;
+  var wrap=document.createElement('div'); wrap.innerHTML=commentThreadHTML(sid,tid); var nn=wrap.firstChild;
+  th.replaceWith(nn); bindOneThread(nn,sid);
+  var cnt=threadCount(sid,tid), btn=null;
+  if(tid.indexOf("sec:")===0){ btn=document.querySelector('.sec-note-btn[data-sec="'+tid.slice(4)+'"]'); }
+  else if(tid.indexOf("asset:")===0){ var card=document.querySelector('.asset-card[data-aid="'+tid.slice(6)+'"]'); if(card) btn=card.querySelector('.notes-btn'); }
+  if(btn){ btn.classList.toggle("has", cnt>0); btn.textContent = cnt ? ("\uD83D\uDCAC "+cnt) : (tid.indexOf("asset:")===0 ? "+ Add note" : "+ Note"); }
+}
+function threadText(sid,tid){
+  var items=(store.get(sid+":thread:"+tid).items)||[];
+  if(!items.length) return "";
+  return items.map(function(it){
+    var s=it.name+": "+it.text;
+    (it.replies||[]).forEach(function(r){ s+="\n        ↳ "+r.name+": "+r.text; });
+    return s;
+  }).join("\n      ");
+}
 function secShell(s, key, label, inner){
-  const n = secNotes(s.id, key);
+  const tid="sec:"+key; const cnt=threadCount(s.id,tid);
   return '<div class="csec" id="sec-'+key+'">'+
     '<div class="csec-head"><p class="sec-label">'+label+'</p>'+
-    '<button class="sec-note-btn'+(n.trim()?" has":"")+'" data-sec="'+key+'">'+(n.trim()?"✎ Notes added":"+ Note")+'</button></div>'+
+    '<button class="sec-note-btn'+(cnt?" has":"")+'" data-sec="'+key+'">'+(cnt?("\uD83D\uDCAC "+cnt):"+ Note")+'</button></div>'+
     inner+
-    '<div class="sec-note'+(n.trim()?" open":"")+'" data-secnote="'+key+'">'+
-      '<textarea placeholder="Feedback on this section…">'+esc(n)+'</textarea>'+
-    '</div>'+
+    '<div class="sec-note'+(cnt?" open":"")+'" data-secnote="'+key+'">'+commentThreadHTML(s.id,tid)+'</div>'+
   '</div>';
 }
 function buildPlatform(s){
@@ -3187,8 +3266,8 @@ const BUILDERS = {platform:buildPlatform, strategy:buildStrategy, offers:buildOf
 /* ---------- asset cards + workflow ---------- */
 function revStrip(s,a){
   const st=statusOf(s.id,a.id);
-  const n=notesOf(s.id,a.id);
-  const noteBtn='<button class="notes-btn'+(n.trim()?" has":"")+'" data-act="notes">'+(n.trim()?"✎ Notes added":"+ Add note")+'</button>';
+  const cnt=threadCount(s.id,"asset:"+a.id);
+  const noteBtn='<button class="notes-btn'+(cnt?" has":"")+'" data-act="notes">'+(cnt?("\uD83D\uDCAC "+cnt):"+ Add note")+'</button>';
   if(!campApproved(s.id)){
     return '<div class="locked-bar">🔒 Approve the campaign direction (top of page) to review and schedule assets.'+noteBtn+'</div>';
   }
@@ -3210,7 +3289,6 @@ function revStrip(s,a){
 }
 function assetCardHTML(s,a){
   const st=statusOf(s.id,a.id);
-  const n=notesOf(s.id,a.id);
   const fmt=FORMAT[a.type]||{label:a.type,cls:"ch-article"};
   const hidden = pendingOnly && st!=="pending";
   return '<div class="asset-card st-'+st+'" data-aid="'+a.id+'"'+(hidden?' hidden':'')+'>'+
@@ -3223,10 +3301,7 @@ function assetCardHTML(s,a){
     (a.note?'<div class="asset-sub" style="padding-bottom:4px"><b style="color:var(--ink)">Production note:</b> '+esc(a.note)+'</div>':'')+
     finalsHTML(s,a)+
     revStrip(s,a)+
-    '<div class="anotes'+(n.trim()?" open":"")+'">'+
-      '<textarea placeholder="What should change on this asset?">'+esc(n)+'</textarea>'+
-      '<div class="save-row" style="display:flex;margin-top:6px"><span class="save-note" style="margin-left:auto"></span></div>'+
-    '</div>'+
+    '<div class="anotes'+(threadCount(s.id,"asset:"+a.id)?" open":"")+'">'+commentThreadHTML(s.id,"asset:"+a.id)+'</div>'+
   '</div>';
 }
 function bindStrip(strip, card, s, aid){
@@ -3247,17 +3322,6 @@ function bindCard(card, s){
   const aid=card.dataset.aid;
   bindStrip(card.querySelector(".rev-strip, .locked-bar"), card, s, aid);
   bindFinals(card.querySelector('.finals'), s, aid);
-  const ta=card.querySelector(".anotes textarea");
-  let t;
-  ta.addEventListener("input",()=>{
-    clearTimeout(t);
-    t=setTimeout(()=>{
-      const k=aKey(s.id,aid); const d=store.get(k); d.notes=ta.value; store.set(k,d);
-      const sn=card.querySelector(".save-note"); if(sn){ sn.textContent="Saved"; setTimeout(()=>{ sn.textContent=""; },1500); }
-      const nb=card.querySelector(".notes-btn");
-      if(nb){ nb.classList.toggle("has", ta.value.trim().length>0); nb.textContent = ta.value.trim() ? "✎ Notes added" : "+ Add note"; }
-    },400);
-  });
 }
 function rerenderCard(s,aid){
   const card=document.querySelector('.asset-card[data-aid="'+aid+'"]');
@@ -3314,10 +3378,7 @@ function renderDetail(){
     (s.landingUrl?'<div class="lp-banner"><b>Potential landing page</b><a href="'+s.landingUrl+'" target="_blank" rel="noopener">'+s.landingUrl+'</a><span>\u2014 opens in a new tab to preview</span></div>':'')+
     campBannerHTML(s)+
     _secs.map(o=>secShell(s, o.x.key, o.x.label, o.inner)).join("")+
-    '<div class="review-box"><p class="sec-label" style="margin-top:0">Overall notes on this campaign</p>'+
-      '<textarea id="strand-notes" placeholder="Direction, tone, priority — anything that applies to the whole campaign…">'+esc(strandNotes(s.id))+'</textarea>'+
-      '<div class="save-row"><span class="save-note" id="strand-save"></span></div>'+
-    '</div>'+
+    '<div class="review-box"><p class="sec-label" style="margin-top:0">Overall notes on this campaign</p>'+commentThreadHTML(s.id,"strand")+'</div>'+
   '</div>';
 
   // campaign approval
@@ -3346,21 +3407,6 @@ function renderDetail(){
       el.querySelector('[data-secnote="'+btn.dataset.sec+'"]').classList.toggle("open");
     });
   });
-  el.querySelectorAll("[data-secnote]").forEach(box=>{
-    const key=box.dataset.secnote;
-    const ta=box.querySelector("textarea");
-    let t;
-    ta.addEventListener("input",()=>{
-      clearTimeout(t);
-      t=setTimeout(()=>{
-        const k=s.id+":sec:"+key; const d=store.get(k); d.notes=ta.value; store.set(k,d);
-        const btn=el.querySelector('.sec-note-btn[data-sec="'+key+'"]');
-        btn.classList.toggle("has", ta.value.trim().length>0);
-        btn.textContent = ta.value.trim() ? "✎ Notes added" : "+ Note";
-      },400);
-    });
-  });
-
   // pending toggle
   const pt = el.querySelector("#pending-toggle");
   if(pt) pt.addEventListener("change",e=>{ pendingOnly = e.target.checked; renderDetail(); });
@@ -3384,17 +3430,8 @@ function renderDetail(){
     inp.addEventListener('input',function(){ var m=store.get(s.id+":__meta"); m[inp.dataset.f]=inp.value; store.set(s.id+":__meta",m); });
   });
 
-  // strand notes
-  const sn = el.querySelector("#strand-notes");
-  let t2;
-  sn.addEventListener("input",()=>{
-    clearTimeout(t2);
-    t2=setTimeout(()=>{
-      const k=s.id+":__strand"; const d=store.get(k); d.notes=sn.value; store.set(k,d);
-      el.querySelector("#strand-save").textContent="Saved";
-      setTimeout(()=>{ const x=el.querySelector("#strand-save"); if(x)x.textContent=""; },1500);
-    },400);
-  });
+  // comment threads (section notes, asset notes, overall notes)
+  bindThread(el, s.id);
 }
 
 /* ----- finals (uploaded assets) UI ----- */
@@ -3507,17 +3544,17 @@ document.getElementById("export-btn").addEventListener("click",()=>{
   SRC.forEach((s,i)=>{
     lines.push((i+1)+". "+s.campaign.toUpperCase()+"  [DIRECTION: "+(campApproved(s.id)?"APPROVED":"PENDING")+"]");
     s.assets.forEach(a=>{
-      const st=statusOf(s.id,a.id), n=notesOf(s.id,a.id).trim();
+      const st=statusOf(s.id,a.id), n=threadText(s.id,"asset:"+a.id);
       const fmt=(FORMAT[a.type]||{label:a.type}).label;
       lines.push("   ["+fmt+"] "+a.title+(a.week?" ("+a.week+")":"")+" — "+STATUS_LABEL[st].toUpperCase());
-      if(n) lines.push("      Notes: "+n.replace(/\n/g,"\n      "));
+      if(n) lines.push("      Notes: "+n);
     });
     SECTIONS.forEach(x=>{
-      const n=secNotes(s.id,x.key).trim();
-      if(n) lines.push("   Section note — "+x.label+": "+n.replace(/\n/g,"\n      "));
+      const n=threadText(s.id,"sec:"+x.key);
+      if(n) lines.push("   Section note — "+x.label+": "+n);
     });
-    const sn=strandNotes(s.id).trim();
-    if(sn) lines.push("   Overall notes: "+sn.replace(/\n/g,"\n   "));
+    const sn=threadText(s.id,"strand");
+    if(sn) lines.push("   Overall notes: "+sn);
     lines.push("");
   });
   const text=lines.join("\n");
