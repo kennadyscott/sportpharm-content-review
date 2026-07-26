@@ -726,6 +726,7 @@
   .ef-cancel{background:none;border:1px solid var(--line);color:var(--steel);font-size:12px;font-weight:600;padding:9px 16px;border-radius:4px;cursor:pointer}
   .sec-edit .lp-row{grid-template-columns:1fr 1.5fr auto}
   .sec-edit input.ef-url{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
+  .ao-assets{border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin:0 0 18px;background:var(--panel);max-width:860px}
 </style>
 
 <header class="topbar">
@@ -2679,7 +2680,7 @@ const SECTIONS = [
   {key:"metrics", label:"Metrics"},
   {key:"results", label:"Results & ROI"}
 ];
-const SECNAV_SHORT = {platform:"Platform", strategy:"Strategy", offers:"Offers", messages:"Messages", structure:"Structure", calendar:"Calendar", stories:"Stories", adaptations:"Adaptations & Assets", paidads:"Meta Ads", creators:"Creators", landing:"Landing Page", visual:"Visual", guardrails:"Guardrails", metrics:"Metrics", results:"Results"};
+const SECNAV_SHORT = {platform:"Platform", strategy:"Strategy", offers:"Offers", messages:"Messages", structure:"Structure", calendar:"Calendar", stories:"Stories", adaptations:"Adaptations", paidads:"Meta Ads", creators:"Creators", landing:"Landing Page", visual:"Visual", guardrails:"Guardrails", metrics:"Metrics", results:"Results"};
 const DEFAULT_SW = [{c:"#101B2D",l:"Navy #101B2D"},{c:"#D6202A",l:"Red #D6202A"},{c:"#F4F6F9",l:"Off-white",border:true},{c:"#5A6B84",l:"Steel"}];
 
 /* ============ data layer: Supabase (live, shared) with localStorage fallback (demo) ============ */
@@ -3220,20 +3221,7 @@ function buildAdaptations(s){
   } else {
     notes=A.map(a=>'<div class="adapt-row"><span class="ch-badge '+CH_META[a.ch].cls+'">'+CH_META[a.ch].label+'</span><p>'+a.note+'</p></div>').join("");
   }
-  const locked = !campApproved(s.id);
-  const calIds = calendarAssetIds(s);
-  const feedAssets = s.assets.filter(function(a){ return !calIds[a.id]; });
-  const inCal = Object.keys(calIds).length;
-  const calNote = inCal ? '<p class="why" style="font-size:12.5px;color:var(--steel);margin:0 0 10px">The dated posts are attached to their day in the Weekly Calendar above — expand a task there to review its asset. Below are the always-on and supporting assets.</p>' : '';
-  const feed = calNote +
-    '<div class="feed-head"><p class="mini-label" style="margin:0">'+(inCal?'Supporting & always-on assets · ':'Drafted assets · ')+feedAssets.length+
-      (locked?' <span style="color:var(--steel);text-transform:none;letter-spacing:0;font-weight:400">— approve the campaign direction to review</span>':'')+'</p>'+
-      '<label class="toggle"><input type="checkbox" id="pending-toggle"'+(pendingOnly?' checked':'')+'> Show pending only</label></div>'+
-    '<div class="feed" id="feed">'+
-      feedAssets.map(a=>assetCardHTML(s,a)).join("")+
-      (pendingOnly && feedAssets.every(a=>statusOf(s.id,a.id)!=="pending") ? '<div class="empty-feed">All assets here are reviewed. Toggle off “pending only” to see them.</div>' : '')+
-    '</div>';
-  return notes + feed;
+  return notes;
 }
 function buildLanding(s){
   const c=campOf(s);
@@ -3361,6 +3349,15 @@ function buildCalendar(s){
   if(c.intro) html+='<p class="why" style="margin-bottom:14px">'+c.intro+'</p>';
   html+='<div class="cal-legend">'+Object.keys(TAGLABEL).filter(function(k){return k!=="blog";}).map(function(k){return '<span class="tg '+k+'">'+TAGLABEL[k]+'</span>';}).join("")+'</div>';
   if(c.alwaysOn) html+='<div class="always-on"><span class="ao-k">Always-on — runs under the whole campaign</span><ul>'+c.alwaysOn.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+  var _cal=calendarAssetIds(s); var _others=s.assets.filter(function(a){return !_cal[a.id];});
+  if(_others.length){
+    html+='<div class="ao-assets"><p class="mini-label" style="margin:0 0 6px">Always-on &amp; supporting assets</p>'+
+      _others.map(function(a){
+        var tag=({email:"email",stories:"stories",reel2:"reel",interview:"reel",carousel:"post",staticpv:"offer",lidoc:"post"})[a.type]||"post";
+        return '<div class="cal-item clickable"><span class="ci-chev">▸</span><span class="tg '+tag+'">'+((FORMAT[a.type]||{}).label||"Asset")+'</span><span class="ci-text">'+esc(a.title)+'</span></div>'+
+          '<div class="cal-detail" hidden data-asset="'+a.id+'"></div>';
+      }).join("")+'</div>';
+  }
   html+=c.weeks.map(function(w,wi){
     return '<details class="cal-week" open><summary class="cal-wk-head"><span class="cw-chev">\u25B8</span><span class="cw-t"><span class="wk">'+esc(w.label)+'</span><span class="fo">'+esc(w.focus)+'</span></span></summary>'+
       w.days.map(function(day,di){
