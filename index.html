@@ -724,6 +724,8 @@
   .ef-actions{display:flex;gap:8px;margin-top:12px}
   .ef-save{background:var(--ok);color:#fff;border:0;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:11px;padding:9px 18px;border-radius:4px;cursor:pointer}
   .ef-cancel{background:none;border:1px solid var(--line);color:var(--steel);font-size:12px;font-weight:600;padding:9px 16px;border-radius:4px;cursor:pointer}
+  .sec-edit .lp-row{grid-template-columns:1fr 1.5fr auto}
+  .sec-edit input.ef-url{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
 </style>
 
 <header class="topbar">
@@ -3089,7 +3091,7 @@ function threadText(sid,tid){
     return s;
   }).join("\n      ");
 }
-const EDITABLE={strategy:1};
+const EDITABLE={strategy:1,landing:1};
 function campOf(s){ var e=store.get(s.id+":__edits"); return (e && e.camp) ? Object.assign({}, s.camp, e.camp) : s.camp; }
 function editStrategyForm(s){
   var st=campOf(s).strategy;
@@ -3121,6 +3123,39 @@ function bindStrategyEdit(body,s){
     var e=store.get(s.id+":__edits"); e.camp=e.camp||{}; e.camp.strategy={primary:primary,supporting:supporting,audiences:audiences}; store.set(s.id+":__edits",e);
     logActivity("edited Strategy","");
     body.innerHTML=buildStrategy(s); toast("Strategy saved.");
+  });
+}
+function landingUrlOf(s){ var e=store.get(s.id+":__edits"); return (e && typeof e.landingUrl==="string") ? e.landingUrl : (s.landingUrl||""); }
+function editLandingForm(s){
+  var c=campOf(s); var h=c.landingHero||{h:"",d:"",buttons:[]};
+  var secs=(c.landing||[]).map(function(l){return '<div class="er-aud lp-row"><input class="ef-lt" value="'+esc(l.t||"")+'" placeholder="Section title"><input class="ef-ld" value="'+esc(l.d||"")+'" placeholder="What it covers"><button class="er-adel" type="button" aria-label="Remove">×</button></div>';}).join("");
+  return '<div class="sec-edit">'+
+    '<label class="ef-label">Landing page URL</label><input class="ef-url" type="url" placeholder="https://… (leave blank to remove)" value="'+esc(landingUrlOf(s))+'">'+
+    '<label class="ef-label">Hero headline</label><input class="ef-lh" value="'+esc(h.h||"")+'">'+
+    '<label class="ef-label">Hero sub-copy</label><textarea class="ef-ldk">'+esc(h.d||"")+'</textarea>'+
+    '<label class="ef-label">Buttons (comma separated)</label><input class="ef-lb" value="'+esc((h.buttons||[]).join(", "))+'">'+
+    '<label class="ef-label">Page sections</label><div class="ef-lsecs">'+secs+'</div><button class="ef-add-lsec" type="button">+ Add section</button>'+
+    '<div class="ef-actions"><button class="ef-save" type="button">Save section</button><button class="ef-cancel" type="button">Cancel</button></div>'+
+  '</div>';
+}
+function bindLandingEdit(body,s){
+  function delRow(e){ var r=e.target.closest('.lp-row'); if(r) r.remove(); }
+  body.querySelectorAll('.lp-row .er-adel').forEach(function(b){ b.addEventListener('click',delRow); });
+  body.querySelector('.ef-add-lsec').addEventListener('click',function(){
+    var d=document.createElement('div'); d.className='er-aud lp-row';
+    d.innerHTML='<input class="ef-lt" placeholder="Section title"><input class="ef-ld" placeholder="What it covers"><button class="er-adel" type="button" aria-label="Remove">×</button>';
+    body.querySelector('.ef-lsecs').appendChild(d); d.querySelector('.er-adel').addEventListener('click',delRow); d.querySelector('input').focus();
+  });
+  body.querySelector('.ef-cancel').addEventListener('click',function(){ body.innerHTML=buildLanding(s); });
+  body.querySelector('.ef-save').addEventListener('click',function(){
+    var prevNote=(campOf(s).landingHero||{}).note;
+    var e=store.get(s.id+":__edits"); e.camp=e.camp||{};
+    e.landingUrl=body.querySelector('.ef-url').value.trim();
+    e.camp.landingHero={h:body.querySelector('.ef-lh').value.trim(), d:body.querySelector('.ef-ldk').value.trim(),
+      buttons:body.querySelector('.ef-lb').value.split(",").map(function(x){return x.trim();}).filter(Boolean), note:prevNote};
+    e.camp.landing=[].map.call(body.querySelectorAll('.lp-row'),function(r){return {t:r.querySelector('.ef-lt').value.trim(), d:r.querySelector('.ef-ld').value.trim()};}).filter(function(l){return l.t;});
+    store.set(s.id+":__edits",e); logActivity("edited Landing Page","");
+    renderDetail(); toast("Landing page saved.");
   });
 }
 function secShell(s, key, label, inner){
@@ -3201,11 +3236,13 @@ function buildAdaptations(s){
   return notes + feed;
 }
 function buildLanding(s){
-  const h=s.camp.landingHero;
-  const hero=h?'<div class="landing-hero"><h4>'+esc(h.h)+'</h4><p>'+esc(h.d)+'</p><div class="btns">'+h.buttons.map(b=>'<span>'+esc(b)+'</span>').join("")+'</div></div>':'';
+  const c=campOf(s);
+  const h=c.landingHero;
+  const url=landingUrlOf(s);
+  const hero=h?'<div class="landing-hero"><h4>'+esc(h.h)+'</h4><p>'+esc(h.d)+'</p><div class="btns">'+(h.buttons||[]).map(b=>'<span>'+esc(b)+'</span>').join("")+'</div></div>':'';
   const hnote=(h&&h.note)?'<p class="guard-note" style="margin:-6px 0 16px">'+esc(h.note)+'</p>':'';
-  const preview=s.landingUrl?'<div class="lp-preview"><div class="lp-pv-head"><span class="lp-pv-label">Live landing page</span><span class="lp-pv-url">'+esc(s.landingUrl)+'</span><a class="lp-pv-open" href="'+s.landingUrl+'" target="_blank" rel="noopener">Open in new tab \u2197</a></div><div class="lp-pv-frame"><iframe src="'+s.landingUrl+'" loading="lazy" title="WasabiRub landing page"></iframe></div></div>':'';
-  return preview+hero+hnote+'<ol class="landing">'+s.camp.landing.map(l=>'<li><div><b>'+l.t+'</b>'+(l.d?'<p>'+l.d+'</p>':'')+'</div></li>').join("")+'</ol>';
+  const preview=url?'<div class="lp-preview"><div class="lp-pv-head"><span class="lp-pv-label">Live landing page</span><span class="lp-pv-url">'+esc(url)+'</span><a class="lp-pv-open" href="'+url+'" target="_blank" rel="noopener">Open in new tab ↗</a></div><div class="lp-pv-frame"><iframe src="'+url+'" loading="lazy" title="Landing page preview"></iframe></div></div>':'';
+  return preview+hero+hnote+'<ol class="landing">'+(c.landing||[]).map(l=>'<li><div><b>'+l.t+'</b>'+(l.d?'<p>'+l.d+'</p>':'')+'</div></li>').join("")+'</ol>';
 }
 function buildVisual(s){
   const v=s.camp.visual;
@@ -3543,7 +3580,7 @@ function renderDetail(){
   '</nav>'+
   '<div class="detail-body">'+
     campMetaHTML(s)+
-    (s.landingUrl?'<a class="lp-cta" href="'+s.landingUrl+'" target="_blank" rel="noopener"><span class="lp-cta-ic">\uD83D\uDDBC\uFE0F</span><span class="lp-cta-main"><span class="lp-cta-k">Potential landing page \u2014 click to preview</span><span class="lp-cta-url">'+s.landingUrl+'</span></span><span class="lp-cta-go">Open preview \u2197</span></a>':'')+
+    (landingUrlOf(s)?'<a class="lp-cta" href="'+landingUrlOf(s)+'" target="_blank" rel="noopener"><span class="lp-cta-ic">\uD83D\uDDBC\uFE0F</span><span class="lp-cta-main"><span class="lp-cta-k">Potential landing page \u2014 click to preview</span><span class="lp-cta-url">'+landingUrlOf(s)+'</span></span><span class="lp-cta-go">Open preview \u2197</span></a>':'')+
     campBannerHTML(s)+
     _secs.map(o=>secShell(s, o.x.key, o.x.label, o.inner)).join("")+
     '<div class="review-box"><p class="sec-label" style="margin-top:0">Overall notes on this campaign</p>'+commentThreadHTML(s.id,"strand")+'</div>'+
@@ -3583,6 +3620,7 @@ function renderDetail(){
     b.addEventListener("click",function(){
       var k=b.dataset.edit; var body=el.querySelector('.sec-body[data-secbody="'+k+'"]'); if(!body) return;
       if(k==="strategy"){ body.innerHTML=editStrategyForm(s); bindStrategyEdit(body,s); }
+      else if(k==="landing"){ body.innerHTML=editLandingForm(s); bindLandingEdit(body,s); }
     });
   });
   // pending toggle
