@@ -691,6 +691,10 @@
   .act-time{margin-left:auto;font-size:11px;color:var(--steel);white-space:nowrap}
   .sharelink.open-camp{border-color:var(--red);color:var(--red)}
   .sharelink.open-camp:hover{background:var(--red);color:#fff}
+  .ci-expand{flex:none;background:none;border:1px solid var(--red);color:var(--red);font-size:10px;font-weight:700;padding:3px 9px;border-radius:4px;cursor:pointer;white-space:nowrap}
+  .ci-expand:hover{background:var(--red);color:#fff}
+  .cal-item.has-asset .ci-text{font-weight:600}
+  .cal-asset{margin:8px 0 6px}
 </style>
 
 <header class="topbar">
@@ -3103,6 +3107,11 @@ function buildStories(s){
   const intro=s.camp.storiesIntro?'<p class="why" style="margin-bottom:10px">'+s.camp.storiesIntro+'</p>':'';
   return intro+'<ul class="plain">'+s.camp.stories.map(x=>'<li>'+x+'</li>').join("")+'</ul>'+attachHTML(s,"stories","Story assets","attach the Story frames / graphics for this section");
 }
+function calendarAssetIds(s){
+  var ids={};
+  if(s.camp.calendar) s.camp.calendar.weeks.forEach(function(w){ w.days.forEach(function(d){ d.items.forEach(function(it){ var m=it.x.match(/^Post (\d+)/); if(m){ var n=+m[1]; if(n>=1 && n<=10 && s.assets.some(function(a){return a.id==="w"+n;})) ids["w"+n]=1; } }); }); });
+  return ids;
+}
 function buildAdaptations(s){
   const A=s.camp.adaptations;
   let notes;
@@ -3114,13 +3123,17 @@ function buildAdaptations(s){
     notes=A.map(a=>'<div class="adapt-row"><span class="ch-badge '+CH_META[a.ch].cls+'">'+CH_META[a.ch].label+'</span><p>'+a.note+'</p></div>').join("");
   }
   const locked = !campApproved(s.id);
-  const feed =
-    '<div class="feed-head"><p class="mini-label" style="margin:0">Drafted assets · '+s.assets.length+
+  const calIds = calendarAssetIds(s);
+  const feedAssets = s.assets.filter(function(a){ return !calIds[a.id]; });
+  const inCal = Object.keys(calIds).length;
+  const calNote = inCal ? '<p class="why" style="font-size:12.5px;color:var(--steel);margin:0 0 10px">The dated posts are attached to their day in the Weekly Calendar above — expand a task there to review its asset. Below are the always-on and supporting assets.</p>' : '';
+  const feed = calNote +
+    '<div class="feed-head"><p class="mini-label" style="margin:0">'+(inCal?'Supporting & always-on assets · ':'Drafted assets · ')+feedAssets.length+
       (locked?' <span style="color:var(--steel);text-transform:none;letter-spacing:0;font-weight:400">— approve the campaign direction to review</span>':'')+'</p>'+
       '<label class="toggle"><input type="checkbox" id="pending-toggle"'+(pendingOnly?' checked':'')+'> Show pending only</label></div>'+
     '<div class="feed" id="feed">'+
-      s.assets.map(a=>assetCardHTML(s,a)).join("")+
-      (pendingOnly && s.assets.every(a=>statusOf(s.id,a.id)!=="pending") ? '<div class="empty-feed">All assets in this campaign are reviewed. Toggle off “pending only” to see them.</div>' : '')+
+      feedAssets.map(a=>assetCardHTML(s,a)).join("")+
+      (pendingOnly && feedAssets.every(a=>statusOf(s.id,a.id)!=="pending") ? '<div class="empty-feed">All assets here are reviewed. Toggle off “pending only” to see them.</div>' : '')+
     '</div>';
   return notes + feed;
 }
@@ -3246,7 +3259,10 @@ function buildCalendar(s){
             var key="w"+wi+"d"+di+"i"+ii; var owner=asg[key]||"";
             var extra=(owner && OWNERS.indexOf(owner)<0)?'<option value="'+esc(owner)+'" selected>'+esc(owner)+'</option>':'';
             var opts='<option value="">Owner</option>'+extra+OWNERS.map(function(o){return '<option value="'+o+'"'+(owner===o?' selected':'')+'>'+o+'</option>';}).join("");
-            return '<div class="cal-item"><span class="tg '+it.t+'">'+(TAGLABEL[it.t]||it.t)+'</span><span class="ci-text">'+esc(it.x)+'</span><select class="ci-owner'+(owner===""?" unset":"")+'" data-akey="'+key+'" aria-label="Assign owner">'+opts+'</select></div>';
+            var mm=it.x.match(/^Post (\d+)/); var asset=(mm && +mm[1]>=1 && +mm[1]<=10)?s.assets.find(function(a){return a.id==="w"+mm[1];}):null;
+            var expandBtn=asset?'<button class="ci-expand" aria-expanded="false">\u25B8 Asset</button>':'';
+            var assetBlock=asset?'<div class="cal-asset" hidden>'+assetCardHTML(s,asset)+'</div>':'';
+            return '<div class="cal-item'+(asset?' has-asset':'')+'"><span class="tg '+it.t+'">'+(TAGLABEL[it.t]||it.t)+'</span><span class="ci-text">'+esc(it.x)+'</span>'+expandBtn+'<select class="ci-owner'+(owner===""?" unset":"")+'" data-akey="'+key+'" aria-label="Assign owner">'+opts+'</select></div>'+assetBlock;
           }).join("")+
         '</div></div>';
       }).join("")+
@@ -3258,6 +3274,12 @@ function buildCalendar(s){
 function bindCalendar(el,s){
   el.querySelectorAll('#sec-calendar .ci-owner').forEach(function(sel){
     sel.addEventListener('change',function(){ var a=store.get(s.id+":__assign"); a[sel.dataset.akey]=sel.value; store.set(s.id+":__assign",a); logActivity("assigned "+(sel.value||"unassigned"), sel.dataset.akey); sel.classList.toggle('unset', sel.value===""); });
+  });
+  el.querySelectorAll('#sec-calendar .ci-expand').forEach(function(b){
+    b.addEventListener('click',function(){
+      var item=b.closest('.cal-item'); var block=item.nextElementSibling;
+      if(block && block.classList.contains('cal-asset')){ block.hidden=!block.hidden; b.innerHTML=(block.hidden?'\u25B8 Asset':'\u25BE Hide asset'); b.setAttribute('aria-expanded', block.hidden?'false':'true'); }
+    });
   });
 }
 function campMetaHTML(s){
