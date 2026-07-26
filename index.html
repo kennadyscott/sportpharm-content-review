@@ -695,6 +695,15 @@
   .ci-expand:hover{background:var(--red);color:#fff}
   .cal-item.has-asset .ci-text{font-weight:600}
   .cal-asset{margin:8px 0 6px}
+  .cal-item.clickable{cursor:pointer;border-radius:5px;padding:4px 8px;transition:background .1s}
+  .cal-item.clickable:hover{background:var(--panel-2)}
+  .cal-item.open{background:var(--panel-2)}
+  .ci-chev{flex:none;color:var(--steel);font-size:12px;transition:transform .12s;width:11px;text-align:center}
+  .cal-item.open .ci-chev{transform:rotate(90deg)}
+  @media (prefers-reduced-motion: reduce){.ci-chev{transition:none}}
+  .cal-detail{margin:6px 0 10px}
+  .comp-panel{border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--panel);display:flex;flex-direction:column;gap:8px}
+  .comp-panel .finals.attach{margin-top:0}
 </style>
 
 <header class="topbar">
@@ -3260,9 +3269,8 @@ function buildCalendar(s){
             var extra=(owner && OWNERS.indexOf(owner)<0)?'<option value="'+esc(owner)+'" selected>'+esc(owner)+'</option>':'';
             var opts='<option value="">Owner</option>'+extra+OWNERS.map(function(o){return '<option value="'+o+'"'+(owner===o?' selected':'')+'>'+o+'</option>';}).join("");
             var mm=it.x.match(/^Post (\d+)/); var asset=(mm && +mm[1]>=1 && +mm[1]<=10)?s.assets.find(function(a){return a.id==="w"+mm[1];}):null;
-            var expandBtn=asset?'<button class="ci-expand" aria-expanded="false">\u25B8 Asset</button>':'';
-            var assetBlock=asset?'<div class="cal-asset" hidden>'+assetCardHTML(s,asset)+'</div>':'';
-            return '<div class="cal-item'+(asset?' has-asset':'')+'"><span class="tg '+it.t+'">'+(TAGLABEL[it.t]||it.t)+'</span><span class="ci-text">'+esc(it.x)+'</span>'+expandBtn+'<select class="ci-owner'+(owner===""?" unset":"")+'" data-akey="'+key+'" aria-label="Assign owner">'+opts+'</select></div>'+assetBlock;
+            var detAttr=asset?'data-asset="'+asset.id+'"':'data-compkey="cal:'+key+'"';
+            return '<div class="cal-item clickable"><span class="ci-chev">▸</span><span class="tg '+it.t+'">'+(TAGLABEL[it.t]||it.t)+'</span><span class="ci-text">'+esc(it.x)+'</span><select class="ci-owner'+(owner===""?" unset":"")+'" data-akey="'+key+'" aria-label="Assign owner">'+opts+'</select></div>'+'<div class="cal-detail" hidden '+detAttr+'></div>';
           }).join("")+
         '</div></div>';
       }).join("")+
@@ -3273,12 +3281,21 @@ function buildCalendar(s){
 }
 function bindCalendar(el,s){
   el.querySelectorAll('#sec-calendar .ci-owner').forEach(function(sel){
+    sel.addEventListener('click',function(e){ e.stopPropagation(); });
     sel.addEventListener('change',function(){ var a=store.get(s.id+":__assign"); a[sel.dataset.akey]=sel.value; store.set(s.id+":__assign",a); logActivity("assigned "+(sel.value||"unassigned"), sel.dataset.akey); sel.classList.toggle('unset', sel.value===""); });
   });
-  el.querySelectorAll('#sec-calendar .ci-expand').forEach(function(b){
-    b.addEventListener('click',function(){
-      var item=b.closest('.cal-item'); var block=item.nextElementSibling;
-      if(block && block.classList.contains('cal-asset')){ block.hidden=!block.hidden; b.innerHTML=(block.hidden?'\u25B8 Asset':'\u25BE Hide asset'); b.setAttribute('aria-expanded', block.hidden?'false':'true'); }
+  el.querySelectorAll('#sec-calendar .cal-item.clickable').forEach(function(row){
+    row.addEventListener('click',function(e){
+      if(e.target.closest('.ci-owner')) return;
+      var det=row.nextElementSibling;
+      if(!det || !det.classList.contains('cal-detail')) return;
+      if(!det.dataset.built){
+        det.dataset.built="1";
+        if(det.dataset.asset){ var a=s.assets.find(function(x){return x.id===det.dataset.asset;}); det.innerHTML=assetCardHTML(s,a); var c=det.querySelector('.asset-card'); if(c) bindCard(c,s); bindThread(det,s.id); }
+        else { var ck=det.dataset.compkey; det.innerHTML='<div class="comp-panel">'+attachHTML(s,ck,"Attach the asset","drop the image / video / file for this component")+commentThreadHTML(s.id,ck)+'</div>'; var an=det.querySelector('.attach'); if(an) bindAttach(an,s,ck); bindThread(det,s.id); }
+      }
+      det.hidden=!det.hidden;
+      row.classList.toggle('open', !det.hidden);
     });
   });
 }
