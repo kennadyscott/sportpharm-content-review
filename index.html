@@ -705,6 +705,25 @@
   .comp-panel{border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--panel);display:flex;flex-direction:column;gap:8px}
   .comp-panel .finals.attach{margin-top:0}
   .mock-wrap{display:flex;justify-content:center;padding:16px;background:var(--panel-2);border-radius:6px}
+  .sec-edit-btn{background:none;border:1px solid var(--line);color:var(--focus);font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;cursor:pointer}
+  .sec-edit-btn:hover{border-color:var(--focus)}
+  .csec-head .sec-label{margin-right:auto}
+  .csec-head .sec-note-btn{margin-left:0}
+  .sec-edit{display:flex;flex-direction:column;gap:8px;max-width:80ch}
+  .sec-edit .ef-label{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;color:var(--steel);margin-top:6px}
+  .sec-edit textarea,.sec-edit input{border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink);font-family:var(--body);font-size:13.5px;line-height:1.5;padding:8px 10px;width:100%}
+  .sec-edit textarea.ef-primary{min-height:64px;resize:vertical}
+  .sec-edit .er-row{display:flex;gap:8px;align-items:flex-start}
+  .sec-edit .er-row textarea{min-height:40px;resize:vertical}
+  .sec-edit .er-aud{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:center}
+  @media (max-width:640px){.sec-edit .er-aud{grid-template-columns:1fr auto}}
+  .er-del,.er-adel{flex:none;background:none;border:1px solid var(--line);color:var(--steel);width:28px;height:28px;border-radius:4px;cursor:pointer;font-size:15px;line-height:1}
+  .er-del:hover,.er-adel:hover{border-color:var(--red);color:var(--red)}
+  .ef-add-goal,.ef-add-aud{align-self:flex-start;background:none;border:1px dashed var(--line);color:var(--steel);font-size:12px;font-weight:600;padding:5px 12px;border-radius:4px;cursor:pointer}
+  .ef-add-goal:hover,.ef-add-aud:hover{color:var(--ink);border-color:var(--steel)}
+  .ef-actions{display:flex;gap:8px;margin-top:12px}
+  .ef-save{background:var(--ok);color:#fff;border:0;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:11px;padding:9px 18px;border-radius:4px;cursor:pointer}
+  .ef-cancel{background:none;border:1px solid var(--line);color:var(--steel);font-size:12px;font-weight:600;padding:9px 16px;border-radius:4px;cursor:pointer}
 </style>
 
 <header class="topbar">
@@ -3070,12 +3089,46 @@ function threadText(sid,tid){
     return s;
   }).join("\n      ");
 }
+const EDITABLE={strategy:1};
+function campOf(s){ var e=store.get(s.id+":__edits"); return (e && e.camp) ? Object.assign({}, s.camp, e.camp) : s.camp; }
+function editStrategyForm(s){
+  var st=campOf(s).strategy;
+  var goals=st.supporting.map(function(g){return '<div class="er-row"><textarea class="ef-sg">'+esc(g)+'</textarea><button class="er-del" type="button" aria-label="Remove">×</button></div>';}).join("");
+  var auds=st.audiences.map(function(a){return '<div class="er-aud"><input class="ef-aw" value="'+esc(a.who||"")+'" placeholder="Audience"><input class="ef-ac" value="'+esc(a.cares||a.why||"")+'" placeholder="What they care about"><input class="ef-am" value="'+esc(a.msg||"")+'" placeholder="Message"><button class="er-adel" type="button" aria-label="Remove">×</button></div>';}).join("");
+  return '<div class="sec-edit">'+
+    '<label class="ef-label">Primary goal</label><textarea class="ef-primary">'+esc(st.primary)+'</textarea>'+
+    '<label class="ef-label">Supporting goals</label><div class="ef-goals">'+goals+'</div><button class="ef-add-goal" type="button">+ Add goal</button>'+
+    '<label class="ef-label">Audiences</label><div class="ef-auds">'+auds+'</div><button class="ef-add-aud" type="button">+ Add audience</button>'+
+    '<div class="ef-actions"><button class="ef-save" type="button">Save section</button><button class="ef-cancel" type="button">Cancel</button></div>'+
+  '</div>';
+}
+function bindStrategyEdit(body,s){
+  function delRow(e){ var r=e.target.closest('.er-row, .er-aud'); if(r) r.remove(); }
+  body.querySelectorAll('.er-del, .er-adel').forEach(function(b){ b.addEventListener('click',delRow); });
+  body.querySelector('.ef-add-goal').addEventListener('click',function(){
+    var d=document.createElement('div'); d.className='er-row'; d.innerHTML='<textarea class="ef-sg"></textarea><button class="er-del" type="button" aria-label="Remove">×</button>';
+    body.querySelector('.ef-goals').appendChild(d); d.querySelector('.er-del').addEventListener('click',delRow); d.querySelector('textarea').focus();
+  });
+  body.querySelector('.ef-add-aud').addEventListener('click',function(){
+    var d=document.createElement('div'); d.className='er-aud'; d.innerHTML='<input class="ef-aw" placeholder="Audience"><input class="ef-ac" placeholder="What they care about"><input class="ef-am" placeholder="Message"><button class="er-adel" type="button" aria-label="Remove">×</button>';
+    body.querySelector('.ef-auds').appendChild(d); d.querySelector('.er-adel').addEventListener('click',delRow); d.querySelector('input').focus();
+  });
+  body.querySelector('.ef-cancel').addEventListener('click',function(){ body.innerHTML=buildStrategy(s); });
+  body.querySelector('.ef-save').addEventListener('click',function(){
+    var primary=body.querySelector('.ef-primary').value.trim();
+    var supporting=[].map.call(body.querySelectorAll('.ef-sg'),function(t){return t.value.trim();}).filter(Boolean);
+    var audiences=[].map.call(body.querySelectorAll('.er-aud'),function(r){return {who:r.querySelector('.ef-aw').value.trim(),cares:r.querySelector('.ef-ac').value.trim(),msg:r.querySelector('.ef-am').value.trim()};}).filter(function(a){return a.who;});
+    var e=store.get(s.id+":__edits"); e.camp=e.camp||{}; e.camp.strategy={primary:primary,supporting:supporting,audiences:audiences}; store.set(s.id+":__edits",e);
+    logActivity("edited Strategy","");
+    body.innerHTML=buildStrategy(s); toast("Strategy saved.");
+  });
+}
 function secShell(s, key, label, inner){
   const tid="sec:"+key; const cnt=threadCount(s.id,tid);
   return '<div class="csec" id="sec-'+key+'">'+
-    '<div class="csec-head"><p class="sec-label">'+label+'</p>'+
+    '<div class="csec-head"><p class="sec-label">'+label+'</p>'+(EDITABLE[key]?'<button class="sec-edit-btn" data-edit="'+key+'">✎ Edit section</button>':'')+
     '<button class="sec-note-btn'+(cnt?" has":"")+'" data-sec="'+key+'">'+(cnt?("\uD83D\uDCAC "+cnt):"+ Note")+'</button></div>'+
-    inner+
+    '<div class="sec-body" data-secbody="'+key+'">'+inner+'</div>'+
     '<div class="sec-note'+(cnt?" open":"")+'" data-secnote="'+key+'">'+commentThreadHTML(s.id,tid)+'</div>'+
   '</div>';
 }
@@ -3088,7 +3141,7 @@ function buildPlatform(s){
   return '<p class="why">'+p.platform+'</p>';
 }
 function buildStrategy(s){
-  const st=s.camp.strategy;
+  const st=campOf(s).strategy;
   let aud;
   if(st.audiences[0] && st.audiences[0].cares!==undefined){
     aud='<div class="aud-table-wrap"><table class="aud-table"><tr><th>Audience</th><th>What they care about</th><th>SportPharm message</th></tr>'+
@@ -3524,6 +3577,12 @@ function renderDetail(){
   el.querySelectorAll(".sec-note-btn").forEach(btn=>{
     btn.addEventListener("click",()=>{
       el.querySelector('[data-secnote="'+btn.dataset.sec+'"]').classList.toggle("open");
+    });
+  });
+  el.querySelectorAll(".sec-edit-btn").forEach(function(b){
+    b.addEventListener("click",function(){
+      var k=b.dataset.edit; var body=el.querySelector('.sec-body[data-secbody="'+k+'"]'); if(!body) return;
+      if(k==="strategy"){ body.innerHTML=editStrategyForm(s); bindStrategyEdit(body,s); }
     });
   });
   // pending toggle
