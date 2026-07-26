@@ -704,6 +704,7 @@
   .cal-detail{margin:6px 0 10px}
   .comp-panel{border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--panel);display:flex;flex-direction:column;gap:8px}
   .comp-panel .finals.attach{margin-top:0}
+  .mock-wrap{display:flex;justify-content:center;padding:16px;background:var(--panel-2);border-radius:6px}
 </style>
 
 <header class="topbar">
@@ -3252,6 +3253,17 @@ function buildCreators(s){
 }
 const TAGLABEL={post:"Post",reel:"Reel",stories:"Stories",email:"Email",ads:"Meta Ad",creator:"Creator",offer:"Offer",blog:"Blog"};
 const OWNERS=["Brandon","Jessie","Kennady"];
+function metaAdMini(x){ return metaAdHTML({primaryText:x, creativeEye:"SportPharm", creativeHook:(x.length>54?x.slice(0,54)+"\u2026":x), headline:"WasabiRub", description:"", cta:"Shop Now"}); }
+function componentMockup(t,x){
+  x=x||"";
+  if(t==="stories"){ return '<div class="mock-wrap"><div class="sphone"><div class="sbar"></div><div class="s-eye">SportPharm \u00B7 Story</div><div class="s-q">'+esc(x)+'</div><div class="cs-link" style="margin:auto auto 0">\uD83D\uDD17 Shop \u2014 sportpharm.com</div></div></div>'; }
+  if(t==="email"){ return '<div class="mock-wrap"><div class="eml" style="max-width:440px;width:100%"><div class="eml-top"><div class="eml-n">\u2709</div><div class="eml-from"><b>SportPharm</b>to your list</div></div><div class="eml-body"><p class="eml-subj">'+esc(x)+'</p><p class="eml-d">Preview text\u2026 feel it work \u2014 shop direct at sportpharm.com.</p></div></div></div>'; }
+  if(t==="ads"){ return '<div class="mock-wrap">'+metaAdMini(x)+'</div>'; }
+  if(t==="creator"){ return '<div class="mock-wrap">'+creatorStoryHTML()+'</div>'; }
+  if(t==="offer"){ return '<div class="mock-wrap"><div class="pv sq" style="max-width:340px;width:100%"><div class="eyebrow">SportPharm \u00B7 Offer</div><div class="big">'+esc(x)+'</div><img class="brand-img" src="'+LOGO_WHITE+'" alt="SportPharm"></div></div>'; }
+  if(t==="reel"){ return '<div class="mock-wrap"><div class="phone"><img class="pl" src="'+LOGO_WHITE+'" alt=""><div class="hookzone"><div class="eyebrow">SportPharm \u00B7 Reel</div><div class="hook">'+esc(x)+'</div></div><div class="meta"><div class="h">@sportpharm</div></div></div></div>'; }
+  return '<div class="mock-wrap"><div class="pv sq" style="max-width:340px;width:100%"><div class="eyebrow">SportPharm \u00B7 Post</div><div class="big">'+esc(x)+'</div><img class="brand-img" src="'+LOGO_WHITE+'" alt="SportPharm"></div></div>';
+}
 function buildCalendar(s){
   const c=s.camp.calendar; if(!c) return "";
   const asg=store.get(s.id+":__assign");
@@ -3269,7 +3281,7 @@ function buildCalendar(s){
             var extra=(owner && OWNERS.indexOf(owner)<0)?'<option value="'+esc(owner)+'" selected>'+esc(owner)+'</option>':'';
             var opts='<option value="">Owner</option>'+extra+OWNERS.map(function(o){return '<option value="'+o+'"'+(owner===o?' selected':'')+'>'+o+'</option>';}).join("");
             var mm=it.x.match(/^Post (\d+)/); var asset=(mm && +mm[1]>=1 && +mm[1]<=10)?s.assets.find(function(a){return a.id==="w"+mm[1];}):null;
-            var detAttr=asset?'data-asset="'+asset.id+'"':'data-compkey="cal:'+key+'"';
+            var detAttr=asset?'data-asset="'+asset.id+'"':'data-compkey="cal:'+key+'" data-ct="'+it.t+'" data-cx="'+esc(it.x)+'"';
             return '<div class="cal-item clickable"><span class="ci-chev">▸</span><span class="tg '+it.t+'">'+(TAGLABEL[it.t]||it.t)+'</span><span class="ci-text">'+esc(it.x)+'</span><select class="ci-owner'+(owner===""?" unset":"")+'" data-akey="'+key+'" aria-label="Assign owner">'+opts+'</select></div>'+'<div class="cal-detail" hidden '+detAttr+'></div>';
           }).join("")+
         '</div></div>';
@@ -3292,7 +3304,7 @@ function bindCalendar(el,s){
       if(!det.dataset.built){
         det.dataset.built="1";
         if(det.dataset.asset){ var a=s.assets.find(function(x){return x.id===det.dataset.asset;}); det.innerHTML=assetCardHTML(s,a); var c=det.querySelector('.asset-card'); if(c) bindCard(c,s); bindThread(det,s.id); }
-        else { var ck=det.dataset.compkey; det.innerHTML='<div class="comp-panel">'+attachHTML(s,ck,"Attach the asset","drop the image / video / file for this component")+commentThreadHTML(s.id,ck)+'</div>'; var an=det.querySelector('.attach'); if(an) bindAttach(an,s,ck); bindThread(det,s.id); }
+        else { var ck=det.dataset.compkey; det.innerHTML='<div class="comp-panel">'+componentMockup(det.dataset.ct,det.dataset.cx)+attachHTML(s,ck,"Upload the final asset","the preview above is representative \u2014 attach the finished creative when it's designed")+commentThreadHTML(s.id,ck)+'</div>'; var an=det.querySelector('.attach'); if(an) bindAttach(an,s,ck); bindThread(det,s.id); }
       }
       det.hidden=!det.hidden;
       row.classList.toggle('open', !det.hidden);
