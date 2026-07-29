@@ -2939,7 +2939,12 @@ function refreshFinals(s, aid){
 }
 
 /* ---------- export ---------- */
-SCOPED("export-btn").addEventListener("click",()=>{
+/* deferred: this ran at load and reached for a node that only exists once
+   HQ has mounted the view. Same handler, attached at mount instead. */
+function wireExport(){
+  const _b = SCOPED("export-btn");
+  if(!_b) return;
+  _b.addEventListener("click",()=>{
   const SRC = soloMode ? STRANDS.filter(s=>s.id===activeId) : STRANDS;
   let SC=0,A=0,R=0,P=0;
   SRC.forEach(s=>s.assets.forEach(x=>{
@@ -2972,7 +2977,7 @@ SCOPED("export-btn").addEventListener("click",()=>{
       ta.remove();
     });
 });
-
+}
 let toastT;
 function toast(msg){
   const t=SCOPED("toast");
@@ -2982,7 +2987,7 @@ function toast(msg){
 
 
   return {
-    mount(rootEl) { ROOT = rootEl; boot(); },
+    mount(rootEl) { ROOT = rootEl; boot(); wireExport(); },
     rerender() { if (ROOT) { renderRail(); renderDetail(); } }
   };
 })();
