@@ -68,6 +68,16 @@ const Store = (() => {
       /* forward-compatible: fill in any key a newer build expects */
       const base = seed();
       Object.keys(base).forEach(k => { if (state[k] === undefined) state[k] = base[k]; });
+      /* ...and any key inside the settings objects. Backfilling only the top
+         level silently left new rules unset on every existing store, so a rule
+         could look switched on in Settings and never actually fire. */
+      ['planRules'].forEach(k => {
+        if (state[k] && typeof state[k] === 'object') {
+          Object.keys(base[k]).forEach(sub => {
+            if (state[k][sub] === undefined) state[k][sub] = base[k][sub];
+          });
+        }
+      });
     } catch (e) { state = seed(); }
     if (runSchedule()) save();
     return state;
