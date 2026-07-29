@@ -88,6 +88,40 @@ const HQ = (() => {
     return { txt, tone: '' };
   }
 
+  /* ------------------------- editing in place --------------------------- */
+  /* Click the text, type, blur or Enter saves, Escape puts it back. Used
+     everywhere a title appears so the detail sheet is somewhere you go for the
+     long fields, not somewhere you are forced through to rename something. */
+  function inlineText(root, sel, onSave) {
+    root.querySelectorAll(sel).forEach(el => {
+      el.setAttribute('contenteditable', 'plaintext-only');
+      el.setAttribute('spellcheck', 'false');
+      el.classList.add('inline-edit');
+      const was = el.textContent;
+      el.addEventListener('mousedown', e => e.stopPropagation());
+      el.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); });
+      el.addEventListener('keydown', e => {
+        e.stopPropagation();
+        if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+        else if (e.key === 'Escape') { el.textContent = was; el.blur(); }
+      });
+      el.addEventListener('blur', () => {
+        const v = el.textContent.replace(/\s+/g, ' ').trim();
+        if (!v) { el.textContent = was; return; }
+        if (v === was.replace(/\s+/g, ' ').trim()) return;
+        onSave(el, v);
+      });
+    });
+  }
+
+  /* A control on a row that must not trigger the row itself. */
+  function stopRow(root, sel) {
+    root.querySelectorAll(sel).forEach(el => {
+      ['click', 'mousedown', 'keydown'].forEach(ev =>
+        el.addEventListener(ev, e => e.stopPropagation()));
+    });
+  }
+
   let toastTimer = null;
   function toast(msg) {
     const t = $('#toast');
@@ -482,6 +516,7 @@ const HQ = (() => {
   return {
     $, esc, svg, avatar, initials, areaOf, statusOf, ago, daysSince, dueLabel,
     toast, copy, view, views, NAV, route, go, render, renderRail,
+    inlineText, stopRow,
     openSheet, closeSheet, refreshSheet, boot, start
   };
 })();

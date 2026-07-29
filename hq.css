@@ -1901,3 +1901,42 @@ ol.b-list li::marker { color: var(--red); font-weight: 700; }
 /* tall enough to actually read a brief in, short enough that the work above
    is still reachable without a long scroll back */
 .cc-brief-frame { width: 100%; height: 78vh; min-height: 520px; border: none; display: block; background: var(--bg); }
+
+/* ---------------------- editing in place ---------------------- */
+.inline-edit {
+  border-radius: 5px; padding: 0 .18rem; margin: 0 -.18rem;
+  cursor: text; transition: background .12s ease, box-shadow .12s ease;
+}
+.inline-edit:hover { background: var(--bg-2); }
+.inline-edit:focus {
+  outline: none; background: var(--paper);
+  box-shadow: 0 0 0 2px var(--blue-deep); cursor: text;
+}
+/* a row that is a div still has to feel like a row */
+.row[role="button"] { cursor: pointer; }
+.row[role="button"]:focus-visible { outline: 2.5px solid var(--blue-deep); outline-offset: 2px; }
+
+.row-stat {
+  font-size: .68rem; font-weight: 700; white-space: nowrap;
+  padding: .16rem .5rem; border-radius: 999px;
+  background: var(--bg-2); color: var(--ink-soft);
+}
+button.row-stat { cursor: pointer; transition: background .12s ease, color .12s ease; }
+button.row-stat:hover { background: var(--navy); color: #fff; }
+.row-stat.st-building { background: #E6EDFD; color: var(--blue-deep); }
+.row-stat.st-review   { background: #FBF1DE; color: var(--amber); }
+.row-stat.st-shipped  { background: #E5F4EC; color: var(--green); }
+
+.row-date {
+  font-size: .72rem; color: var(--ink-soft); border: 1.5px solid transparent;
+  border-radius: 7px; padding: .12rem .3rem; background: none; width: 8.4rem;
+  transition: border-color .12s ease, background .12s ease;
+}
+.row-date:hover { background: var(--bg-2); }
+.row-date:focus { outline: none; border-color: var(--blue-deep); background: var(--paper); }
+.row .row-side { display: flex; align-items: center; gap: .4rem; }
+@media (max-width: 760px) { .row-date { display: none; } }
+
+.cc-piece[role="button"] { cursor: pointer; }
+button.pl-st { cursor: pointer; }
+button.pl-st:hover { filter: brightness(.94); }

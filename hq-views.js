@@ -19,14 +19,23 @@
   function taskRow(t) {
     const a = areaOf(t.project.area);
     const d = dueLabel(t.due);
-    return `<button class="row t-${a.tone}" data-task="${t.project.id}:${t.id}">
+    const ed = Store.can('edit');
+    const ref = t.project.id + ':' + t.id;
+    return `<div class="row t-${a.tone}" data-task="${ref}" tabindex="0" role="button">
       <i class="row-dot"></i>
       <span class="row-body">
-        <span class="row-title">${esc(t.title)}</span>
-        <span class="row-meta">${esc(t.project.name)} · ${esc(statusOf(t.status).label)}${d ? ' · <span class="due ' + d.tone + '">' + esc(d.txt) + '</span>' : ''}</span>
+        <span class="row-title" ${ed ? `data-ititle="${ref}"` : ''}>${esc(t.title)}</span>
+        <span class="row-meta">${esc(t.project.name)}${d && !ed ? ' · <span class="due ' + d.tone + '">' + esc(d.txt) + '</span>' : ''}</span>
       </span>
-      <span class="row-side">${t.owner ? avatar(Store.user(t.owner), 'sm') : ''}</span>
-    </button>`;
+      <span class="row-side">
+        ${ed ? `<button class="row-stat st-${t.status}" data-istatus="${ref}"
+                  title="Click to move it along">${esc(statusOf(t.status).label)}</button>
+                <input class="row-date" type="date" value="${esc(t.due || '')}" data-idate="${ref}"
+                  aria-label="Due date">`
+             : `<span class="row-stat st-${t.status}">${esc(statusOf(t.status).label)}</span>`}
+        ${t.owner ? avatar(Store.user(t.owner), 'sm') : ''}
+      </span>
+    </div>`;
   }
 
   HQ.view('today', {
@@ -230,10 +239,45 @@
   }
 
   function wireTaskRows(root) {
-    root.querySelectorAll('[data-task]').forEach(b =>
+    root.querySelectorAll('[data-task]').forEach(b => {
       b.addEventListener('click', () => {
         const [pid, tid] = b.dataset.task.split(':');
         openTaskSheet(pid, tid);
+      });
+      b.addEventListener('keydown', e => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.target !== b) return;
+        e.preventDefault();
+        const [pid, tid] = b.dataset.task.split(':');
+        openTaskSheet(pid, tid);
+      });
+    });
+    wireInlineTask(root);
+  }
+
+  /* Rename, re-date and advance a task without opening anything. */
+  function wireInlineTask(root) {
+    HQ.inlineText(root, '[data-ititle]', (el, v) => {
+      const [pid, tid] = el.dataset.ititle.split(':');
+      Store.updateTask(pid, tid, { title: v });
+      HQ.render();
+    });
+    HQ.stopRow(root, '[data-idate]');
+    root.querySelectorAll('[data-idate]').forEach(el =>
+      el.addEventListener('change', () => {
+        const [pid, tid] = el.dataset.idate.split(':');
+        Store.updateTask(pid, tid, { due: el.value });
+        HQ.render();
+      }));
+    HQ.stopRow(root, '[data-istatus]');
+    root.querySelectorAll('[data-istatus]').forEach(el =>
+      el.addEventListener('click', () => {
+        const [pid, tid] = el.dataset.istatus.split(':');
+        const t = Store.taskRef(pid, tid);
+        if (!t) return;
+        const i = STATUSES.findIndex(x => x.id === t.status);
+        Store.moveTask(pid, tid, STATUSES[(i + 1) % STATUSES.length].id, null);
+        HQ.render();
       }));
   }
 
@@ -319,7 +363,7 @@
               return `<article class="card t-${a.tone}" draggable="${Store.can('edit')}"
                         data-tcard="${t.project.id}:${t.id}" tabindex="0">
                 <span class="card-proj">${esc(t.project.name)}</span>
-                <h4>${esc(t.title)}</h4>
+                <h4 ${Store.can('edit') ? `data-ititle="${t.project.id}:${t.id}"` : ''}>${esc(t.title)}</h4>
                 <div class="card-foot">
                   ${d ? `<span class="due ${d.tone}">${esc(d.txt)}</span>` : '<span class="mini-prog">no date</span>'}
                   ${t.campaign ? `<span class="card-camp">${esc((Store.campaign(t.campaign) || {}).title || '')}</span>` : ''}
@@ -346,6 +390,7 @@
   HQ.wireProjToggle = wireProjToggle;
 
   function wireTaskBoard(root) {
+    wireInlineTask(root);
     root.querySelectorAll('[data-tmonth]').forEach(b =>
       b.addEventListener('click', () => { taskMonth = b.dataset.tmonth; HQ.render(); }));
 
@@ -414,16 +459,18 @@
       const st = PLAN_STATUS[p.status] || PLAN_STATUS.drafting;
       const ch = CHANNELS[p.channel] || { label: p.channel, tone: 'blue' };
       const d = p.date ? dueLabel(p.date) : null;
-      return `<button class="cc-piece" data-piece="${p.id}">
+      return `<div class="cc-piece" data-piece="${p.id}" tabindex="0" role="button">
         <span class="cc-piece-date">${p.date ? esc(new Date(p.date + 'T12:00:00')
           .toLocaleDateString(undefined, { month: 'short', day: 'numeric' })) : '—'}</span>
         <span class="cc-piece-body">
-          <span class="cc-piece-title">${esc(p.title)}${p.assetId
+          <span class="cc-piece-title"><span ${Store.can('edit') ? `data-ipiece="${p.id}"` : ''}>${esc(p.title)}</span>${p.assetId
             ? '<span class="pl-linked">brief</span>' : ''}</span>
           <span class="cc-piece-meta">${esc(p.format)} · ${esc(ch.label)}</span>
         </span>
-        <span class="pl-st t-${st.tone}"><i></i>${st.label}</span>
-      </button>`;
+        ${Store.can('edit')
+          ? `<button class="pl-st t-${st.tone}" data-ipstatus="${p.id}" title="Click to move it along"><i></i>${st.label}</button>`
+          : `<span class="pl-st t-${st.tone}"><i></i>${st.label}</span>`}
+      </div>`;
     };
 
     return `
@@ -840,6 +887,19 @@
         wireTaskBoard(root);
         root.querySelectorAll('[data-piece]').forEach(b =>
           b.addEventListener('click', () => go('#/plan')));
+        HQ.inlineText(root, '[data-ipiece]', (el, v) => {
+          Store.updatePiece(el.dataset.ipiece, { title: v }); HQ.render();
+        });
+        HQ.stopRow(root, '[data-ipstatus]');
+        root.querySelectorAll('[data-ipstatus]').forEach(el =>
+          el.addEventListener('click', () => {
+            const keys = Object.keys(PLAN_STATUS);
+            const p = Store.piece(el.dataset.ipstatus);
+            if (!p) return;
+            const next = keys[(keys.indexOf(p.status) + 1) % keys.length];
+            Store.updatePiece(p.id, { status: next });
+            HQ.render();
+          }));
         const bf = root.querySelector('#cc-brief-frame');
         if (bf) bf.addEventListener('load', () => {
           try {
