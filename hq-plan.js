@@ -17,7 +17,6 @@
     calMonth: null        /* 'YYYY-MM' shown in calendar view */
   };
 
-  let wiredSync = false;
   let pbOpen = null;   /* week index open; null = auto (today's week) */
   let pbHidden = false;
 
@@ -139,32 +138,43 @@
 
   /* What the Content Studio says about this piece's creative. Three states,
      and "not heard" is deliberately distinct from "not approved". */
+  const APPR = {
+    approved:  { label: 'approved',      ok: true },
+    scheduled: { label: 'approved',      ok: true },
+    revise:    { label: 'needs changes', ok: false },
+    pending:   { label: 'not reviewed',  ok: false }
+  };
+
   function approvalChip(p) {
     if (!p.assetId) return '';
-    if (typeof StudioSync === 'undefined') return '';
-    const v = StudioSync.assetStatus(p.campaign, p.assetId);
-    if (!v) return `<span class="pl-appr unknown" title="The Studio hasn’t recorded a verdict for this asset">brief</span>`;
-    return `<span class="pl-appr ${v.ok ? 'ok' : 'no'}" title="${esc(v.label)} in the Content Studio">${
-      v.ok ? '✓ approved' : esc(v.label.toLowerCase())}</span>`;
+    const st = Store.studioAssetStatus(p.campaign, p.assetId);
+    if (!st) return `<span class="pl-appr unknown" title="Nobody has reviewed this asset in Campaigns yet">brief</span>`;
+    const v = APPR[st] || APPR.pending;
+    return `<span class="pl-appr ${v.ok ? 'ok' : 'no'}" title="${esc(v.label)} in Campaigns">${
+      v.ok ? '✓ approved' : esc(v.label)}</span>`;
   }
 
   /* Says plainly where the approval data is coming from, and when it is not. */
+  /* Where the Content Plan stands against what Campaigns has signed off. Same
+     store on both sides now, so this is just a count — nothing to fetch and
+     nothing to be out of date. */
   function syncBanner() {
-    if (typeof StudioSync === 'undefined') return '';
-    const st = StudioSync.state;
-    const sum = StudioSync.summarise(Store.pieces());
-    if (st === 'loading' || st === 'idle') return `<div class="pl-sync">Checking the Studio for approvals…</div>`;
-    if (st === 'error') return `<div class="pl-sync bad">Couldn’t reach the Content Studio — ${esc(StudioSync.error)}.
-      Approval status below is unavailable, not negative.</div>`;
-    if (st === 'empty') return `<div class="pl-sync warn">
-      <b>The Studio has no approvals recorded yet.</b> It only saves to the shared database when a
-      reviewer is <em>signed in</em> — signed out, their sign-off stays in their own browser and
-      nothing here can see it. Worth confirming with Brandon and Jessie before a real review round.</div>`;
+    const linked = Store.pieces().filter(p => p.assetId);
+    if (!linked.length) return '';
+    let approved = 0, changes = 0, unseen = 0;
+    linked.forEach(p => {
+      const st = Store.studioAssetStatus(p.campaign, p.assetId);
+      const v = st && APPR[st];
+      if (!v) unseen++; else if (v.ok) approved++; else changes++;
+    });
+    if (!approved && !changes) return `<div class="pl-sync warn">
+      <b>None of the ${linked.length} briefed pieces has been reviewed yet.</b>
+      Creative gets signed off in Campaigns; the verdict shows up here.</div>`;
     return `<div class="pl-sync ok">
-      <b>${sum.approved}</b> of ${sum.linked} briefed pieces approved in the Studio${
-        sum.changes ? ` · <b>${sum.changes}</b> need changes` : ''}${
-        sum.unknown ? ` · ${sum.unknown} not yet reviewed` : ''}.
-      <span>Read-only — approving happens in Campaigns.</span></div>`;
+      <b>${approved}</b> of ${linked.length} briefed pieces approved${
+        changes ? ` · <b>${changes}</b> need changes` : ''}${
+        unseen ? ` · ${unseen} not yet reviewed` : ''}.
+      <span>Approving happens in Campaigns.</span></div>`;
   }
 
   const campOf = id => Store.campaign(id);
@@ -521,13 +531,6 @@
         const p = Store.addPiece({});
         HQ.render(); openPieceSheet(p.id);
       });
-      if (typeof StudioSync !== 'undefined') {
-        StudioSync.refresh();
-        if (!wiredSync) {
-          wiredSync = true;
-          StudioSync.onChange(() => { if (HQ.route().view === 'plan') HQ.render(); });
-        }
-      }
       if (HQ.wireProjToggle) HQ.wireProjToggle(root);
       const rb = root.querySelector('#pl-rules');
       if (rb) rb.addEventListener('click', openRulesSheet);

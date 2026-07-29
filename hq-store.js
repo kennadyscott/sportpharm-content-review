@@ -53,6 +53,7 @@ const Store = (() => {
       reminders: SEED_REMINDERS.map((r, i) => ({ resolved: false, ...r, order: i, createdAt: now(), updatedAt: now() })),
       metrics: {},    /* rowKey -> { col: value }, plus .margin — HQ-level rollup */
       campReview: {}, /* "campId:sec:<key>" | "campId:asset:<id>" -> { status, thread[] } */
+      studio: {},     /* the Content Studio's own key/value space, now HQ data */
       flags: {},      /* one-off markers: migrations, dismissals */
       invites: [],
       activity: [],
@@ -775,10 +776,11 @@ const Store = (() => {
   function briefBlocks(p) {
     const rules = planRules();
     if (!rules.requireBriefApproval) return null;
-    if (!p.assetId || typeof StudioSync === 'undefined') return null;
-    const v = StudioSync.assetStatus(p.campaign, p.assetId);
-    if (!v || v.ok) return null;
-    return v.label;
+    if (!p.assetId) return null;
+    const st = studioAssetStatus(p.campaign, p.assetId);
+    if (!st) return null;                                  /* unreviewed is silence, not rejection */
+    if (st === 'approved' || st === 'scheduled') return null;
+    return st === 'revise' ? 'Needs changes' : 'Not reviewed';
   }
 
   function bulkStatus(ids, status) {
@@ -894,6 +896,30 @@ const Store = (() => {
       (r[k].thread || []).forEach(t => { n += 1 + (t.replies || []).length; });
     });
     return n;
+  }
+
+  /* ------------------------- the Content Studio -------------------------- */
+  /* The Studio reads and writes through these two. Its key shapes are its own
+     ("<campaignId>:<assetId>", "<campaignId>:sec:<key>", "<campaignId>:__edits")
+     and are kept exactly as they were, so nothing had to be re-keyed and its
+     code did not have to change. Living in HQ's state means approvals sync
+     with the team like everything else instead of sitting in a second database. */
+  function studioGet(k) {
+    const s = load();
+    if (!s.studio) s.studio = {};
+    return s.studio[k] || {};
+  }
+  function studioSet(k, v) {
+    const s = load();
+    if (!s.studio) s.studio = {};
+    s.studio[k] = v;
+    save();
+  }
+  /* what the Content Plan asks: has this asset's creative been signed off? */
+  function studioAssetStatus(campaignId, assetId) {
+    if (!campaignId || !assetId) return null;
+    const rec = studioGet(campaignId + ':' + assetId);
+    return rec && rec.status ? rec.status : null;
   }
 
   /* ------------------------------- playbook ------------------------------ */
@@ -1032,6 +1058,7 @@ const Store = (() => {
     addArticleNote, removeArticleNote, noteCount,
     media, mediaItem, addMedia, updateMedia, removeMedia, mediaUsedBy,
     metricsOf, setMetric, setMargin,
+    studioGet, studioSet, studioAssetStatus,
     briefs, brief, reviewState, setReviewState, reviewThread,
     addReviewNote, removeReviewNote, campaignProgress, campaignNoteCount,
     addIdea, voteIdea, setIdeaState, removeIdea, promoteIdea, ideaToArticle,

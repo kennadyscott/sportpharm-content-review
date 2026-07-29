@@ -17,7 +17,8 @@ const Cloud = (() => {
   const enabled = !!(cfg.url && cfg.anonKey && window.supabase);
 
   const KEYS = ['users', 'projects', 'articles', 'media', 'ideas', 'platforms',
-                'plan', 'planRules', 'reminders', 'metrics', 'flags', 'invites', 'activity'];
+                'plan', 'planRules', 'reminders', 'metrics', 'flags', 'invites', 'activity',
+                'campReview', 'studio'];
 
   let client = null;
   let sess = null;

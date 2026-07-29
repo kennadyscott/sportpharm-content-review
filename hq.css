@@ -2040,3 +2040,18 @@ button.pl-st:hover { filter: brightness(.94); }
 .pl-sync.ok   { border-left-color: var(--green); }
 .pl-sync.warn { border-left-color: var(--amber); background: #FBF1DE; }
 .pl-sync.bad  { border-left-color: var(--red); background: #FDE9E8; }
+
+/* ---- the Content Studio, hosted natively ---- */
+.studio-host { display: flex; flex-direction: column; flex: 1; width: 100%; min-width: 0; min-height: 0; }
+.studio-hostbar {
+  display: flex; align-items: center; gap: .7rem; flex-wrap: wrap;
+  padding: .6rem clamp(.9rem, 3vw, 1.6rem);
+  border-bottom: 1px solid var(--line); background: var(--paper); flex: none;
+}
+.studio-hostbar .crumb { margin: 0; }
+.studio-hostbar select {
+  margin-left: auto; padding: .35rem .6rem; border: 1.5px solid var(--line);
+  border-radius: 999px; background: var(--paper); font-size: .82rem; max-width: 240px;
+}
+/* the Studio owns everything inside here */
+.studio { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
