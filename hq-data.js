@@ -661,34 +661,73 @@ const PILLARS = {
 
 const SEED_PLAN = [];   /* seeded by LAUNCH_PIECES below */
 
-/* The direct-sales push. Five weeks, Monday-dated, ending on a deadline close. */
+/* The direct-sales push, reconciled against the Content Studio on 2026-07-29.
+
+   Every Studio asset for Feel It Work (w1–w14) now has a dated slot here, and
+   `assetId` links the two so the Plan row and the Studio brief are the same
+   piece of work seen from two angles. Pieces with no assetId are HQ-only —
+   paid placements and offer mechanics, which the Studio tracks in its own
+   Meta Ads and Offers sections rather than as assets.
+
+   Reconciling caught two scheduling errors: the cart-abandon flow was dated
+   mid-campaign when it has to exist before week one, and the close was dated
+   31 Aug — a Monday — while its own copy says the deadline is Sunday. */
 const LAUNCH_PIECES = [
-  { id: 'lp1',  title: 'Hero reel — "Three sensations. One rub."', campaign: 'wasabi-direct', format: 'Reel',    channel: 'instagram', status: 'drafting',  date: '2026-08-03', facing: 'athlete', pillar: 'Feel it work',
+  /* ---- Week 0 · before anything posts ---- */
+  { id: 'lp-w14', assetId: 'w14', title: 'Cart-abandon flow — 3 emails', campaign: 'wasabi-direct', format: 'Email', channel: 'email', status: 'drafting', date: '2026-07-30', facing: 'athlete', pillar: 'Feel it work',
+    notes: 'Reminder → objection/review → incentive. Studio marks this "core, build before launch" — it has to be firing on a test cart before week one, not bolted on later.' },
+
+  /* ---- Week 1 · three sensations, one rub ---- */
+  { id: 'lp-w1', assetId: 'w1', title: 'Hero reel — Feel It Work', campaign: 'wasabi-direct', format: 'Reel', channel: 'instagram', status: 'drafting', date: '2026-08-03', facing: 'athlete', pillar: 'Feel it work',
     notes: 'Opens on the differentiator, not the jar. Menthol / capsaicin / methyl salicylate as three beats. Ends at the product page, not the profile.' },
-  { id: 'lp2',  title: 'Lineup carousel — cool, balanced, hot', campaign: 'wasabi-direct', format: 'Carousel', channel: 'instagram', status: 'drafting',  date: '2026-08-05', facing: 'athlete', pillar: 'Feel it work',
+  { id: 'lp-w12', assetId: 'w12', title: 'Stories — polls, quiz & shop links', campaign: 'wasabi-direct', format: 'Stories', channel: 'instagram', status: 'drafting', date: '2026-08-03', facing: 'athlete', pillar: 'Feel it work',
+    notes: 'Always-on from launch. The lowest-effort direct path we have — link stickers on every frame.' },
+  { id: 'lp-w11', assetId: 'w11', title: 'Email sequence — 3 sends', campaign: 'wasabi-direct', format: 'Email', channel: 'email', status: 'drafting', date: '2026-08-04', facing: 'athlete', pillar: 'Feel it work',
+    notes: 'Runs across all five weeks. Capture is the byproduct; the order is the point.' },
+  { id: 'lp-w2', assetId: 'w2', title: 'Meet the lineup carousel', campaign: 'wasabi-direct', format: 'Carousel', channel: 'instagram', status: 'drafting', date: '2026-08-05', facing: 'athlete', pillar: 'Feel it work',
     notes: 'IcetraRub blue / WasabiRub green / Super Hot red. One idea per slide. Prices on the last slide only.' },
-  { id: 'lp3',  title: 'Launch offer — FEELIT15', campaign: 'wasabi-direct', format: 'Post',     channel: 'instagram', status: 'drafting',  date: '2026-08-07', facing: 'athlete', pillar: 'Feel it work',
-    notes: 'Code has to exist in-store before this posts. Check with Kennady.' },
-  { id: 'lp4',  title: 'Welcome email 1 — first-order free shipping', campaign: 'wasabi-direct', format: 'Email',    channel: 'email',     status: 'drafting',  date: '2026-08-10', facing: 'athlete', pillar: 'Feel it work',
-    notes: 'FREESHIP1. Capture is the byproduct, the order is the point.' },
-  { id: 'lp5',  title: 'Triple-action explainer', campaign: 'wasabi-direct', format: 'Carousel', channel: 'instagram', status: 'drafting',  date: '2026-08-12', facing: 'athlete', pillar: 'Feel it work',
-    notes: 'Soften "only triple-action" to something defensible before this goes to paid.' },
-  { id: 'lp6',  title: 'Cold prospecting reel — Meta', campaign: 'wasabi-direct', format: 'Meta ad',  channel: 'paid',      status: 'drafting',  date: '2026-08-14', facing: 'athlete', pillar: 'Feel it work',
-    notes: 'No personal-attribute copy. OTC claims only. Pixel + CAPI both firing before spend starts.' },
-  { id: 'lp7',  title: 'Cart abandon flow — 3 parts', campaign: 'wasabi-direct', format: 'Email',    channel: 'email',     status: 'drafting',  date: '2026-08-17', facing: 'athlete', pillar: 'Feel it work',
-    notes: 'Reminder → objection/review → incentive. Build before launch, not after.' },
-  { id: 'lp8',  title: 'What TruShield actually screens for', campaign: 'clean-sport', format: 'Blog',     channel: 'blog',      status: 'review',    date: '2026-08-19', facing: 'pro',     pillar: 'What touches the athlete',
+  { id: 'lp-w13', assetId: 'w13', title: 'First-order offer — your first order ships free', campaign: 'wasabi-direct', format: 'Post', channel: 'instagram', status: 'drafting', date: '2026-08-06', facing: 'athlete', pillar: 'Feel it work',
+    notes: 'FREESHIP1. Always-on across the window. Code has to exist in-store before this posts.' },
+  { id: 'lp3', assetId: '', title: 'Launch offer — FEELIT15', campaign: 'wasabi-direct', format: 'Post', channel: 'instagram', status: 'drafting', date: '2026-08-07', facing: 'athlete', pillar: 'Feel it work',
+    notes: 'HQ-only — an offer mechanic, not a Studio asset. Code has to exist in-store before this posts. Check with Kennady.' },
+
+  /* ---- Week 2 · why it feels different ---- */
+  { id: 'lp-w3', assetId: 'w3', title: 'WasabiRub triple-action', campaign: 'wasabi-direct', format: 'Carousel', channel: 'instagram', status: 'drafting', date: '2026-08-10', facing: 'athlete', pillar: 'Feel it work',
+    notes: 'Soften "only triple-action" to something defensible before this goes anywhere near paid.' },
+  { id: 'lp-w4', assetId: 'w4', title: 'IcetraRub cooling spotlight', campaign: 'wasabi-direct', format: 'Post', channel: 'instagram', status: 'drafting', date: '2026-08-12', facing: 'athlete', pillar: 'Feel it work',
+    notes: '16% menthol, the cooling end of the range. Was in the Studio with no dated slot until the reconcile.' },
+  { id: 'lp-w5', assetId: 'w5', title: 'WasabiRub Super Hot spotlight', campaign: 'wasabi-direct', format: 'Post', channel: 'instagram', status: 'drafting', date: '2026-08-14', facing: 'athlete', pillar: 'Feel it work',
+    notes: 'The max-heat end. Was in the Studio with no dated slot until the reconcile.' },
+  { id: 'lp6', assetId: '', title: 'Cold prospecting reel — Meta', campaign: 'wasabi-direct', format: 'Meta ad', channel: 'paid', status: 'drafting', date: '2026-08-14', facing: 'athlete', pillar: 'Feel it work',
+    notes: 'HQ-only — lives in the Studio\'s Meta Ads section, not its assets. No personal-attribute copy. OTC claims only. Pixel + CAPI both firing before spend starts.' },
+
+  /* ---- Week 3 · help them choose ---- */
+  { id: 'lp-w6', assetId: 'w6', title: 'Cool → Heat: which rub?', campaign: 'wasabi-direct', format: 'Carousel', channel: 'instagram', status: 'drafting', date: '2026-08-17', facing: 'athlete', pillar: 'Find your heat',
+    notes: 'The chooser. Was in the Studio with no dated slot until the reconcile.' },
+  { id: 'lp-w7', assetId: 'w7', title: 'Bundle & save', campaign: 'wasabi-direct', format: 'Post', channel: 'instagram', status: 'drafting', date: '2026-08-19', facing: 'athlete', pillar: 'Feel it work',
+    notes: 'Fire & Ice / OG Heat / Recovery. Raises basket size. Was in the Studio with no dated slot until the reconcile.' },
+
+  /* ---- Week 4 · proof ---- */
+  { id: 'lp-w8', assetId: 'w8', title: 'Trusted by pros & pharmacists', campaign: 'wasabi-direct', format: 'Post', channel: 'instagram', status: 'drafting', date: '2026-08-24', facing: 'athlete', pillar: 'Trusted since 1995',
+    notes: 'Describe use, never endorsement. Was in the Studio with no dated slot until the reconcile.' },
+  { id: 'lp-w9', assetId: 'w9', title: 'Ask Brandon — triple-action & how to use', campaign: 'wasabi-direct', format: 'Reel', channel: 'instagram', status: 'drafting', date: '2026-08-26', facing: 'athlete', pillar: 'Trusted since 1995',
+    notes: 'People buy the pharmacist before the product. Was in the Studio with no dated slot until the reconcile.' },
+  { id: 'lp12', assetId: '', title: 'Retargeting proof + LASTCALL', campaign: 'wasabi-direct', format: 'Meta ad', channel: 'paid', status: 'drafting', date: '2026-08-28', facing: 'athlete', pillar: 'Feel it work',
+    notes: 'HQ-only — Studio Meta Ads section. Real deadline or do not run it.' },
+
+  /* ---- Week 5 · the close ---- */
+  { id: 'lp-w10', assetId: 'w10', title: 'Campaign close — launch pricing ends Sunday', campaign: 'wasabi-direct', format: 'Post', channel: 'instagram', status: 'drafting', date: '2026-08-30', facing: 'athlete', pillar: 'Feel it work',
+    notes: 'LASTCALL. 30 Aug is the Sunday — the previous date (31 Aug) was a Monday and contradicted the copy. Deadline is midnight and it has to actually be enforced in-store.' },
+
+  /* ---- other campaigns ---- */
+  { id: 'lp8', assetId: '', title: 'What TruShield actually screens for', campaign: 'clean-sport', format: 'Blog', channel: 'blog', status: 'review', date: '2026-08-19', facing: 'pro', pillar: 'What touches the athlete',
     notes: 'Article is approved in the CMS — this is the social pull-through.' },
-  { id: 'lp9',  title: 'Sideline kit audit — the checklist', campaign: 'sideline-ready', format: 'Post', channel: 'linkedin',  status: 'drafting',  date: '2026-08-21', facing: 'pro',     pillar: 'Sideline ready',
+  { id: 'lp9', assetId: '', title: 'Sideline kit audit — the checklist', campaign: 'sideline-ready', format: 'Post', channel: 'linkedin', status: 'drafting', date: '2026-08-21', facing: 'pro', pillar: 'Sideline ready',
     notes: 'The download has to exist first. It does not yet — see Professional channel.' },
-  { id: 'lp10', title: 'Trusted since 1995 — the thirty-year post', campaign: 'trusted', format: 'Post',     channel: 'linkedin',  status: 'drafting',  date: '2026-08-24', facing: 'pro',     pillar: 'Trusted since 1995',
+  { id: 'lp10', assetId: '', title: 'Trusted since 1995 — the thirty-year post', campaign: 'trusted', format: 'Post', channel: 'linkedin', status: 'drafting', date: '2026-08-24', facing: 'pro', pillar: 'Trusted since 1995',
     notes: 'Proof, not nostalgia. What thirty years actually bought the customer.' },
-  { id: 'lp11', title: 'Ask Brandon — interview cut', campaign: 'team', format: 'Reel',     channel: 'instagram', status: 'drafting',  date: '2026-08-26', facing: 'athlete', pillar: 'Trusted since 1995',
-    notes: 'People buy the pharmacist before the product.' },
-  { id: 'lp12', title: 'Retargeting proof + LASTCALL', campaign: 'wasabi-direct', format: 'Meta ad',  channel: 'paid',      status: 'drafting',  date: '2026-08-28', facing: 'athlete', pillar: 'Feel it work',
-    notes: 'Real deadline or do not run it. Launch pricing genuinely ends Sunday.' },
-  { id: 'lp13', title: 'Launch pricing ends Sunday', campaign: 'wasabi-direct', format: 'Post',     channel: 'instagram', status: 'drafting',  date: '2026-08-31', facing: 'athlete', pillar: 'Feel it work',
-    notes: 'The close. LASTCALL. Deadline is midnight and it has to actually be enforced in-store.' }
+  { id: 'lp11', assetId: '', title: 'Ask Brandon — interview cut', campaign: 'team', format: 'Reel', channel: 'instagram', status: 'drafting', date: '2026-08-26', facing: 'athlete', pillar: 'Trusted since 1995',
+    notes: 'Behind the Counter campaign. Distinct from the WasabiRub Ask Brandon on the same day — one is product, one is the pharmacist.' }
 ];
 
 /* The launch window, week by week, sitting above the plan. The checkboxes are

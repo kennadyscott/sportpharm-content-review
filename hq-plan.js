@@ -27,7 +27,7 @@
     const fchip = p.facing ? `<span class="face-chip fc-${p.facing}">${FACING[p.facing].short}</span>` : '';
     return `<tr class="pl-row ${checked ? 'sel' : ''}" data-piece="${p.id}">
       <td class="pl-ck"><input type="checkbox" data-sel="${p.id}" ${checked ? 'checked' : ''} aria-label="Select ${esc(p.title)}"></td>
-      <td class="pl-title">${esc(p.title)} ${fchip}</td>
+      <td class="pl-title">${esc(p.title)} ${fchip}${p.assetId ? '<span class="pl-linked" title="Has a brief in the Content Studio">brief</span>' : ''}</td>
       <td><span class="pl-fmt fmt-${p.format.toLowerCase()}">${esc(p.format)}</span></td>
       <td><span class="tag t-${ch.tone}">${esc(ch.label)}</span></td>
       <td><span class="pl-st t-${st.tone}"><i></i>${st.label}</span></td>
@@ -212,7 +212,7 @@
     const fchip = p.facing ? `<span class="face-chip fc-${p.facing}">${FACING[p.facing].short}</span>` : '';
     return `<tr class="pl-row ${checked ? 'sel' : ''}" data-piece="${p.id}">
       <td class="pl-ck"><input type="checkbox" data-sel="${p.id}" ${checked ? 'checked' : ''} aria-label="Select ${esc(p.title)}"></td>
-      <td class="pl-title">${esc(p.title)} ${fchip}</td>
+      <td class="pl-title">${esc(p.title)} ${fchip}${p.assetId ? '<span class="pl-linked" title="Has a brief in the Content Studio">brief</span>' : ''}</td>
       <td>${c ? `<span class="pl-camp">${esc(c.title)}</span>` : '<span class="pl-dim">—</span>'}</td>
       <td><span class="pl-fmt fmt-${p.format.toLowerCase()}">${esc(p.format)}</span></td>
       <td><span class="tag t-${ch.tone}">${esc(ch.label)}</span></td>
@@ -530,6 +530,12 @@
                 </select></div>
               <div class="field"><label>Date</label>
                 <input type="date" id="pc-date" value="${esc(p.date || '')}" ${editable ? '' : 'disabled'}></div>
+              <div class="field" style="grid-column:1/-1"><label>Content Studio</label>
+                ${p.assetId
+                  ? `<button class="btn btn-outline btn-sm" data-go="#/campaigns/${esc(p.campaign)}">${svg('mega')}Open the brief for this piece</button>
+                     <span class="pl-hint">Studio asset <code>${esc(p.assetId)}</code>. Creative approval lives there; the ship date lives here.</span>`
+                  : `<span class="pl-hint">No Studio asset — this is an HQ-only piece (paid placement or offer mechanic).</span>`}
+              </div>
               <div class="field"><label>Who</label>
                 <select id="pc-owner" ${editable ? '' : 'disabled'}>
                   <option value="">No one yet</option>

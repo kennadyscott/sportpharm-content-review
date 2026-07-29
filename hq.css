@@ -1794,3 +1794,12 @@ ol.b-list li::marker { color: var(--red); font-weight: 700; }
 .b-spacer.s-large { height: 4rem; }
 
 .a-series { color: var(--red); font-weight: 700; }
+
+/* Plan ↔ Studio link — which pieces have a brief on the other side */
+.pl-linked {
+  display: inline-block; margin-left: .35rem; font-size: .6rem; font-weight: 800;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--red);
+  background: #FDE9E8; padding: .08rem .34rem; border-radius: 999px; vertical-align: middle;
+}
+.pl-hint { display: block; font-size: .74rem; color: var(--ink-faint); line-height: 1.5; margin-top: .35rem; }
+.pl-hint code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem; color: var(--ink-soft); }
