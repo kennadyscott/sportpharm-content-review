@@ -7,6 +7,36 @@
    is not ours to reinterpret.
 ============================================================================= */
 
+/* -----------------------------------------------------------------------------
+   HQ restyles h1–h3, ul, a, button, input, select, textarea and svg globally,
+   and it happens to use .rail, .topbar, .wrap, .chip and .dots as class names
+   too. The Studio was authored against browser defaults and its own rules, so
+   HQ's cascade was landing on top of a design that never asked for it.
+
+   Everything HQ sets globally is reverted to the user agent here, first, so the
+   Studio's own rules below decide — exactly as they did standalone.
+----------------------------------------------------------------------------- */
+.studio h1, .studio h2, .studio h3, .studio h4, .studio h5, .studio h6 {
+  font-family: revert; font-weight: revert; font-size: revert;
+  letter-spacing: revert; line-height: revert; color: revert; margin: revert;
+}
+.studio p, .studio ul, .studio ol, .studio li, .studio figure, .studio blockquote {
+  margin: revert; padding: revert;
+}
+.studio ul, .studio ol { list-style: revert; }
+.studio a { color: revert; text-decoration: revert; }
+.studio button {
+  font: revert; color: revert; background: revert; border: revert;
+  padding: revert; cursor: pointer;
+}
+.studio input, .studio textarea, .studio select {
+  font: revert; color: revert; background: revert; border: revert; padding: revert;
+}
+.studio svg { display: revert; }
+.studio [hidden] { display: none; }
+
+
+
 .studio{
     --red:#D6202A;
     --red-deep:#B0161F;
