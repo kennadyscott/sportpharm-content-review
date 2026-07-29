@@ -1865,27 +1865,7 @@ ol.b-list li::marker { color: var(--red); font-weight: 700; }
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;
 }
 
-/* ------------- Campaign cockpit: the whole campaign on one page ------------- */
-.cc-stats { margin-bottom: 1rem; }
-.cc-work { margin-bottom: 1.3rem; }
-
-.cc-pieces { display: grid; gap: .15rem; max-height: 420px; overflow-y: auto; }
-.cc-piece {
-  display: flex; align-items: center; gap: .7rem; text-align: left; width: 100%;
-  padding: .5rem .55rem; border-radius: 9px; transition: background .12s ease;
-}
-.cc-piece:hover { background: var(--line-soft); }
-.cc-piece-date {
-  font-size: .72rem; font-weight: 700; color: var(--ink-faint);
-  min-width: 3.4rem; flex: none; white-space: nowrap;
-}
-.cc-piece-body { flex: 1; min-width: 0; }
-.cc-piece-title {
-  display: block; font-size: .86rem; font-weight: 500; color: var(--navy);
-  line-height: 1.35; overflow: hidden; text-overflow: ellipsis;
-}
-.cc-piece-meta { display: block; font-size: .72rem; color: var(--ink-faint); margin-top: .05rem; }
-
+/* ---- Campaign step: the brief, on its own ---- */
 .cc-brief {
   background: var(--paper); border: 1px solid var(--line);
   border-top: 3px solid var(--red); border-radius: 16px; overflow: hidden;

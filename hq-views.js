@@ -442,70 +442,20 @@
     });
   }
 
-  /* Everything about the campaign in flight, on one page: its tasks, its dated
-     pieces, and the actual brief embedded from the Content Studio — so you can
-     read what was agreed without leaving the place you plan the work. */
+  /* The Campaign step is the campaign — nothing else. Its tasks live in Tasks
+     and its dated pieces live in the Content Plan; repeating them here just
+     made the same work appear three times. */
   function campaignCockpit() {
     const c = Store.campaign(CURRENT_CAMPAIGN);
     if (!c) return groupedView('campaign');
-
-    const tasks = Store.allTasks().filter(t => t.campaign === c.id);
-    const openTasks = tasks.filter(t => t.status !== 'shipped');
-    const pieces = Store.pieces().filter(p => p.campaign === c.id)
-      .sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999'));
-    const linked = pieces.filter(p => p.assetId).length;
-
-    const pieceRow = p => {
-      const st = PLAN_STATUS[p.status] || PLAN_STATUS.drafting;
-      const ch = CHANNELS[p.channel] || { label: p.channel, tone: 'blue' };
-      const d = p.date ? dueLabel(p.date) : null;
-      return `<div class="cc-piece" data-piece="${p.id}" tabindex="0" role="button">
-        <span class="cc-piece-date">${p.date ? esc(new Date(p.date + 'T12:00:00')
-          .toLocaleDateString(undefined, { month: 'short', day: 'numeric' })) : '—'}</span>
-        <span class="cc-piece-body">
-          <span class="cc-piece-title"><span ${Store.can('edit') ? `data-ipiece="${p.id}"` : ''}>${esc(p.title)}</span>${p.assetId
-            ? '<span class="pl-linked">brief</span>' : ''}</span>
-          <span class="cc-piece-meta">${esc(p.format)} · ${esc(ch.label)}</span>
-        </span>
-        ${Store.can('edit')
-          ? `<button class="pl-st t-${st.tone}" data-ipstatus="${p.id}" title="Click to move it along"><i></i>${st.label}</button>`
-          : `<span class="pl-st t-${st.tone}"><i></i>${st.label}</span>`}
-      </div>`;
-    };
-
     return `
-      <div class="metric-grid cc-stats">
-        <div class="metric-card stat"><h3>${c.assets}</h3><p>Assets briefed</p></div>
-        <div class="metric-card stat"><h3>${openTasks.length}</h3><p>Tasks still open</p></div>
-        <div class="metric-card stat"><h3>${pieces.length}</h3><p>Pieces dated</p></div>
-        <div class="metric-card stat"><h3>${linked}</h3><p>Linked to a brief</p></div>
-      </div>
-
-      <div class="col-2 stack cc-work">
-        <section class="panel">
-          <div class="panel-head"><h2>What it still needs</h2>
-            <span class="note">${openTasks.length} open</span></div>
-          ${tasks.length ? tasks.map(taskRow).join('')
-            : '<p class="panel-empty">No tasks tagged to this campaign yet.</p>'}
-        </section>
-
-        <section class="panel">
-          <div class="panel-head"><h2>What ships, and when</h2>
-            <span class="note">from the Content Plan</span></div>
-          <div class="cc-pieces">
-            ${pieces.length ? pieces.map(pieceRow).join('')
-              : '<p class="panel-empty">Nothing dated yet.</p>'}
-          </div>
-        </section>
-      </div>
-
       <section class="cc-brief">
         <div class="cc-brief-head">
           ${svg('mega')}
           <div>
-            <h2>${esc(c.title)} — the brief</h2>
-            <p>${c.assets} drafted assets, the weekly calendar, the guardrails. Approve the
-               creative here; the Content Plan picks the verdict up.</p>
+            <h2>${esc(c.title)}</h2>
+            <p>${esc(c.strand)} — ${c.assets} drafted assets. Approve the creative here;
+               the Content Plan picks the verdict up.</p>
           </div>
           <a class="btn btn-ghost btn-sm" href="campaigns/index.html?c=${esc(c.id)}"
              target="_blank" rel="noopener">Open in a tab</a>
@@ -885,21 +835,6 @@
         if (cs) cs.addEventListener('click', () => { showAllCampaigns = !showAllCampaigns; HQ.render(); });
         wireTaskRows(root);
         wireTaskBoard(root);
-        root.querySelectorAll('[data-piece]').forEach(b =>
-          b.addEventListener('click', () => go('#/plan')));
-        HQ.inlineText(root, '[data-ipiece]', (el, v) => {
-          Store.updatePiece(el.dataset.ipiece, { title: v }); HQ.render();
-        });
-        HQ.stopRow(root, '[data-ipstatus]');
-        root.querySelectorAll('[data-ipstatus]').forEach(el =>
-          el.addEventListener('click', () => {
-            const keys = Object.keys(PLAN_STATUS);
-            const p = Store.piece(el.dataset.ipstatus);
-            if (!p) return;
-            const next = keys[(keys.indexOf(p.status) + 1) % keys.length];
-            Store.updatePiece(p.id, { status: next });
-            HQ.render();
-          }));
         const bf = root.querySelector('#cc-brief-frame');
         if (bf) bf.addEventListener('load', () => {
           try {
