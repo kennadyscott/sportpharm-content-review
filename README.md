@@ -4,6 +4,17 @@ The internal hub for everything SportPharm: the work, the CMS that feeds the
 public site, the content plan, the campaign briefs, the brand decisions,
 analytics, platform spend, and the team.
 
+**Live:** <https://kennadyscott.github.io/sportpharm-content-review/> — HQ at the
+root, the Content Studio at `/campaigns/`. Deploy = `git push` to `main` on
+**`kennadyscott/sportpharm-content-review`**; Pages rebuilds in ~60s.
+
+> **This page is public.** The seat picker is a UI overlay, not a gate — the
+> full source has always been readable without credentials, which is also true
+> of the Studio and always was. Nothing in either bundle should be anything you
+> would mind a competitor reading. Internal channel strategy was stripped on
+> 2026-07-29 for exactly this reason; do not put it back. When Supabase Auth
+> lands, private content loads after sign-in and never ships in the bundle.
+
 **Source of truth:** `~/Documents/Claude/sportpharm-hq/`
 **Preview:** launch config `sportpharm-hq` (port 4196) serves `/tmp/sportpharm-hq`.
 After edits: `rm -rf /tmp/sportpharm-hq && cp -R ~/Documents/Claude/sportpharm-hq /tmp/sportpharm-hq`
