@@ -21,7 +21,24 @@
   /* ---------------------------- small pieces ----------------------------- */
   const para = t => `<p>${esc(t)}</p>`;
   const paras = v => (Array.isArray(v) ? v : [v]).filter(Boolean).map(para).join('');
-  const bullets = v => `<ul class="speclist">${(v || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+  /* The briefs were authored by hand over months, so the same field arrives as
+     a string, a string[] or an object depending on the campaign. Normalise
+     rather than assume. */
+  const asList = v => !v ? [] : Array.isArray(v) ? v : typeof v === 'string' ? [v] : [];
+  const bullets = v => {
+    const l = asList(v).map(x => typeof x === 'string' ? x : (x.t || x.s || x.label || ''))
+      .filter(Boolean);
+    return l.length ? `<ul class="speclist">${l.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
+  };
+  /* use / avoid / note appears on both visual direction and guardrails */
+  const useAvoid = (v, useLabel, avoidLabel) => {
+    if (!v) return '';
+    if (Array.isArray(v) || typeof v === 'string') return bullets(v);
+    return `${v.use ? `<h4>${useLabel}</h4>${bullets(v.use)}` : ''}
+      ${v.avoid ? `<h4>${avoidLabel}</h4><ul class="speclist guard-list">${asList(v.avoid)
+        .map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+      ${v.note ? `<p class="bf-note">${esc(v.note)}</p>` : ''}`;
+  };
 
   /* The approve / needs-changes control that sits on every section and asset. */
   function reviewBar(campId, part, label) {
@@ -103,7 +120,7 @@
         <div class="bf-primary"><span>The primary goal</span><p>${esc(s.primary)}</p></div>
         ${s.supporting ? `<h4>Supporting goals</h4>${bullets(s.supporting)}` : ''}
         ${s.audiences ? `<h4>Who it is for</h4>
-          <div class="bf-aud">${s.audiences.map(a => `<div class="bf-aud-row">
+          <div class="bf-aud">${asList(s.audiences).map(a => `<div class="bf-aud-row">
             <b>${esc(a.who)}</b>
             <span>${esc(a.cares)}</span>
             <q>${esc(a.msg)}</q>
@@ -113,7 +130,7 @@
     offers: c => c.camp.offers && (() => {
       const o = c.camp.offers;
       return `${o.intro ? paras(o.intro) : ''}
-        ${o.stack ? `<div class="bf-offers">${o.stack.map(x => `<div class="bf-offer">
+        ${o.stack ? `<div class="bf-offers">${asList(o.stack).map(x => `<div class="bf-offer">
           <b>${esc(x.code || x.name || '')}</b><span>${esc(x.what || x.d || '')}</span>
         </div>`).join('')}</div>` : ''}`;
     })(),
@@ -128,7 +145,7 @@
 
     structure: c => c.camp.structure && `
       ${c.camp.structureNote ? paras(c.camp.structureNote) : ''}
-      <div class="bf-phases">${c.camp.structure.map(p => `<div class="bf-phase">
+      <div class="bf-phases">${asList(c.camp.structure).map(p => `<div class="bf-phase">
         <b>${esc(p.phase || p.label || '')}</b>
         <p>${esc(p.what || p.d || '')}</p>
         ${p.posts ? bullets(p.posts) : ''}
@@ -151,12 +168,12 @@
 
     stories: c => c.camp.stories && `
       ${c.camp.storiesIntro ? paras(c.camp.storiesIntro) : ''}
-      <div class="bf-stories">${c.camp.stories.map(s => `<div class="bf-story">
-        <b>${esc(s.s || s.title || '')}</b><p>${esc(s.d || s.what || '')}</p>
+      <div class="bf-stories">${asList(c.camp.stories).map(x => `<div class="bf-story">
+        <p>${esc(typeof x === 'string' ? x : (x.d || x.s || ''))}</p>
       </div>`).join('')}</div>`,
 
     adaptations: c => c.camp.adaptations && `
-      <div class="bf-adapts">${c.camp.adaptations.map(a => `<div class="bf-adapt">
+      <div class="bf-adapts">${asList(c.camp.adaptations).map(a => `<div class="bf-adapt">
         <b>${esc(a.ch || a.channel || '')}</b>
         ${a.items ? bullets(a.items) : ''}
         ${a.cadence ? `<span class="bf-cadence">${esc(a.cadence)}</span>` : ''}
@@ -164,7 +181,7 @@
 
     paidAds: c => c.camp.paidAds && (() => {
       const p = c.camp.paidAds;
-      const ads = p.ads || (Array.isArray(p) ? p : []);
+      const ads = asList(p.ads).length ? asList(p.ads) : asList(p);
       return `${p.intro ? paras(p.intro) : ''}
         <div class="bf-ads">${ads.map(a => `<div class="bf-ad">
           <span class="bf-ad-kind">${esc(a.kind || a.type || 'Ad')}</span>
@@ -181,7 +198,7 @@
       return `${cr.intro ? paras(cr.intro) : ''}
         ${cr.who ? `<h4>Who to approach</h4>${bullets(cr.who)}` : ''}
         ${cr.mechanics ? `<h4>How it works</h4>
-          <div class="bf-mech">${cr.mechanics.map(m => `<div class="bf-mech-row">
+          <div class="bf-mech">${asList(cr.mechanics).map(m => `<div class="bf-mech-row">
             <b>${esc(m.k || m.label || '')}</b><span>${esc(m.v || m.d || '')}</span>
           </div>`).join('')}</div>` : ''}
         ${cr.note ? `<p class="bf-note">${esc(cr.note)}</p>` : ''}`;
@@ -193,27 +210,20 @@
         <p>${esc(c.camp.landingHero.dek || c.camp.landingHero.sub || '')}</p>
         ${c.camp.landingHero.note ? `<span class="bf-cadence">${esc(c.camp.landingHero.note)}</span>` : ''}
       </div>` : ''}
-      <div class="bf-phases">${(c.camp.landing || []).map(s => `<div class="bf-phase">
-        <b>${esc(s.s || s.label || '')}</b><p>${esc(s.d || s.what || '')}</p>
+      <div class="bf-phases">${asList(c.camp.landing).map(x => `<div class="bf-phase">
+        <b>${esc(x.t || x.s || x.label || '')}</b>${x.d || x.what ? `<p>${esc(x.d || x.what)}</p>` : ''}
       </div>`).join('')}</div>`,
 
     visual: c => (c.camp.visual || c.camp.visualFeel) && `
       ${c.camp.visualFeel ? paras(c.camp.visualFeel) : ''}
-      ${c.camp.visualSwatches ? `<div class="bf-swatches">${c.camp.visualSwatches.map(v =>
+      ${c.camp.visualSwatches ? `<div class="bf-swatches">${asList(c.camp.visualSwatches).map(v =>
         `<span class="bf-swatch"><i style="background:${esc(v.hex || v)}"></i>${esc(v.name || v)}</span>`).join('')}</div>` : ''}
-      ${c.camp.visual ? bullets(c.camp.visual) : ''}`,
+      ${useAvoid(c.camp.visual, 'Lean into', 'Steer clear of')}`,
 
-    guardrails: c => c.camp.guardrails && (() => {
-      const g = c.camp.guardrails;
-      const avoid = g.avoid || (Array.isArray(g) ? g : []);
-      return `${g.say ? `<h4>Safe to say</h4>${bullets(g.say)}` : ''}
-        ${avoid.length ? `<h4>Never say</h4><ul class="speclist guard-list">${avoid.map(x =>
-          `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
-        ${g.note ? `<p class="bf-note">${esc(g.note)}</p>` : ''}`;
-    })(),
+    guardrails: c => c.camp.guardrails && useAvoid(c.camp.guardrails, 'Safe to say', 'Never say'),
 
     metrics: c => c.camp.metrics && `
-      <div class="bf-metrics">${c.camp.metrics.map(m => `<div class="bf-metric">
+      <div class="bf-metrics">${asList(c.camp.metrics).map(m => `<div class="bf-metric">
         <b>${esc(m.goal || m.k || '')}</b><span>${esc(m.kpi || m.why || '')}</span>
       </div>`).join('')}</div>`
   };
