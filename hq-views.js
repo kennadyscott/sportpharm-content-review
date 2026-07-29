@@ -503,12 +503,16 @@
         <div class="cc-brief-head">
           ${svg('mega')}
           <div>
-            <h2>The brief</h2>
-            <p>The brief as built — ${c.assets} drafted assets, the weekly calendar, the
-               guardrails. Creative approval happens in here.</p>
+            <h2>${esc(c.title)} — the brief</h2>
+            <p>${c.assets} drafted assets, the weekly calendar, the guardrails. Approve the
+               creative here; the Content Plan picks the verdict up.</p>
           </div>
-          <button class="btn btn-dark btn-sm" data-go="#/campaigns/${esc(c.id)}">Open the brief${svg('arrow')}</button>
+          <a class="btn btn-ghost btn-sm" href="campaigns/index.html?c=${esc(c.id)}"
+             target="_blank" rel="noopener">Open in a tab</a>
         </div>
+        <iframe class="cc-brief-frame" id="cc-brief-frame"
+          src="campaigns/index.html?c=${esc(c.id)}"
+          title="${esc(c.title)} — campaign brief"></iframe>
       </section>`;
   }
 
