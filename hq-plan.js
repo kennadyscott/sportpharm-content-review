@@ -317,9 +317,9 @@
 
       return `<div class="wrap">
         <div class="page-head">
-          <div><h1>Plan</h1>
+          <div><h1>Content Plan</h1>
             <p>Every piece on its way out the door — by rhythm, status, and schedule.
-               The campaigns say what; this says when.</p></div>
+               Campaigns decide whether the creative is approved; this decides when it ships.</p></div>
           <div class="page-actions">
             ${editable ? `<button class="btn btn-outline" id="pl-rules">${svg('gear')} Rules</button>
             <button class="btn btn-dark" id="pl-new">${svg('plus')}New piece</button>` : ''}
