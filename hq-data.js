@@ -76,10 +76,10 @@ const SEED_PROJECTS = [
     goal: 'Get articles written, reviewed and published from HQ instead of by hand-editing HTML.',
     due: '2026-09-15',
     tasks: [
-      { id: 't1', title: 'Point articles.html at the published feed', status: 'next', owner: 'u-kennady', due: '2026-08-14' },
-      { id: 't2', title: 'Run supabase/hq.sql — hq_kv, hq_members, and the published_articles view', status: 'next', owner: 'u-kennady', due: '2026-08-07' },
-      { id: 't3', title: 'Move the 3 existing articles into the CMS', status: 'next', owner: 'u-jessie', due: '2026-08-21', campaign: 'recovery' },
-      { id: 't4', title: 'Agree who approves an article before it goes live', status: 'next', owner: 'u-brandon', due: '2026-08-12' },
+      { id: 't1', title: 'Point articles.html at the published feed', status: 'next', owner: null, due: '2026-08-14' },
+      { id: 't2', title: 'Run supabase/hq.sql — hq_kv, hq_members, and the published_articles view', status: 'next', owner: null, due: '2026-08-07' },
+      { id: 't3', title: 'Move the 3 existing articles into the CMS', status: 'next', owner: null, due: '2026-08-21', campaign: 'recovery' },
+      { id: 't4', title: 'Agree who approves an article before it goes live', status: 'next', owner: null, due: '2026-08-12' },
       { id: 't5', title: 'Decide the image budget — the site is carrying ~2MB PNGs', status: 'someday', owner: null, due: '' }
     ]
   },
@@ -89,10 +89,10 @@ const SEED_PROJECTS = [
     due: '2026-10-31',
     tasks: [
       { id: 't1', title: 'Stand up Stripe + native promotion codes', status: 'next', owner: null, due: '2026-09-05', campaign: 'wasabi-direct' },
-      { id: 't2', title: 'Cart abandonment flow — 3 emails, build before launch', status: 'next', owner: 'u-jessie', due: '2026-09-12', campaign: 'wasabi-direct' },
+      { id: 't2', title: 'Cart abandonment flow — 3 emails, build before launch', status: 'next', owner: null, due: '2026-09-12', campaign: 'wasabi-direct' },
       { id: 't3', title: 'Set up the offer codes in-store (FREESHIP1 first)', status: 'next', owner: null, due: '2026-09-05', campaign: 'wasabi-direct' },
       { id: 't4', title: 'Mailchimp connected for email + abandoned cart', status: 'next', owner: null, due: '2026-09-19', campaign: 'wasabi-direct' },
-      { id: 't5', title: 'Run the Feel It Work campaign', status: 'someday', owner: 'u-jessie', due: '', campaign: 'wasabi-direct' }
+      { id: 't5', title: 'Run the Feel It Work campaign', status: 'someday', owner: null, due: '', campaign: 'wasabi-direct' }
     ]
   },
   {
@@ -101,11 +101,11 @@ const SEED_PROJECTS = [
     due: '2026-11-30',
     tasks: [
       { id: 't1', title: 'Compress the imagery — the ~2MB PNG pass never happened', status: 'next', owner: null, due: '2026-08-29' },
-      { id: 't2', title: 'Wire the public contact forms into Leads', status: 'next', owner: 'u-kennady', due: '2026-09-05', campaign: 'trusted' },
+      { id: 't2', title: 'Wire the public contact forms into Leads', status: 'next', owner: null, due: '2026-09-05', campaign: 'trusted' },
       { id: 't3', title: 'Build the 4 pathway landing pages', status: 'next', owner: null, due: '2026-09-26', campaign: 'playbooks' },
       { id: 't4', title: 'pro-hero.png and pro-support.png still missing on Sports Medicine', status: 'next', owner: null, due: '2026-08-22' },
       { id: 't5', title: 'Pro / Healthcare persona pages are still on placeholder photos', status: 'someday', owner: null, due: '' },
-      { id: 't6', title: 'Decide: merge Injuries and Recovery, or keep the split', status: 'next', owner: 'u-brandon', due: '2026-08-29' }
+      { id: 't6', title: 'Decide: merge Injuries and Recovery, or keep the split', status: 'next', owner: null, due: '2026-08-29' }
     ]
   },
   {
@@ -113,10 +113,10 @@ const SEED_PROJECTS = [
     goal: 'Turn the Sports Medicine page into a real B2B pipeline — ATs, team physicians, compliance staff.',
     due: '2026-12-15',
     tasks: [
-      { id: 't1', title: 'Sideline Ready audit checklist — the actual downloadable', status: 'next', owner: 'u-brandon', due: '2026-09-12', campaign: 'sideline-ready' },
+      { id: 't1', title: 'Sideline Ready audit checklist — the actual downloadable', status: 'next', owner: null, due: '2026-09-12', campaign: 'sideline-ready' },
       { id: 't2', title: 'KetoRub / TruShield one-pager for compliance staff', status: 'next', owner: null, due: '2026-09-19', campaign: 'clean-sport' },
-      { id: 't3', title: 'Consult request form on the 8 service cards', status: 'next', owner: 'u-kennady', due: '2026-09-26', campaign: 'dispensing' },
-      { id: 't4', title: 'Decide whether professionals need a login at all', status: 'someday', owner: 'u-brandon', due: '' }
+      { id: 't3', title: 'Consult request form on the 8 service cards', status: 'next', owner: null, due: '2026-09-26', campaign: 'dispensing' },
+      { id: 't4', title: 'Decide whether professionals need a login at all', status: 'someday', owner: null, due: '' }
     ]
   }
 ];
@@ -566,37 +566,37 @@ const SEED_PLATFORMS = [
     pricing: '2.9% + 30¢ per transaction. Promotion Codes included, no add-on.',
     what: 'Payments for direct sales, plus the native promo codes the whole offer stack depends on (FREESHIP1, FEELIT15, LASTCALL).',
     judge: 'It is the assumed default. The real question is whether we launch on it before Payload exists or wait — waiting costs us the direct-sales window.',
-    verdict: '', owner: 'u-kennady', decideBy: '2026-08-22' },
+    verdict: '', owner: null, decideBy: '2026-08-22' },
   { id: 'pl-mailchimp', name: 'Mailchimp', cat: 'email', status: 'evaluating', cost: 26,
     pricing: 'Standard ~$26/mo at our list size; scales with contacts.',
     what: 'Email sends, the welcome sequence, and abandoned cart — which we decided is core, not a nice-to-have.',
     judge: 'Does abandoned cart work without a real backend? If it needs Payload anyway, this waits.',
-    verdict: '', owner: 'u-jessie', decideBy: '2026-09-05' },
+    verdict: '', owner: null, decideBy: '2026-09-05' },
   { id: 'pl-meta', name: 'Meta Ads', cat: 'paid', status: 'evaluating', cost: 1500,
     pricing: 'Budget, not licence. $1.5k/mo is the tested-floor proposal.',
     what: 'The three-ad structure in the Feel It Work brief: cold prospecting reel, mid-funnel carousel, retargeting proof.',
     judge: 'Cost per order against a $29.95–$39.95 basket. If CPO exceeds margin at 4 weeks, stop.',
-    verdict: '', owner: 'u-jessie', decideBy: '2026-09-12' },
+    verdict: '', owner: null, decideBy: '2026-09-12' },
   { id: 'pl-vercel', name: 'Vercel', cat: 'infra', status: 'evaluating', cost: 20,
     pricing: 'Pro $20/mo per seat.',
     what: 'Where Next.js + Payload lands when we stop being a static site.',
     judge: 'Only worth paying for once the port actually starts. GitHub Pages is free and currently sufficient.',
-    verdict: '', owner: 'u-kennady', decideBy: '2026-10-31' },
+    verdict: '', owner: null, decideBy: '2026-10-31' },
   { id: 'pl-payload', name: 'Payload CMS', cat: 'infra', status: 'evaluating', cost: 0,
     pricing: 'Self-hosted, free. Cloud tier exists if we do not want to run Postgres.',
     what: 'The long-term CMS. Auth, roles, and the employee submission workflow, natively.',
     judge: 'HQ’s CMS is the blueprint for this. Build it here first, learn the workflow, then port the model.',
-    verdict: 'Deferred on purpose — HQ proves the workflow before we commit to the stack.', owner: 'u-kennady', decideBy: '2026-11-30' },
+    verdict: 'Deferred on purpose — HQ proves the workflow before we commit to the stack.', owner: null, decideBy: '2026-11-30' },
   { id: 'pl-supabase', name: 'Supabase', cat: 'infra', status: 'trial', cost: 0,
     pricing: 'Free tier covers us today. Pro is $25/mo when we outgrow it.',
     what: 'Already running the Content Studio. Now also the CMS store and the shared HQ workspace.',
     judge: 'It is doing two real jobs already. The question is only whether Payload eventually replaces it.',
-    verdict: 'Keeping it. Two projects in production already.', owner: 'u-kennady', decideBy: '' },
+    verdict: 'Keeping it. Two projects in production already.', owner: null, decideBy: '' },
   { id: 'pl-marketplaces', name: 'Third-party marketplaces', cat: 'commerce', status: 'passed', cost: 0,
     pricing: 'Referral fees per order.',
     what: 'Reselling through channels we do not control.',
     judge: 'Weighed against owning the customer relationship and the margin on sportpharm.com.',
-    verdict: 'De-prioritised in favour of direct. The full reasoning is deliberately not written down here — ask Brandon.', owner: 'u-brandon', decideBy: '' }
+    verdict: 'De-prioritised in favour of direct. The full reasoning is deliberately not written down here — ask Brandon.', owner: null, decideBy: '' }
 ];
 
 /* ------------------------------ launch gates ----------------------------- */

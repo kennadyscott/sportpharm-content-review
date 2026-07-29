@@ -255,7 +255,6 @@ const HQ = (() => {
   const NAV = [
     { id: 'today',     label: 'Today',            icon: 'today' },
     { id: 'projects',  label: 'Project Planning', icon: 'board' },
-    { id: 'plan',      label: 'Content Plan',     icon: 'cal' },
     { parent: 'Content', icon: 'doc', children: CONTENT_KIDS },
     { id: 'strategy',  label: 'Branding',  icon: 'quote' },
     { id: 'analytics', label: 'Analytics', icon: 'chart' },
@@ -292,7 +291,7 @@ const HQ = (() => {
     const { view: v } = route();
     const me = Store.currentUser();
     const c = counts();
-    const badge = { projects: c.open, content: c.content, ideas: c.ideas, platforms: c.evaluating, plan: c.planning };
+    const badge = { projects: c.open + c.planning, content: c.content, ideas: c.ideas, platforms: c.evaluating };
     /* the Content parent rolls up only its own children, not Content Plan */
     const link = (n, sub) => `
       <a class="rail-link ${sub ? 'sub' : ''} ${n.id === v ? 'on' : ''}" href="#/${n.id}">

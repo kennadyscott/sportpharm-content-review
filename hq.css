@@ -1840,3 +1840,27 @@ ol.b-list li::marker { color: var(--red); font-weight: 700; }
 }
 .camp-scope .btn:last-child { margin-left: auto; }
 .camp-scope .btn svg { width: 14px; height: 14px; }
+
+/* Tasks board — month capsules across the top, one board underneath */
+.month-caps { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.month-cap {
+  display: inline-flex; align-items: baseline; gap: .45rem;
+  padding: .45rem .85rem; border-radius: 999px; background: var(--paper);
+  border: 1.5px solid var(--line); font-size: .84rem; color: var(--ink-soft);
+  transition: border-color .14s ease, transform .14s ease, color .14s ease;
+}
+.month-cap:hover { border-color: var(--blue); transform: translateY(-1px); }
+.month-cap b { font-size: .72rem; font-weight: 700; color: var(--ink-faint); }
+.month-cap.on { background: var(--navy); border-color: var(--navy); color: #fff; }
+.month-cap.on b { color: rgba(255,255,255,.7); }
+
+/* cards on the Tasks board carry their project, since it spans all of them */
+.card-proj {
+  display: block; font-size: .64rem; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--tone, var(--navy)); margin-bottom: .25rem;
+}
+.card-camp {
+  font-size: .66rem; font-weight: 600; color: var(--ink-faint);
+  background: var(--bg-2); padding: .1rem .4rem; border-radius: 999px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;
+}

@@ -317,7 +317,7 @@
 
       return `<div class="wrap">
         <div class="page-head">
-          <div><h1>Content Plan</h1>
+          <div><h1>Project Planning</h1>
             <p>Every piece on its way out the door — by rhythm, status, and schedule.
                Campaigns decide whether the creative is approved; this decides when it ships.</p></div>
           <div class="page-actions">
@@ -325,6 +325,8 @@
             <button class="btn btn-dark" id="pl-new">${svg('plus')}New piece</button>` : ''}
           </div>
         </div>
+
+        ${HQ.projToggle ? HQ.projToggle('plan') : ''}
 
         <div class="role-bar">
           <button class="role-other" data-go="#/campaigns">${svg('check')}<b>Campaigns</b> — creative approval</button>
@@ -486,6 +488,7 @@
         const p = Store.addPiece({});
         HQ.render(); openPieceSheet(p.id);
       });
+      if (HQ.wireProjToggle) HQ.wireProjToggle(root);
       const rb = root.querySelector('#pl-rules');
       if (rb) rb.addEventListener('click', openRulesSheet);
     }

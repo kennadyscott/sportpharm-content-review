@@ -246,19 +246,155 @@
   /* The same work, cut three ways. Project is the board you drag things on;
      Monthly answers "what lands this month"; Campaign answers "what does the
      Feel It Work push still need". Nothing moves — only the grouping. */
-  let projView = 'project';   /* month | project | campaign */
+  let projView = 'tasks';   /* tasks | campaign | project  (plan is its own route) */
   let showAllCampaigns = false;
+  let taskMonth = null;     /* which month the Tasks board is showing */
 
+  /* One toggle across two routes. Content Plan lives at #/plan but renders the
+     same bar, so the four read as one surface rather than a page and a tab. */
   const VIEWS = [
-    ['month',    'Monthly',  'By the month it’s due'],
-    ['project',  'Project',  'The boards themselves'],
-    ['campaign', 'Campaign', 'By the campaign it serves']
+    ['tasks',    'Tasks',        'The board, a month at a time'],
+    ['campaign', 'Campaign',     'What the campaign in flight still needs'],
+    ['plan',     'Content Plan', 'Every piece on its way out the door'],
+    ['project',  'Projects',     'The projects themselves']
   ];
+
+  function projToggle(active) {
+    return `<div class="seg seg-views">
+      ${VIEWS.map(([k, label, hint]) =>
+        `<button data-pview="${k}" class="${active === k ? 'on' : ''}" title="${esc(hint)}">${label}</button>`).join('')}
+    </div>`;
+  }
+  /* the Plan module renders the same bar */
+  HQ.projToggle = projToggle;
+  HQ.setProjView = v => { projView = v; };
 
   function monthKeyOf(d) { return d ? d.slice(0, 7) : ''; }
   function monthLabelOf(k) {
     if (!k) return 'No date yet';
     return new Date(k + '-15T12:00:00').toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  }
+
+  /* Every month that has work in it, plus an undated bucket, in date order. */
+  function taskMonths() {
+    const keys = new Set();
+    Store.allTasks().forEach(t => keys.add(monthKeyOf(t.due)));
+    const out = [...keys].sort((a, b) => (a || '9999').localeCompare(b || '9999'));
+    return out;
+  }
+
+  /* Tasks = a board, one month at a time. Same drag behaviour as a project
+     board, but the cards come from every project — which is how the work
+     actually arrives. */
+  function taskBoard() {
+    const months = taskMonths();
+    if (!months.length) return '<p class="panel-empty">No tasks yet.</p>';
+    if (taskMonth === null || months.indexOf(taskMonth) === -1) {
+      const thisMonth = new Date().toISOString().slice(0, 7);
+      taskMonth = months.indexOf(thisMonth) !== -1 ? thisMonth : months[0];
+    }
+    const tasks = Store.allTasks()
+      .filter(t => monthKeyOf(t.due) === taskMonth)
+      .sort((a, b) => a.order - b.order);
+
+    return `<div class="month-caps">
+        ${months.map(k => {
+          const n = Store.allTasks().filter(t => monthKeyOf(t.due) === k).length;
+          const done = Store.allTasks().filter(t => monthKeyOf(t.due) === k && t.status === 'shipped').length;
+          return `<button class="month-cap ${k === taskMonth ? 'on' : ''}" data-tmonth="${k}">
+            <span>${esc(monthLabelOf(k))}</span><b>${done}/${n}</b>
+          </button>`;
+        }).join('')}
+      </div>
+
+      <div class="board" id="task-board">
+        ${STATUSES.map(st => {
+          const col = tasks.filter(t => t.status === st.id);
+          return `<section class="col" data-col="${st.id}">
+            <div class="col-head"><h3>${st.label}</h3><span class="n">${col.length}</span>
+              <span class="hint">${esc(st.hint)}</span></div>
+            <div class="col-list">${col.length ? col.map(t => {
+              const a = areaOf(t.project.area);
+              const d = dueLabel(t.due);
+              return `<article class="card t-${a.tone}" draggable="${Store.can('edit')}"
+                        data-tcard="${t.project.id}:${t.id}" tabindex="0">
+                <span class="card-proj">${esc(t.project.name)}</span>
+                <h4>${esc(t.title)}</h4>
+                <div class="card-foot">
+                  ${d ? `<span class="due ${d.tone}">${esc(d.txt)}</span>` : '<span class="mini-prog">no date</span>'}
+                  ${t.campaign ? `<span class="card-camp">${esc((Store.campaign(t.campaign) || {}).title || '')}</span>` : ''}
+                </div>
+              </article>`;
+            }).join('') : '<p class="col-empty">Drop something here</p>'}</div>
+          </section>`;
+        }).join('')}
+      </div>`;
+  }
+
+  /* Content Plan is its own route; the other three are in-page. Either way the
+     bar behaves like one control. */
+  function wireProjToggle(root) {
+    root.querySelectorAll('[data-pview]').forEach(b =>
+      b.addEventListener('click', () => {
+        const v = b.dataset.pview;
+        if (v === 'plan') { go('#/plan'); return; }
+        projView = v;
+        if (HQ.route().view === 'plan') { go('#/projects'); return; }
+        HQ.render();
+      }));
+  }
+  HQ.wireProjToggle = wireProjToggle;
+
+  function wireTaskBoard(root) {
+    root.querySelectorAll('[data-tmonth]').forEach(b =>
+      b.addEventListener('click', () => { taskMonth = b.dataset.tmonth; HQ.render(); }));
+
+    const board = root.querySelector('#task-board');
+    if (!board) return;
+    let dragRef = null;
+
+    board.querySelectorAll('[data-tcard]').forEach(card => {
+      card.addEventListener('dragstart', e => {
+        dragRef = card.dataset.tcard;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        try { e.dataTransfer.setData('text/plain', dragRef); } catch (err) {}
+      });
+      card.addEventListener('dragend', () => { card.classList.remove('dragging'); dragRef = null; });
+      card.addEventListener('click', () => {
+        const [pid, tid] = card.dataset.tcard.split(':');
+        openTaskSheet(pid, tid);
+      });
+      card.addEventListener('keydown', e => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        const [pid, tid] = card.dataset.tcard.split(':');
+        openTaskSheet(pid, tid);
+      });
+    });
+
+    board.querySelectorAll('[data-col]').forEach(col => {
+      col.addEventListener('dragover', e => {
+        if (!dragRef) return;
+        e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+        col.classList.add('over');
+      });
+      col.addEventListener('dragleave', e => { if (!col.contains(e.relatedTarget)) col.classList.remove('over'); });
+      col.addEventListener('drop', e => {
+        e.preventDefault(); col.classList.remove('over');
+        if (!dragRef) return;
+        const [pid, tid] = dragRef.split(':');
+        const cards = [...col.querySelectorAll('[data-tcard]')].filter(c => c.dataset.tcard !== dragRef);
+        let beforeId = null;
+        for (const c of cards) {
+          const r = c.getBoundingClientRect();
+          if (e.clientY < r.top + r.height / 2) { beforeId = c.dataset.tcard.split(':')[1]; break; }
+        }
+        Store.moveTask(pid, tid, col.dataset.col, beforeId);
+        dragRef = null;
+        HQ.render();
+      });
+    });
   }
 
   function projectCards() {
@@ -343,8 +479,8 @@
 
   function projectsIndex() {
     const blurb = {
-      month: 'Everything with a date on it, by the month it lands. Undated work sits at the bottom where you can see it.',
-      project: 'The work itself — every project SportPharm has going, and who is holding it.',
+      tasks: 'Every task on one board, a month at a time. Drag between columns; the months are up top.',
+      project: 'The work itself — every project SportPharm has going.',
       campaign: 'The same tasks, read as "what does this campaign still need before it can run".'
     }[projView];
 
@@ -360,10 +496,7 @@
         </div>
       </div>
 
-      <div class="seg seg-views">
-        ${VIEWS.map(([k, label, hint]) =>
-          `<button data-pview="${k}" class="${projView === k ? 'on' : ''}" title="${esc(hint)}">${label}</button>`).join('')}
-      </div>
+      ${projToggle(projView)}
 
       ${projView === 'campaign' ? `
         <div class="camp-scope">
@@ -375,7 +508,9 @@
           <button class="btn btn-ghost btn-sm" data-go="#/campaigns">Open the Studio${svg('arrow')}</button>
         </div>` : ''}
 
-      ${projView === 'project' ? projectCards() : groupedView(projView)}
+      ${projView === 'project' ? projectCards()
+        : projView === 'tasks' ? taskBoard()
+        : groupedView(projView)}
     </div>`;
   }
 
@@ -625,11 +760,11 @@
         const ep = root.querySelector('#edit-project');
         if (ep) ep.addEventListener('click', () => openProjectSheet(p.id));
       } else {
-        root.querySelectorAll('[data-pview]').forEach(b =>
-          b.addEventListener('click', () => { projView = b.dataset.pview; HQ.render(); }));
+        wireProjToggle(root);
         const cs = root.querySelector('#camp-scope-toggle');
         if (cs) cs.addEventListener('click', () => { showAllCampaigns = !showAllCampaigns; HQ.render(); });
         wireTaskRows(root);
+        wireTaskBoard(root);
         const np = root.querySelector('#new-project');
         if (np) np.addEventListener('click', () => {
           const proj = Store.createProject({ name: 'New project' });
