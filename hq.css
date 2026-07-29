@@ -1940,3 +1940,101 @@ button.row-stat:hover { background: var(--navy); color: #fff; }
 .cc-piece[role="button"] { cursor: pointer; }
 button.pl-st { cursor: pointer; }
 button.pl-st:hover { filter: brightness(.94); }
+
+/* ================= Campaign briefs, native ================= */
+.bf-layout { display: grid; grid-template-columns: 218px minmax(0, 1fr); gap: 1.4rem; align-items: start; }
+@media (max-width: 980px) { .bf-layout { grid-template-columns: 1fr; } .bf-rail { position: static !important; display: flex; overflow-x: auto; gap: .3rem; } }
+
+.bf-rail { position: sticky; top: 5rem; display: grid; gap: .1rem; }
+.bf-railbtn {
+  display: flex; align-items: center; gap: .5rem; text-align: left; width: 100%;
+  padding: .42rem .6rem; border-radius: 8px; font-size: .82rem; color: var(--ink-soft);
+  white-space: nowrap; transition: background .12s ease, color .12s ease;
+}
+.bf-railbtn:hover { background: var(--line-soft); color: var(--navy); }
+.bf-railbtn b { margin-left: auto; font-size: .7rem; color: var(--ink-faint); }
+.rv-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--line); flex: none; }
+.rv-dot.rv-approved { background: var(--green); }
+.rv-dot.rv-changes  { background: var(--red); }
+
+.bf-body { display: grid; gap: 1rem; min-width: 0; }
+.bf-sec { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 1.2rem 1.3rem 1.3rem; scroll-margin-top: 5rem; }
+.bf-sec-head { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: .9rem; }
+.bf-sec-head h2 { font-size: 1.15rem; }
+.bf-sec-head .note { margin-left: auto; }
+.bf-sec-body { font-size: .92rem; line-height: 1.7; color: var(--ink); }
+.bf-sec-body p { margin-bottom: .8rem; }
+.bf-sec-body h4 { font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); margin: 1.2rem 0 .5rem; }
+
+.bf-tag { font-family: 'Bebas Neue','Inter',sans-serif; font-size: 1.5rem; color: var(--red); line-height: 1.1; margin-bottom: .8rem !important; }
+.bf-primary { background: var(--bg); border-left: 3px solid var(--red); border-radius: 10px; padding: .8rem 1rem; margin-bottom: 1rem; }
+.bf-primary span { font-size: .68rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-faint); }
+.bf-primary p { font-size: 1rem; color: var(--navy); margin: .25rem 0 0 !important; }
+.bf-aud { display: grid; gap: .4rem; }
+.bf-aud-row { display: grid; gap: .1rem; padding: .6rem .8rem; background: var(--bg); border-radius: 10px; }
+.bf-aud-row b { font-size: .88rem; color: var(--navy); }
+.bf-aud-row span { font-size: .8rem; color: var(--ink-soft); }
+.bf-aud-row q { font-size: .84rem; color: var(--red); quotes: none; font-style: italic; }
+
+.bf-msgs, .bf-phases, .bf-stories, .bf-adapts, .bf-ads, .bf-metrics, .bf-offers, .bf-mech { display: grid; gap: .5rem; }
+.bf-msgs { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.bf-msg { background: var(--bg); border-radius: 10px; padding: .7rem .85rem; }
+.bf-msg span { font-size: .66rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--red); }
+.bf-msg p { font-size: .86rem; margin: .2rem 0 0 !important; }
+.bf-phase, .bf-story, .bf-adapt, .bf-ad, .bf-hero { background: var(--bg); border-radius: 10px; padding: .75rem .9rem; border-left: 3px solid var(--blue); }
+.bf-phase b, .bf-story b, .bf-adapt b, .bf-ad b, .bf-hero b { display: block; font-size: .9rem; color: var(--navy); margin-bottom: .2rem; }
+.bf-phase p, .bf-story p, .bf-ad p, .bf-hero p { font-size: .84rem; color: var(--ink-soft); margin-bottom: .4rem !important; }
+.bf-cadence { display: inline-block; font-size: .72rem; color: var(--ink-faint); background: var(--bg-2); padding: .12rem .5rem; border-radius: 999px; margin-top: .3rem; }
+.bf-ad-kind, .bf-asset-kind { font-size: .64rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--red); }
+.bf-ad q { display: block; font-size: .9rem; color: var(--navy); quotes: none; margin-bottom: .3rem; }
+.bf-note { font-size: .8rem; color: var(--ink-faint); font-style: italic; margin-top: .7rem; }
+.bf-offers { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.bf-offer { background: #FDE9E8; border-radius: 10px; padding: .6rem .8rem; }
+.bf-offer b { display: block; font-family: ui-monospace, Menlo, monospace; font-size: .82rem; color: var(--red); }
+.bf-offer span { font-size: .76rem; color: var(--ink-soft); }
+.bf-mech-row { display: grid; grid-template-columns: 150px 1fr; gap: .6rem; font-size: .84rem; padding: .4rem 0; border-bottom: 1px solid var(--line-soft); }
+.bf-mech-row b { color: var(--navy); }
+.bf-metrics { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.bf-metric { background: var(--bg); border-radius: 10px; padding: .6rem .8rem; }
+.bf-metric b { display: block; font-size: .86rem; color: var(--navy); }
+.bf-metric span { font-size: .78rem; color: var(--ink-soft); }
+.bf-swatches { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .7rem; }
+.bf-swatch { display: inline-flex; align-items: center; gap: .35rem; font-size: .76rem; color: var(--ink-soft); }
+.bf-swatch i { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--line); }
+
+.bf-week { background: var(--bg); border-radius: 10px; padding: .5rem .8rem; margin-bottom: .4rem; }
+.bf-week summary { cursor: pointer; font-size: .86rem; }
+.bf-week summary b { color: var(--navy); }
+.bf-week summary span { color: var(--ink-faint); margin-left: .4rem; font-size: .8rem; }
+.bf-days { display: grid; gap: .2rem; margin-top: .6rem; }
+.bf-day { display: grid; grid-template-columns: 44px 1fr; gap: .5rem; font-size: .8rem; padding: .2rem 0; }
+.bf-day-n { font-weight: 700; color: var(--ink-faint); }
+.bf-item { display: inline-block; background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: .1rem .5rem; margin: 0 .25rem .25rem 0; font-size: .74rem; }
+.bf-day i { color: var(--ink-faint); }
+
+.bf-assets { display: grid; gap: .8rem; }
+.bf-asset { background: var(--bg); border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: 12px; padding: .9rem 1rem; }
+.bf-asset.rv-approved { border-left-color: var(--green); }
+.bf-asset.rv-changes  { border-left-color: var(--red); }
+.bf-asset-head { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; margin-bottom: .3rem; }
+.bf-asset-week { font-size: .7rem; color: var(--ink-faint); }
+.bf-asset h3 { font-size: 1rem; margin-bottom: .25rem; }
+.bf-asset-purpose { font-size: .84rem; color: var(--ink-soft); line-height: 1.6; margin-bottom: .6rem; }
+.bf-cover { background: var(--navy); color: #fff; border-radius: 10px; padding: .9rem 1rem; margin-bottom: .6rem; }
+.bf-cover span { font-size: .64rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--red); }
+.bf-cover b { display: block; font-family: 'Bebas Neue','Inter',sans-serif; font-size: 1.5rem; line-height: 1.1; margin: .2rem 0; }
+.bf-cover i { font-style: normal; font-size: .82rem; color: rgba(255,255,255,.7); }
+.bf-more { margin-top: .4rem; }
+.bf-more summary { cursor: pointer; font-size: .78rem; color: var(--blue-deep); font-weight: 600; }
+.bf-more p, .bf-more ul { font-size: .84rem; color: var(--ink-soft); margin-top: .4rem; line-height: 1.65; }
+
+.rv-bar { display: flex; align-items: center; gap: .3rem; flex-wrap: wrap; margin-top: .7rem; }
+.rv-btn { font-size: .72rem; font-weight: 700; padding: .28rem .7rem; border-radius: 999px; background: var(--bg-2); color: var(--ink-soft); transition: background .12s ease, color .12s ease; }
+.rv-btn:hover { background: var(--line); }
+.rv-btn.rv-approved.on { background: var(--green); color: #fff; }
+.rv-btn.rv-changes.on  { background: var(--red); color: #fff; }
+.rv-btn.rv-pending.on  { background: var(--navy); color: #fff; }
+.rv-notes { display: inline-flex; align-items: center; gap: .3rem; margin-left: auto; font-size: .74rem; color: var(--ink-faint); padding: .25rem .5rem; border-radius: 999px; }
+.rv-notes:hover { background: var(--line-soft); color: var(--navy); }
+.rv-notes svg { width: 13px; height: 13px; }
+.rv-thread { display: grid; gap: .5rem; margin-top: .7rem; padding-top: .7rem; border-top: 1px solid var(--line-soft); }

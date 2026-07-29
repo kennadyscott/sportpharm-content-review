@@ -1,0 +1,3957 @@
+/* =============================================================================
+   SportPharm HQ — campaign briefs
+
+   The eleven campaigns, extracted from the Content Studio on 2026-07-29 and
+   now HQ's own data rather than a page we embed. Sixty-four assets across
+   fifteen brief sections.
+
+   Review state — approvals, notes, threads — lives in hq-store.js like
+   everything else, so it edits the same way the rest of HQ does.
+============================================================================= */
+
+const CAMPAIGN_BRIEFS = [
+ {
+  "id": "clean-sport",
+  "title": "Clean Sport & Banned-Substance Safety",
+  "campaign": "SportPharm Clean Sport Campaign",
+  "prio": "Lead campaign",
+  "channels": [
+   "IG",
+   "LinkedIn",
+   "FB",
+   "Email"
+  ],
+  "camp": {
+   "platformTag": "“What Touches the Athlete Matters.”",
+   "platform": [
+    "Athletes scrutinize what they swallow. They should be able to bring the same level of care to what they apply.",
+    "This gives SportPharm a strong, ownable position: pain relief should never introduce an unnecessary question.",
+    "KetoRub is the proof point: the first prescription-only NSAID topical in the United States to earn TruShield Certification through third-party screening for more than 480 banned substances. The larger story is that SportPharm understands medication safety through the lens of competitive sport — not simply pain relief.",
+    "That distinction separates SportPharm from generic topical products."
+   ],
+   "strategy": {
+    "primary": "Make SportPharm the trusted authority on topical pain management and banned-substance awareness in sports.",
+    "supporting": [
+     "Build credibility with athletic trainers, sports pharmacists, physicians and compliance personnel",
+     "Educate athletes without using unnecessary fear",
+     "Give professionals a defensible reason to choose or recommend KetoRub",
+     "Generate KetoRub inquiries, prescription requests and professional partnerships",
+     "Establish clean-sport safety as an ongoing SportPharm content pillar"
+    ],
+    "audiences": [
+     {
+      "who": "Athletic trainers",
+      "cares": "Protecting athletes and the program",
+      "msg": "Know what is being used in the training room"
+     },
+     {
+      "who": "Team physicians",
+      "cares": "Effective, responsible prescribing",
+      "msg": "A prescription topical developed for sports medicine and independently screened"
+     },
+     {
+      "who": "Sports pharmacists",
+      "cares": "Medication safety and compliance",
+      "msg": "Athlete-centered pharmaceutical care includes banned-substance awareness"
+     },
+     {
+      "who": "Compliance staff",
+      "cares": "Reducing preventable exposure",
+      "msg": "Product decisions are part of the compliance system"
+     },
+     {
+      "who": "Tested athletes",
+      "cares": "Protecting eligibility and reputation",
+      "msg": "What you use matters — even when the risk is unintentional"
+     },
+     {
+      "who": "Parents & youth organizations",
+      "cares": "Making safer, informed choices",
+      "msg": "Ask more questions before a product reaches the athlete"
+     }
+    ]
+   },
+   "messages": {
+    "emotional": "You have worked too hard to leave product safety to an assumption.",
+    "educational": "Under anti-doping rules, an athlete can be held responsible when a prohibited substance is found in their system, regardless of whether the exposure was intentional. Third-party banned-substance testing helps reduce product-related risk, although no certification can eliminate all risk. WADA explains the strict-liability principle, and USADA recommends that athletes verify legitimate third-party certification.",
+    "product": "KetoRub is the first prescription-only NSAID topical in the United States to earn TruShield Certification. It underwent third-party screening for more than 480 banned substances through a WADA-experienced, ISO 17025-accredited laboratory. (Link: SportPharm's certification announcement.)",
+    "brand": "SportPharm doesn't look at pain relief in isolation. It considers the athlete, the treatment environment, performance demands and clean-sport responsibilities."
+   },
+   "structureNote": "Launched as a structured narrative rather than repeatedly announcing the certification.",
+   "structure": [
+    {
+     "phase": "Week 1 · The announcement",
+     "what": "Introduce the news and establish its significance.",
+     "posts": [
+      "Post 1 — Hero video (20–30s reel)",
+      "Post 2 — Announcement carousel"
+     ]
+    },
+    {
+     "phase": "Week 2 · Why it matters",
+     "what": "Shift from news to stakes — label literacy and strict liability.",
+     "posts": [
+      "Post 3 — “The label is not the test” (Performance Check carousel)",
+      "Post 4 — Strict liability explainer (LinkedIn document)"
+     ]
+    },
+    {
+     "phase": "Week 3 · Certification explained",
+     "what": "Make the certification concrete and honest about its limits.",
+     "posts": [
+      "Post 5 — What TruShield Certification means (carousel)",
+      "Post 6 — “Not every certification tests the same thing” (infographic)"
+     ]
+    },
+    {
+     "phase": "Week 4 · Behind the certification",
+     "what": "Show the work — process footage and the expert voice.",
+     "posts": [
+      "Post 7 — Behind-the-scenes reel",
+      "Post 8 — Brandon interview (Ask Brandon)"
+     ]
+    },
+    {
+     "phase": "Week 5 · The professional responsibility",
+     "what": "Turn education into professional practice — and capture leads.",
+     "posts": [
+      "Post 9 — Training-room checklist (saveable/download)",
+      "Post 10 — Who owns clean-sport safety? (LinkedIn carousel)"
+     ]
+    },
+    {
+     "phase": "Week 6 · From education to action",
+     "what": "Product proof and the emotional close.",
+     "posts": [
+      "Post 11 — KetoRub product proof (static)",
+      "Post 12 — Campaign close (emotional reel)"
+     ]
+    }
+   ],
+   "storiesIntro": "Run Stories throughout the six weeks to make the topic interactive. The full Stories package (polls, quiz sequence and Story FAQ) is drafted as an approvable asset under Platform Adaptations.",
+   "stories": [
+    "Polls: topical testing awareness, who checks training-room products, zero-risk misconception, certification verification habits",
+    "Quiz sequence: strict liability — does intent have to be proven?",
+    "Story FAQ: ketoprofen status, NSAIDs, TruShield panel, zero-risk question, lot verification, prescription access",
+    "The final FAQ — “Does a prescription automatically make every medication permissible in sport?” — opens the door to SportPharm's larger sports-pharmacy expertise"
+   ],
+   "adaptations": [
+    {
+     "ch": "instagram",
+     "items": [
+      "Strong athlete-centered hooks",
+      "Short expert reels",
+      "Saveable education carousels",
+      "Story quizzes and polls",
+      "Product content only after the educational groundwork"
+     ],
+     "cadence": "Three feed posts and four to six Story frames each week."
+    },
+    {
+     "ch": "linkedin",
+     "items": [
+      "Trainer and compliance implications",
+      "Brandon's professional perspective",
+      "Certification-process detail",
+      "Team policy and product-verification resources",
+      "Short articles on clean-sport medication management"
+     ],
+     "cadence": "Two or three posts per week."
+    },
+    {
+     "ch": "facebook",
+     "items": [
+      "Parent and community education",
+      "Longer captions",
+      "Brandon's videos",
+      "Links to the certification article and downloadable checklist"
+     ]
+    },
+    {
+     "ch": "email",
+     "items": [
+      "Three-email sequence — drafted as an approvable asset below: announcement, certification education, checklist download."
+     ]
+    }
+   ],
+   "landingHero": {
+    "h": "What touches the athlete matters.",
+    "d": "KetoRub is the first prescription-only NSAID topical in the United States to earn TruShield Certification for banned-substance testing.",
+    "buttons": [
+     "Explore KetoRub",
+     "Download the Training-Room Checklist"
+    ]
+   },
+   "landing": [
+    {
+     "t": "Why banned-substance screening matters"
+    },
+    {
+     "t": "What TruShield Certification includes"
+    },
+    {
+     "t": "Why KetoRub's achievement is different"
+    },
+    {
+     "t": "Behind the certification process"
+    },
+    {
+     "t": "Questions athletes and professionals should ask"
+    },
+    {
+     "t": "Brandon's perspective"
+    },
+    {
+     "t": "Prescription-access information"
+    },
+    {
+     "t": "Professional partnership inquiry"
+    },
+    {
+     "t": "Sources and medical disclosures"
+    }
+   ],
+   "visualFeel": "This campaign should feel clinical, athletic and premium — but not ominous.",
+   "visualSwatches": [
+    {
+     "c": "#FFFFFF",
+     "l": "Crisp white",
+     "border": true
+    },
+    {
+     "c": "#D6202A",
+     "l": "SportPharm red"
+    },
+    {
+     "c": "#1C1F23",
+     "l": "Black / charcoal"
+    },
+    {
+     "c": "#9AA6B2",
+     "l": "Cool gray / metallic"
+    }
+   ],
+   "visual": {
+    "use": [
+     "Crisp white and SportPharm red",
+     "Black or charcoal for authority",
+     "Cool gray or metallic laboratory accents",
+     "Large typography and generous negative space",
+     "Actual athletes, trainers, pharmacists and laboratory details",
+     "A diverse mix of athletes across race, gender, age and sport",
+     "Macro product photography showing lot numbers, packaging and certification details",
+     "Thin technical lines inspired by analytical testing data"
+    ],
+    "avoid": [
+     "Syringes, police tape or “caught doping” imagery",
+     "Generic supplement bottles with red warning symbols",
+     "Excessive fear-based copy",
+     "Fake laboratory scenes that feel AI-generated",
+     "Suggesting that KetoRub is “WADA approved”",
+     "Treating TruShield, NSF Certified for Sport and Informed Sport as interchangeable programs"
+    ]
+   },
+   "guardrails": {
+    "use": [
+     "“TruShield Certified”",
+     "“Third-party screened for more than 480 banned substances”",
+     "“Tested through a WADA-experienced, ISO 17025-accredited laboratory”",
+     "“Helps reduce product-related risk”",
+     "“Adds another layer of independent scrutiny”",
+     "“First prescription-only NSAID topical in the United States to achieve TruShield Certification”"
+    ],
+    "avoid": [
+     "“WADA approved”",
+     "“Guaranteed safe for every athlete”",
+     "“100% banned-substance free”",
+     "“Prevents positive tests”",
+     "“Eliminates compliance risk”",
+     "“Safe for all competition”",
+     "“Athletes can use KetoRub without checking their sport's rules”"
+    ],
+    "note": "Certification concerns the tested product and lots; it does not replace an athlete's obligation to check the medication, prescription, therapeutic-use and governing-body requirements."
+   },
+   "metrics": [
+    {
+     "goal": "Authority (primary)",
+     "kpi": "Engagement and follower growth among AT, pharmacist, physician and compliance titles; saves/shares on education carousels; branded search for “KetoRub TruShield”"
+    },
+    {
+     "goal": "Lead generation",
+     "kpi": "Training-room checklist downloads (the campaign's best lead-gen asset); KetoRub inquiries and prescription requests; professional partnership inquiries"
+    },
+    {
+     "goal": "Education reach",
+     "kpi": "Hero video and reel completion rates; carousel save rate; landing-page read depth; Story poll/quiz participation"
+    },
+    {
+     "goal": "Review cadence",
+     "kpi": "Weekly during the six-week arc; end-of-campaign retro against inquiry and download targets"
+    }
+   ]
+  },
+  "assets": [
+   {
+    "id": "p1",
+    "type": "reel2",
+    "title": "Post 1 · Hero video — 20–30s reel",
+    "week": "Week 1",
+    "chs": [
+     "Instagram",
+     "LinkedIn",
+     "Facebook"
+    ],
+    "purpose": "Introduce the news and establish its significance.",
+    "cover": {
+     "eyebrow": "Clean Sport",
+     "hook": "The first prescription-only NSAID topical in the U.S. to earn TruShield Certification.",
+     "sub": "What touches the athlete matters."
+    },
+    "audio": "Original audio — SportPharm",
+    "scenes": [
+     "Athlete preparing for competition",
+     "Training-room treatment",
+     "Close-up of KetoRub",
+     "TruShield mark",
+     "Lab or certification-process footage",
+     "Brandon or another SportPharm expert on camera",
+     "Closing campaign line"
+    ],
+    "vo": "Athletes are expected to know what enters their bodies. But product safety shouldn't stop with supplements. KetoRub is now the first prescription-only NSAID topical in the United States to earn TruShield Certification, following third-party screening for more than 480 banned substances. Because what touches the athlete matters.",
+    "endcard": [
+     "KETORUB × TRUSHIELD",
+     "A higher standard for athlete care.",
+     "Perform. Recover. Return."
+    ],
+    "caption": "An athlete shouldn't have to choose between managing pain and feeling confident about the products used in their care.\n\nKetoRub is now the first prescription-only NSAID topical in the United States to earn TruShield Certification for banned-substance testing.\n\nThat means KetoRub underwent comprehensive third-party screening for more than 480 banned substances through a WADA-experienced, ISO 17025-accredited laboratory.\n\nThis certification does not mean zero risk — and no legitimate certification should be described that way. It means SportPharm chose to add another meaningful layer of independent scrutiny for athletes, trainers and healthcare professionals.\n\nBecause what touches the athlete matters.\n\nKetoRub is available by prescription. Learn more at the link in our bio."
+   },
+   {
+    "id": "p2",
+    "type": "carousel",
+    "title": "Post 2 · Announcement carousel",
+    "week": "Week 1",
+    "chs": [
+     "Instagram",
+     "LinkedIn"
+    ],
+    "slides": [
+     "A first for sports medicine.",
+     "KetoRub is the first prescription-only NSAID topical in the U.S. to earn TruShield Certification.",
+     "Screened for more than 480 banned substances.",
+     "Tested by a WADA-experienced, ISO 17025-accredited laboratory.",
+     "Why does that matter?\n\nAthletes are responsible for what is found in their systems — even when exposure was unintentional.",
+     "Certification adds an independent layer of scrutiny to the products used in athlete care.",
+     "Pain relief should never introduce an unnecessary question.",
+     "What touches the athlete matters.\n\nKetoRub × TruShield"
+    ]
+   },
+   {
+    "id": "p3",
+    "type": "carousel",
+    "title": "Post 3 · “The label is not the test” — Performance Check carousel",
+    "week": "Week 2",
+    "chs": [
+     "Instagram"
+    ],
+    "series": "Performance Check",
+    "slides": [
+     "PERFORMANCE CHECK\n\n“If it's sold legally, it must be safe for tested athletes.”",
+     "VERDICT: NOT NECESSARILY.",
+     "A product label tells you what a manufacturer says is inside.",
+     "Third-party testing asks another question:\n\nWhat is actually detected in the finished product?",
+     "Contamination, undisclosed ingredients and manufacturing issues can create risks that are not obvious from the label alone.",
+     "That is why the testing program behind a certification mark matters.",
+     "Don't just look for a seal.\n\nVerify what was tested, by whom and against which standards.",
+     "Better questions protect athletes."
+    ],
+    "note": "Caption angle: the point is not that every untested product is contaminated. The point is that an athlete, trainer or medical professional should not have to rely solely on an assumption. A legitimate certification should be verifiable and should clearly explain what it tests."
+   },
+   {
+    "id": "p4",
+    "type": "lidoc",
+    "title": "Post 4 · Strict liability explainer — LinkedIn document",
+    "week": "Week 2",
+    "chs": [
+     "LinkedIn"
+    ],
+    "headline": "The athlete may not have intended it. The consequences can still be real.",
+    "bullets": [
+     "Anti-doping systems generally operate under strict liability.",
+     "The presence of a prohibited substance can establish a violation without proof that the athlete intended to cheat.",
+     "The source and degree of fault may affect the final sanction.",
+     "Contamination is therefore not merely a manufacturer issue; it is an athlete-care and risk-management issue.",
+     "Product verification should be part of a team's broader medication and supplement protocol."
+    ],
+    "note": "Important wording: use “can result in sanctions, lost competition opportunities and reputational harm” rather than the absolute “a positive test can end a career” throughout most of the campaign. The latter is emotionally powerful but too sweeping to use as the primary factual claim."
+   },
+   {
+    "id": "p5",
+    "type": "carousel",
+    "title": "Post 5 · What TruShield Certification means — carousel",
+    "week": "Week 3",
+    "chs": [
+     "Instagram",
+     "LinkedIn"
+    ],
+    "slides": [
+     "What does TruShield Certified actually mean?",
+     "It is independent banned-substance screening — not a marketing seal created by SportPharm.",
+     "KetoRub was screened for more than 480 banned substances.",
+     "The panel includes categories such as anabolic agents, stimulants, SARMs and diuretics.",
+     "Testing is conducted through a WADA-experienced, ISO 17025-accredited laboratory.",
+     "Certified lots are validated, and label claims are reviewed against the Certificate of Analysis.",
+     "It does not mean that any product can guarantee zero risk.",
+     "It means KetoRub underwent independent scrutiny designed specifically around banned-substance safety.",
+     "That is a meaningful distinction for athlete care."
+    ]
+   },
+   {
+    "id": "p6",
+    "type": "staticpv",
+    "title": "Post 6 · “Not every certification tests the same thing” — infographic",
+    "week": "Week 3",
+    "chs": [
+     "Instagram",
+     "LinkedIn"
+    ],
+    "big": "A certification logo is only as meaningful as the testing behind it.",
+    "items": [
+     "What substances are included?",
+     "Is the finished product tested?",
+     "Are certified lots verifiable?",
+     "Is the laboratory appropriately accredited?",
+     "Is the prohibited-substance panel current?",
+     "Can the certification be independently confirmed?"
+    ],
+    "cta": "Ask better questions. Protect the athlete.",
+    "note": "Keep this educational instead of directly attacking NSF Certified for Sport, Informed Sport or other programs. Position TruShield by clearly explaining its particular testing depth."
+   },
+   {
+    "id": "p7",
+    "type": "reel2",
+    "title": "Post 7 · Behind-the-scenes reel",
+    "week": "Week 4",
+    "chs": [
+     "Instagram",
+     "Facebook"
+    ],
+    "purpose": "Concept: “What does it take to earn the mark?” Use real footage wherever possible.",
+    "cover": {
+     "eyebrow": "Behind the Certification",
+     "hook": "What does it take to earn the mark?",
+     "sub": "Trust should be tested."
+    },
+    "audio": "Original audio — SportPharm",
+    "scenes": [
+     "KetoRub production",
+     "Lot identification",
+     "Samples being prepared",
+     "Sealed sample shipment",
+     "Laboratory exterior or approved TruShield footage",
+     "Testing instruments",
+     "Documentation review",
+     "Certification confirmation",
+     "Product receiving its mark"
+    ],
+    "onscreen": [
+     "A finished product",
+     "A traceable lot",
+     "Independent laboratory screening",
+     "480+ banned substances",
+     "Documentation review",
+     "Certified lot validation",
+     "The TruShield mark"
+    ],
+    "endcard": [
+     "Trust should be tested."
+    ],
+    "note": "Avoid implying that every specific scene is part of the actual process unless SportPharm or TruShield can verify it."
+   },
+   {
+    "id": "p8",
+    "type": "interview",
+    "title": "Post 8 · Brandon interview — Ask Brandon, 45–60s",
+    "week": "Week 4",
+    "chs": [
+     "Instagram",
+     "LinkedIn",
+     "Facebook"
+    ],
+    "cover": {
+     "eyebrow": "Ask Brandon",
+     "hook": "Why certify a prescription topical?",
+     "sub": "45–60 second video"
+    },
+    "q": "Why did SportPharm pursue banned-substance certification for a prescription topical?",
+    "a": "Athletes and medical teams already think carefully about supplements and medications. But topicals are often treated as an afterthought. At SportPharm, we believe every product used in athlete care deserves appropriate scrutiny. TruShield gave us a way to independently screen KetoRub against more than 480 banned substances. It is one more layer of confidence for the professionals and athletes we serve.",
+    "followups": [
+     "“Can certification guarantee that an athlete will never test positive?”",
+     "“What should a trainer look for in a testing program?”",
+     "“Why test the finished product instead of reviewing only the ingredients?”",
+     "“What makes an athlete's medication needs different?”"
+    ],
+    "note": "Each follow-up answer can become its own reel."
+   },
+   {
+    "id": "p9",
+    "type": "staticpv",
+    "title": "Post 9 · Training-room checklist — saveable carousel / download",
+    "week": "Week 5",
+    "chs": [
+     "Instagram",
+     "LinkedIn"
+    ],
+    "big": "Before a product enters your training room",
+    "items": [
+     "Is every product documented?",
+     "Are ingredients and active medications reviewed?",
+     "Is the athlete subject to WADA, NCAA, league or federation rules?",
+     "Has the product's certification been independently verified?",
+     "Is the specific certified lot identifiable?",
+     "Does the athlete have a prescription or therapeutic-use requirement to address?",
+     "Is there a process for reporting adverse reactions?",
+     "Does the medical and compliance team know what the athlete is using?"
+    ],
+    "cta": "Download the Athlete Product Verification Checklist.",
+    "note": "This is the campaign's best lead-generation opportunity."
+   },
+   {
+    "id": "p10",
+    "type": "carousel",
+    "title": "Post 10 · Who owns clean-sport safety? — LinkedIn carousel",
+    "week": "Week 5",
+    "chs": [
+     "LinkedIn"
+    ],
+    "slides": [
+     "Who is responsible for clean-sport safety?",
+     "The athlete is ultimately responsible for what is found in their system.",
+     "But the athlete should not be the only person asking questions.",
+     "Trainers manage products used in care.",
+     "Physicians and pharmacists guide treatment decisions.",
+     "Compliance teams interpret program requirements.",
+     "Manufacturers are responsible for quality and transparency.",
+     "Clean sport is an individual responsibility supported by a complete care team.",
+     "Athlete care is a team sport."
+    ],
+    "note": "This connects to SportPharm's broader brand campaign."
+   },
+   {
+    "id": "p11",
+    "type": "staticpv",
+    "title": "Post 11 · KetoRub product proof — clean product static",
+    "week": "Week 6",
+    "chs": [
+     "Instagram",
+     "LinkedIn",
+     "Facebook"
+    ],
+    "big": "Prescription pain relief.\nIndependently screened with athletes in mind.",
+    "items": [
+     "Prescription-only ketoprofen topical",
+     "TruShield Certified",
+     "Screened for 480+ banned substances",
+     "Developed by sports pharmacists"
+    ],
+    "cta": "Ask your healthcare provider about KetoRub.",
+    "note": "Keep required prescription and pharmaceutical disclosures visible wherever applicable."
+   },
+   {
+    "id": "p12",
+    "type": "reel2",
+    "title": "Post 12 · Campaign close — emotional reel",
+    "week": "Week 6",
+    "chs": [
+     "Instagram",
+     "Facebook"
+    ],
+    "purpose": "Emotional close over athlete/trainer photography.",
+    "cover": {
+     "eyebrow": "Clean Sport",
+     "hook": "What touches the athlete matters.",
+     "sub": "Campaign close"
+    },
+    "audio": "Licensed emotive track or original — SportPharm",
+    "scenes": [
+     "Athlete and trainer photography montage — reps, practices, quiet decisions"
+    ],
+    "vo": "Careers are built rep by rep. Practice by practice. Decision by decision. The products used in athlete care should be chosen with the same intention. What touches the athlete matters.",
+    "endcard": [
+     "KetoRub × TruShield × SportPharm"
+    ]
+   },
+   {
+    "id": "stories",
+    "type": "stories",
+    "title": "Supporting Stories package — polls, quiz & FAQ",
+    "week": "All 6 weeks",
+    "chs": [
+     "Instagram"
+    ],
+    "polls": [
+     {
+      "q": "Do topical products need banned-substance testing?",
+      "opts": [
+       "Yes",
+       "I've never considered it"
+      ]
+     },
+     {
+      "q": "Who checks the products used in your training room?",
+      "opts": [
+       "Athletic trainer",
+       "Medical team",
+       "Compliance",
+       "Not sure"
+      ]
+     },
+     {
+      "q": "Does a certification guarantee zero risk?",
+      "opts": [
+       "Yes",
+       "No"
+      ]
+     },
+     {
+      "q": "Have you ever verified a certification logo?",
+      "opts": [
+       "Yes",
+       "No"
+      ]
+     }
+    ],
+    "quiz": {
+     "q": "Under strict liability, does intent have to be proven for a prohibited-substance finding?",
+     "opts": [
+      "Yes",
+      "No"
+     ],
+     "answer": "No. Intent and fault may affect the outcome or sanction, but they are not required to establish the initial presence of a prohibited substance."
+    },
+    "faq": [
+     "Is ketoprofen itself prohibited?",
+     "What is an NSAID?",
+     "What substances does TruShield screen for?",
+     "Does certification guarantee zero risk?",
+     "Can athletes verify a certified lot?",
+     "How can a patient access KetoRub?",
+     "Does a prescription automatically make every medication permissible in sport?"
+    ],
+    "note": "The final FAQ opens the door to SportPharm's larger sports-pharmacy expertise."
+   },
+   {
+    "id": "email",
+    "type": "email",
+    "title": "Email sequence — 3 sends",
+    "week": "Weeks 1–5",
+    "chs": [
+     "Email"
+    ],
+    "emails": [
+     {
+      "s": "The product athletes apply matters, too",
+      "d": "Announcement and significance."
+     },
+     {
+      "s": "What does “banned-substance certified” actually mean?",
+      "d": "Certification education."
+     },
+     {
+      "s": "Before a product enters your training room",
+      "d": "Checklist download and professional CTA."
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "sideline-ready",
+  "title": "“Sideline Ready” — Emergency Preparedness for ATs",
+  "campaign": "SportPharm Sideline Ready Campaign",
+  "prio": "B2B priority",
+  "channels": [
+   "LinkedIn",
+   "IG",
+   "Blog"
+  ],
+  "camp": {
+   "platform": "Sideline med kits get restocked all season and audited almost never — and the gap only shows the day something goes wrong. Sideline Ready turns SportPharm's pharmacist perspective into the operational standard for emergency medication preparedness: audits, storage, labeling, travel workflows, documentation. It's the most save-and-forward content the brand can make, aimed at the exact professionals who buy SportPharm services.",
+   "strategy": {
+    "primary": "Make SportPharm the name ATs associate with sideline medication readiness — measured by checklist saves, downloads, and kit-audit consult requests.",
+    "supporting": [
+     "Build a library of practical tools (audit checklist, travel workflow, documentation templates) that live in training rooms",
+     "Time content to pre-season and tournament windows when readiness is top-of-mind",
+     "Convert audit-tool users into conversations about SportPharm's kit-management and repackaging services"
+    ],
+    "audiences": [
+     {
+      "who": "Athletic trainers",
+      "why": "Own the kit day-to-day; personally exposed when documentation or storage fails."
+     },
+     {
+      "who": "Head ATs & sports-med coordinators",
+      "why": "Set protocols across programs; the audience for workflow and documentation standards."
+     },
+     {
+      "who": "Athletic directors",
+      "why": "Approve the services that fix what audits find; secondary but decision-holding."
+     }
+    ]
+   },
+   "messages": {
+    "emotional": "None of this matters on a normal Tuesday. All of it matters the day something goes wrong.",
+    "educational": "Restocking is not auditing — expiration, storage temperature, labeling, and documentation each fail silently.",
+    "product": "SportPharm's pharmacists audit, stock, and label kits for team clients — the same checklist we publish is the one we run.",
+    "brand": "We Take Our Drugs Seriously — preparedness is pharmacy work done before it's needed."
+   },
+   "structure": [
+    {
+     "phase": "Pre-season push (Weeks 1–4)",
+     "what": "Launch with the 10-minute audit: LinkedIn checklist post, IG carousel, audit Reel, anchor article with printable checklist."
+    },
+    {
+     "phase": "In-season utility (Months 2–4)",
+     "what": "Monthly: storage/labeling deep-dive, travel & tournament workflow, documentation habits. Each with a takeaway tool."
+    },
+    {
+     "phase": "Tournament re-push (season end)",
+     "what": "Re-run the audit framing for postseason travel; retarget checklist downloaders with the kit-audit service offer."
+    }
+   ],
+   "stories": [
+    "The sideline med kit audit: a pharmacist's checklist",
+    "Storage & labeling best practices that survive an inspection",
+    "Travel and tournament workflows: meds across state lines",
+    "Documentation habits that protect the AT, not just the athlete"
+   ],
+   "adaptations": [
+    {
+     "ch": "linkedin",
+     "note": "The professional utility surface: numbered checklists, “save this” framing, comment-link to the printable."
+    },
+    {
+     "ch": "instagram",
+     "note": "Carousel-first — each audit step is a slide; cover card designed for the save button."
+    },
+    {
+     "ch": "reel",
+     "note": "Real kit on camera. Pharmacist audits a kit live and finds real problems — inherently watchable, inherently credible."
+    },
+    {
+     "ch": "article",
+     "note": "Anchor with the printable checklist; subsequent articles add the travel workflow and documentation templates."
+    },
+    {
+     "ch": "email",
+     "note": "Pre-season note to team list: “Before first practice: the 10-minute kit audit” + printable attached."
+    }
+   ],
+   "landing": [
+    {
+     "t": "Hero",
+     "d": "“Is your kit sideline ready?” — season-timed framing, checklist CTA."
+    },
+    {
+     "t": "The audit",
+     "d": "The 4 failure points: expiration, temperature, labeling, documentation — with the printable download (email gate)."
+    },
+    {
+     "t": "Toolkit",
+     "d": "Travel workflow, documentation templates, storage guide — the growing library."
+    },
+    {
+     "t": "The service",
+     "d": "What SportPharm does for team clients: kit audits, compliant repackaging, restock programs."
+    },
+    {
+     "t": "Proof",
+     "d": "Programs served since 1995; testimonial pull-quote (approved)."
+    },
+    {
+     "t": "Consult CTA",
+     "d": "“Have a pharmacist audit your kit” — booking form."
+    }
+   ],
+   "visual": [
+    "Ground: lighter than Clean Sport — utility content on off-white with navy structure; red reserved for the checklist checkmarks.",
+    "Motif: the checklist — literal check squares as a repeating graphic device across covers and carousels.",
+    "Photography: real kits, real compartments, hands-in-frame documentary style; nothing staged-glossy.",
+    "Type: checklist items in condensed caps; supporting copy small and dense like a field manual."
+   ],
+   "guardrails": [
+    "Educational only — never instruct on clinical use of emergency meds (epinephrine, naloxone, etc.); route protocol questions to the program's supervising physician.",
+    "State laws differ on stocking/administration: say “varies by state; verify locally” wherever rules are referenced.",
+    "The audit checklist is process guidance, not a legal compliance certification — label it as such on the printable.",
+    "No fear-mongering with real incident stories unless public, sourced, and told respectfully; no identifiable athlete health details ever.",
+    "Service claims (“we audit, stock, label”) must match the current service agreement scope."
+   ],
+   "metrics": [
+    {
+     "goal": "Utility adoption (primary)",
+     "kpi": "Checklist downloads; IG carousel saves; LinkedIn post saves/shares among AT titles"
+    },
+    {
+     "goal": "Lead generation",
+     "kpi": "Kit-audit consult requests; email-gate conversions; reply rate on the pre-season email"
+    },
+    {
+     "goal": "Franchise growth",
+     "kpi": "Returning readers on subsequent toolkit articles; follower growth in target titles"
+    },
+    {
+     "goal": "Review cadence",
+     "kpi": "Monthly; re-forecast at pre-season and postseason pushes"
+    }
+   ]
+  },
+  "assets": [
+   {
+    "id": "li",
+    "type": "linkedin",
+    "title": "LinkedIn checklist post",
+    "caption": "When was your sideline med kit last audited by a pharmacist?\n\nNot restocked. Audited.\n\nMost kits we review have at least one of these problems:\n• Expired medications that were restocked around, not replaced\n• Meds stored outside their temperature range all season\n• Labels that don't meet state dispensing requirements\n• No documentation trail if something is administered\n\nNone of these matter on a normal Tuesday. All of them matter the day something goes wrong.\n\nWe put together a pharmacist's audit checklist for athletic trainers — the same one we use with our team clients. Link in comments.\n\n#AthleticTraining #SportsMedicine #EmergencyPreparedness #ATtwitter",
+    "visual": {
+     "type": "checklist",
+     "eyebrow": "Sideline Ready · No. 1",
+     "big": "The 10-minute med kit audit",
+     "items": [
+      "Expiration sweep — every compartment",
+      "Temperature log for heat-sensitive meds",
+      "Labels meet state dispensing rules",
+      "Administration documentation in the kit"
+     ]
+    }
+   },
+   {
+    "id": "ig",
+    "type": "instagram",
+    "title": "Instagram carousel (cover + caption)",
+    "caption": "Restocking a med kit is not the same as auditing one. 🧰\n\nSwipe for the 10-minute audit our pharmacists run with team clients — the four checks that matter the day something goes wrong.\n\nSave this for pre-season. Your future self will thank you.\n\n#AthleticTraining #SidelineReady #SportsMedicine #ATlife",
+    "visual": {
+     "type": "checklist",
+     "sq": true,
+     "eyebrow": "Sideline Ready",
+     "big": "The 10-minute med kit audit",
+     "items": [
+      "Expiration sweep",
+      "Temperature log",
+      "Compliant labels",
+      "Documentation in the kit"
+     ]
+    }
+   },
+   {
+    "id": "reel",
+    "type": "reel",
+    "title": "Reel — 35s",
+    "cover": {
+     "eyebrow": "Sideline Ready",
+     "hook": "Your med kit has an expired problem.",
+     "sub": "A pharmacist audits a real sideline kit."
+    },
+    "audio": "Original audio — SportPharm",
+    "script": [
+     {
+      "t": "Hook 0–2s",
+      "x": "Pharmacist unzips a sideline kit: “Let's audit a real med kit. Bet we find something expired.”",
+      "os": "ON SCREEN: Auditing a real sideline kit."
+     },
+     {
+      "t": "Beat 3–12s",
+      "x": "Compartment-by-compartment sweep. Finds an expired item — holds it up. “Restocked around, never replaced. Happens in most kits we review.”",
+      "os": "ON SCREEN: Check every compartment, not the top layer."
+     },
+     {
+      "t": "Beat 13–22s",
+      "x": "Points out a heat-sensitive med: “This spent August in a trunk. Storage range matters as much as the date.”",
+      "os": "ON SCREEN: Storage temps count."
+     },
+     {
+      "t": "Beat 23–30s",
+      "x": "“Last thing — if you administered something today, where's it documented? The kit should carry its own log.”",
+      "os": "B-ROLL: log sheet in kit lid."
+     },
+     {
+      "t": "CTA 31–35s",
+      "x": "“Full 10-minute audit checklist — link in bio. Run it before your season does.”",
+      "os": "CTA: Audit checklist in bio."
+     }
+    ]
+   },
+   {
+    "id": "art",
+    "type": "article",
+    "title": "Blog article (campaign anchor)",
+    "headline": "The Pharmacist's Sideline Med Kit Audit: A 10-Minute Checklist for Athletic Trainers",
+    "dek": "The kit gets restocked all season — but restocking hides problems an audit catches. Here's the exact walkthrough our pharmacists run with team clients.",
+    "author": "SportPharm Clinical Team",
+    "read": "6 min read",
+    "outline": [
+     "Restocking vs. auditing: why kits drift out of compliance mid-season",
+     "The expiration sweep: how to do it so nothing hides",
+     "Temperature: which sideline meds heat quietly ruins",
+     "Labeling that survives an inspection (state-by-state basics)",
+     "The administration log: documentation that lives in the kit",
+     "Printable: the 10-minute audit checklist"
+    ],
+    "cta": "Closes with: printable checklist download + offer to have a SportPharm pharmacist audit your kit."
+   }
+  ]
+ },
+ {
+  "id": "dispensing",
+  "title": "Compliant In-House Dispensing & Medication Management",
+  "campaign": "SportPharm Compliance Playbook Campaign",
+  "prio": "B2B priority",
+  "channels": [
+   "LinkedIn",
+   "Blog"
+  ],
+  "camp": {
+   "platform": "Athletic programs handle prescription medications every week under rules written for pharmacies — and the gap between the two is where institutional liability lives. The Compliance Playbook campaign speaks past the training room to the people who carry that risk: athletic directors and program administrators. It names the five pitfalls almost every program has, prices the risk honestly, and positions pharmacist oversight as the fix that closes them within a season.",
+   "strategy": {
+    "primary": "Generate qualified program-level conversations (ADs, administrators) by making SportPharm the clearest voice on dispensing compliance risk.",
+    "supporting": [
+     "Arm ATs with the language to escalate compliance gaps upward",
+     "Establish the “five pitfalls” framework as the shorthand programs use to self-assess",
+     "Publish a self-assessment tool that doubles as the lead-qualification instrument"
+    ],
+    "audiences": [
+     {
+      "who": "Athletic directors",
+      "why": "Sign the contracts; think in liability, not logistics. The campaign's true buyer."
+     },
+     {
+      "who": "Program administrators / compliance officers",
+      "why": "Own institutional risk registers; a documented gap is their problem to close."
+     },
+     {
+      "who": "Head athletic trainers",
+      "why": "Live the gap daily; the internal champions who forward this content upward."
+     }
+    ]
+   },
+   "messages": {
+    "emotional": "The most expensive medication in your training room is the one you can't document.",
+    "educational": "Dispensing rules were written for pharmacies, not training rooms — labeling, logs, cold-chain, sourcing pedigree, and written policy each fail differently.",
+    "product": "SportPharm's pharmacists bring programs into compliance in a season: compliant repackaging, dispensing systems, documented oversight.",
+    "brand": "We Take Our Drugs Seriously — including the paperwork."
+   },
+   "structure": [
+    {
+     "phase": "Name the problem (Weeks 1–3)",
+     "what": "Five-pitfalls pillar post + anchor article. LinkedIn-first; the Reel adapts the list for reach."
+    },
+    {
+     "phase": "Deepen (Months 2–3)",
+     "what": "One pitfall per month in depth: cold-chain, gray-market sourcing, documentation. Self-assessment tool launches."
+    },
+    {
+     "phase": "Convert (Quarter 2)",
+     "what": "Case-study content (with Trusted-Since-1995 crossover); self-assessment completers get the program-review consult offer."
+    }
+   ],
+   "stories": [
+    "5 compliance pitfalls hiding in the athletic training room",
+    "Cold-chain handling: the medications most programs store wrong",
+    "Licensed pharmacy vs. gray market: what sourcing risk really costs",
+    "What pharmacist oversight of a program actually looks like"
+   ],
+   "adaptations": [
+    {
+     "ch": "linkedin",
+     "note": "Primary channel. Executive tone, liability framing, numbered lists; target AD and compliance titles with the self-assessment."
+    },
+    {
+     "ch": "reel",
+     "note": "Secondary reach play: “5 things an auditor sees” countdown format — makes a dry topic scrollable."
+    },
+    {
+     "ch": "article",
+     "note": "The playbook lives here: long-form anchor + one deep-dive per pitfall; hosts the self-assessment."
+    },
+    {
+     "ch": "email",
+     "note": "Direct to AD/admin contacts: one-page risk summary framed as a board-ready briefing, not marketing."
+    }
+   ],
+   "landing": [
+    {
+     "t": "Hero",
+     "d": "“Dispensing rules were written for pharmacies. Not training rooms.” — the gap, stated plainly."
+    },
+    {
+     "t": "The five pitfalls",
+     "d": "Labeling · logs · cold-chain · sourcing · policy — each with the one-line failure mode."
+    },
+    {
+     "t": "Self-assessment",
+     "d": "10-question program check (email gate) that scores exposure and qualifies the lead."
+    },
+    {
+     "t": "The fix",
+     "d": "Pharmacist oversight explained: what changes month-to-month; the one-season remediation timeline."
+    },
+    {
+     "t": "Proof",
+     "d": "Programs served; compliance-relevant testimonial (approved wording only)."
+    },
+    {
+     "t": "Consult CTA",
+     "d": "“Request a program review” — routed to the concierge team."
+    }
+   ],
+   "visual": [
+    "Ground: the most buttoned-up treatment in the series — navy-on-white, document-like, generous whitespace.",
+    "Motif: the ledger/log — ruled lines, stamped labels, checkbox forms as graphic elements.",
+    "Photography: training-room storage, fridges, labeled bins; detail shots that say “systems,” not action shots.",
+    "Type: tabular numbers and small caps; feels like a well-designed audit report, not an ad."
+   ],
+   "guardrails": [
+    "This is risk education, not legal advice — say so explicitly; regulations vary by state and league.",
+    "Never assert a specific program is non-compliant; all pitfalls are described categorically.",
+    "Gray-market claims stay general (“distributors who can't produce a pedigree”) — no named distributors.",
+    "Cost-of-risk framing uses public, citable cases only; no speculation about penalties.",
+    "Service scope claims must match current SportPharm offerings state-by-state (licensure varies)."
+   ],
+   "metrics": [
+    {
+     "goal": "Qualified leads (primary)",
+     "kpi": "Self-assessment completions; program-review requests; email reply rate from AD/admin list"
+    },
+    {
+     "goal": "Authority",
+     "kpi": "LinkedIn engagement among AD/compliance titles; “five pitfalls” language showing up in inbound inquiries"
+    },
+    {
+     "goal": "Content performance",
+     "kpi": "Anchor article read depth; deep-dive return visits"
+    },
+    {
+     "goal": "Review cadence",
+     "kpi": "Monthly, with a quarter-end pipeline review against consults booked"
+    }
+   ]
+  },
+  "assets": [
+   {
+    "id": "li",
+    "type": "linkedin",
+    "title": "LinkedIn pillar post",
+    "caption": "The most expensive medication in your training room is the one you can't document.\n\nAthletic programs handle prescription medications every week — but dispensing rules were written for pharmacies, not training rooms. That gap is where liability lives.\n\nThe five pitfalls we see most:\n1. Repackaged meds without compliant labeling\n2. No dispensing log tied to a supervising physician\n3. Refrigerated meds outside cold-chain more than they're in it\n4. Sourcing from distributors who can't produce a pedigree\n5. “The AT has always handled it” as the written policy\n\nEvery one is fixable — usually within a season. That's the work our pharmacists do with collegiate and pro programs.\n\n#AthleticDirectors #SportsMedicine #Compliance #CollegeAthletics",
+    "visual": {
+     "type": "stat",
+     "eyebrow": "Compliance Playbook",
+     "big": "Dispensing rules were written for pharmacies. Not training rooms.",
+     "small": "Five compliance pitfalls we find in almost every program review — and how to close them before an audit does."
+    }
+   },
+   {
+    "id": "ig",
+    "type": "instagram",
+    "title": "Instagram feed post",
+    "caption": "“The AT has always handled it” is not a compliance policy. 📋\n\nFive dispensing pitfalls we find in almost every athletic program — all fixable within a season, all cheaper to fix before an audit finds them.\n\nFull playbook on the blog — link in bio.\n\n#CollegeAthletics #SportsMedicine #AthleticTraining #Compliance",
+    "visual": {
+     "type": "stat",
+     "sq": true,
+     "eyebrow": "Compliance Playbook",
+     "big": "5 compliance pitfalls hiding in your training room",
+     "small": "Labeling · logs · cold-chain · sourcing · policy. How many would survive an audit?"
+    }
+   },
+   {
+    "id": "reel",
+    "type": "reel",
+    "title": "Reel — 30s",
+    "cover": {
+     "eyebrow": "Compliance Playbook",
+     "hook": "5 things an auditor sees in your training room.",
+     "sub": "A sports pharmacist's walkthrough."
+    },
+    "audio": "Original audio — SportPharm",
+    "script": [
+     {
+      "t": "Hook 0–2s",
+      "x": "“If an auditor walked into your training room today, here's what they'd flag first.”",
+      "os": "ON SCREEN: What an auditor sees."
+     },
+     {
+      "t": "Beat 3–10s",
+      "x": "Rapid count-up over b-roll: repackaged meds without compliant labels… no dispensing log tied to a physician…",
+      "os": "ON SCREEN: 1. Labels 2. Logs"
+     },
+     {
+      "t": "Beat 11–18s",
+      "x": "…refrigerated meds out of cold-chain… sourcing with no pedigree… and a policy that's really just habit.",
+      "os": "ON SCREEN: 3. Cold-chain 4. Sourcing 5. Policy"
+     },
+     {
+      "t": "Beat 19–26s",
+      "x": "“None of this is rare. All of it is fixable in a season with pharmacist oversight.”",
+      "os": "ON SCREEN: All fixable. One season."
+     },
+     {
+      "t": "CTA 27–30s",
+      "x": "“The full dispensing playbook is on our blog — link in bio.”",
+      "os": "CTA: Playbook in bio."
+     }
+    ]
+   },
+   {
+    "id": "art",
+    "type": "article",
+    "title": "Blog article (campaign anchor)",
+    "headline": "The Compliant Dispensing Playbook: Medication Management for Athletic Programs",
+    "dek": "A practical guide for athletic directors and head ATs: where training-room dispensing goes wrong, what it exposes the program to, and the season-long fix.",
+    "author": "SportPharm Clinical Team",
+    "read": "9 min read",
+    "outline": [
+     "Why training rooms fall into a regulatory gap",
+     "Pitfall audit: labeling, logs, cold-chain, sourcing, policy",
+     "The gray-market problem: what a pedigree is and why it matters",
+     "What pharmacist oversight actually looks like month to month",
+     "A season-long remediation timeline any program can run"
+    ],
+    "cta": "Closes with: program compliance self-assessment + consult CTA for athletic directors."
+   }
+  ]
+ },
+ {
+  "id": "recovery",
+  "title": "Recovery Isn't One-Size-Fits-All",
+  "campaign": "SportPharm Recovery, Honestly Campaign",
+  "prio": "Authority",
+  "channels": [
+   "LinkedIn",
+   "IG",
+   "Blog"
+  ],
+  "camp": {
+   "platform": "Athletes get their recovery advice from an algorithm, and nobody behind it is accountable. Recovery, Honestly is SportPharm's clinical team reading the evidence out loud — one trend at a time, verdicts included. It's the brand's credibility engine: no product to sell in most posts, just the discipline of showing your work. The authority it banks pays out across every other campaign.",
+   "strategy": {
+    "primary": "Position SportPharm's clinical team as the accountable, evidence-literate voice on recovery — grow engaged following among ATs, coaches, and serious athletes.",
+    "supporting": [
+     "Build a recurring, anticipated format (“Evidence vs. Hype”) with a recognizable verdict card",
+     "Bank credibility that de-risks product campaigns (Targeted Relief, Read the Label)",
+     "Harvest audience questions as a pipeline of future episodes"
+    ],
+    "audiences": [
+     {
+      "who": "Athletic trainers & S&C coaches",
+      "why": "Fight the misinformation their athletes bring in; will share content that settles arguments."
+     },
+     {
+      "who": "Serious athletes (college/club)",
+      "why": "The ones actually doing the ice baths; reachable on IG/Reels."
+     },
+     {
+      "who": "Sports-med physicians",
+      "why": "Quiet validators — their reshares carry outsized authority."
+     }
+    ]
+   },
+   "messages": {
+    "emotional": "Your recovery shouldn't be decided by whoever went viral this week.",
+    "educational": "Every trend gets the same treatment: what the evidence supports, what it doesn't, and the honest “it depends.”",
+    "product": "When products do appear, they've passed the same evidence bar we apply to everything else.",
+    "brand": "We Take Our Drugs Seriously — and the evidence, too."
+   },
+   "structure": [
+    {
+     "phase": "Format launch (Weeks 1–2)",
+     "what": "Ice-bath episode across all channels establishes the format and the verdict-card visual."
+    },
+    {
+     "phase": "Serialize (ongoing, biweekly)",
+     "what": "One trend per episode: recovery powders, energy drinks, sleep vs. supplements. Audience submissions drive the queue."
+    },
+    {
+     "phase": "Compound (quarterly)",
+     "what": "“Season verdicts” roundup article; verdict-card recap carousel; feed the best questions into the Behind the Counter Q&A."
+    }
+   ],
+   "stories": [
+    "Ice baths: what the evidence actually supports",
+    "Recovery powders vs. a boring good night's sleep",
+    "Energy drinks in the training room: a pharmacist's take",
+    "Pharmacist-guided supplement selection: why guidance beats guessing"
+   ],
+   "adaptations": [
+    {
+     "ch": "linkedin",
+     "note": "Full-argument captions for the professional audience; the “shows their work” framing is the hook."
+    },
+    {
+     "ch": "instagram",
+     "note": "The verdict card is the format: supported / unproven / caution in a consistent square template built for saves."
+    },
+    {
+     "ch": "reel",
+     "note": "Highest-reach surface. Pharmacist-on-camera verdicts in 30s; hook on the contrarian angle, land on “it depends,” done honestly."
+    },
+    {
+     "ch": "article",
+     "note": "Each episode's long-form receipt: the citations behind the verdict. Linked from every social post."
+    },
+    {
+     "ch": "email",
+     "note": "Biweekly “verdict” digest to subscribers; one trend, one verdict, one link."
+    }
+   ],
+   "landing": [
+    {
+     "t": "Hero",
+     "d": "“Recovery, honestly.” — the series promise: evidence read out loud, verdicts included."
+    },
+    {
+     "t": "Episode index",
+     "d": "Verdict-card grid of every trend covered; filter by supported/unproven/caution."
+    },
+    {
+     "t": "How we read evidence",
+     "d": "The team's method — what counts, what doesn't; the credibility page."
+    },
+    {
+     "t": "Submit a trend",
+     "d": "Question intake form — fuels the queue and the email list."
+    },
+    {
+     "t": "The team",
+     "d": "Clinical roster with credentials (crossover to Behind the Counter)."
+    },
+    {
+     "t": "Disclaimer",
+     "d": "Educational content; not individual medical advice."
+    }
+   ],
+   "visual": [
+    "Ground: split-tone system — navy “evidence” panel vs. light “hype” panel; the verdict card is the campaign's signature unit.",
+    "Motif: the verdict stamp — SUPPORTED / UNPROVEN / CAUTION in stencil-stamp type, applied consistently.",
+    "Photography: minimal; the format is typographic. Reels are pharmacist-on-camera with burned-in captions.",
+    "Type: verdicts in heavy condensed caps; citations set small — visible rigor is part of the design."
+   ],
+   "guardrails": [
+    "Every claim traces to citable evidence; the article lists sources for each verdict — no vibes-based verdicts.",
+    "No disease-treatment claims; frame as performance/recovery education, not medical advice.",
+    "Verdicts criticize practices and product categories, never named brands.",
+    "“It depends” is stated honestly — resist collapsing nuance for a better hook.",
+    "If an episode touches a SportPharm product category, disclose it in-post (“we sell topicals; here's the evidence anyway”)."
+   ],
+   "metrics": [
+    {
+     "goal": "Authority & following (primary)",
+     "kpi": "Follower growth and engagement rate among AT/S&C/med titles; Reel completion and share rates"
+    },
+    {
+     "goal": "Format traction",
+     "kpi": "Verdict-card saves; trend-submission volume; email digest open rate"
+    },
+    {
+     "goal": "Halo effect",
+     "kpi": "Referral traffic from episodes into product/landing pages; branded search growth"
+    },
+    {
+     "goal": "Review cadence",
+     "kpi": "Per-episode quick read; quarterly format review (keep/kill/evolve segments)"
+    }
+   ]
+  },
+  "assets": [
+   {
+    "id": "li",
+    "type": "linkedin",
+    "title": "LinkedIn series opener",
+    "caption": "The recovery advice your athletes get from social media has one thing in common: nobody's accountable for it.\n\nThis series is our pharmacists and sports dietitian going through trending recovery claims, one at a time — what the evidence supports, what it doesn't, and what we'd actually recommend.\n\nFirst up: ice baths.\n\nThe honest summary: cold-water immersion reliably reduces soreness perception. What it doesn't reliably do is improve performance recovery — and post-strength-training, it may blunt the adaptation you trained for.\n\nSo: fine after a tournament. Questionable after a lifting block. Wrong as a default for everyone.\n\nThat's what “it depends” looks like when someone shows their work.\n\n#SportsScience #Recovery #AthleteHealth #SportsNutrition",
+    "visual": {
+     "type": "vs",
+     "eyebrow": "Evidence vs. Hype · No. 1",
+     "big": "Ice baths: recovery tool or ritual?",
+     "small": "Reduces soreness perception: supported. Improves performance recovery: unproven. Blunts strength adaptation: possible."
+    }
+   },
+   {
+    "id": "ig",
+    "type": "instagram",
+    "title": "Instagram verdict card",
+    "caption": "Ice baths: recovery tool or just a very cold ritual? 🧊\n\nThe honest read from our clinical team:\n✔️ Reduces how sore you FEEL — supported\n❓ Improves actual performance recovery — unproven\n⚠️ After strength training — may blunt the gains you trained for\n\nFine after a tournament. Questionable after a lifting block. Wrong as a default.\n\nNew trend under the microscope every two weeks. 🔬\n\n#Recovery #SportsScience #IceBath #AthleteHealth",
+    "visual": {
+     "type": "vs",
+     "sq": true,
+     "eyebrow": "Evidence vs. Hype",
+     "big": "Ice baths: tool or ritual?",
+     "small": "Soreness: supported · Recovery: unproven · Post-lifting: may blunt gains"
+    }
+   },
+   {
+    "id": "reel",
+    "type": "reel",
+    "title": "Reel — 30s",
+    "cover": {
+     "eyebrow": "Evidence vs. Hype",
+     "hook": "Your ice bath might be costing you gains.",
+     "sub": "A pharmacist reads the actual evidence."
+    },
+    "audio": "Trending audio (calm) or original — SportPharm",
+    "script": [
+     {
+      "t": "Hook 0–2s",
+      "x": "“Your ice bath might be costing you gains.” Freeze on athlete mid-plunge.",
+      "os": "ON SCREEN: Costing you gains?"
+     },
+     {
+      "t": "Beat 3–10s",
+      "x": "“Here's what the evidence actually supports: you'll FEEL less sore. That part's real.”",
+      "os": "ON SCREEN: Feels better ✓"
+     },
+     {
+      "t": "Beat 11–18s",
+      "x": "“What it doesn't reliably do: speed up performance recovery. And after lifting, cold may blunt the adaptation you just trained for.”",
+      "os": "ON SCREEN: Recovery? Unproven. Post-lifting? Careful."
+     },
+     {
+      "t": "Beat 19–26s",
+      "x": "“So: tournament weekend — sure. Strength block — skip it. One-size-fits-all — never.”",
+      "os": "ON SCREEN: It depends — shown with work."
+     },
+     {
+      "t": "CTA 27–30s",
+      "x": "“New recovery trend under the microscope every two weeks. Follow along.”",
+      "os": "CTA: Follow for the series."
+     }
+    ]
+   },
+   {
+    "id": "art",
+    "type": "article",
+    "title": "Blog article (episode receipt)",
+    "headline": "Ice Baths, Read Honestly: What the Evidence Supports and What It Doesn't",
+    "dek": "Cold plunges are everywhere. Our clinical team read the research so you don't have to — here's where ice baths help, where they're neutral, and where they may work against you.",
+    "author": "SportPharm Clinical Team",
+    "read": "8 min read",
+    "outline": [
+     "The claim vs. the literature: what cold-water immersion is supposed to do",
+     "Soreness perception: the part that holds up",
+     "Performance recovery: why the evidence is thinner than the hype",
+     "The strength-training caveat: cold and adaptation",
+     "A decision guide: when we'd say yes, when we'd say skip it"
+    ],
+    "cta": "Closes with: series index + invite to submit the next trend to examine."
+   }
+  ]
+ },
+ {
+  "id": "topicals",
+  "title": "Topical Pain Relief & Compounded Solutions",
+  "campaign": "SportPharm Targeted Relief Campaign",
+  "prio": "Product",
+  "channels": [
+   "LinkedIn",
+   "IG"
+  ],
+  "camp": {
+   "platform": "An oral NSAID treats an ankle by treating the whole body. Targeted Relief makes the clinical case for topical, site-specific delivery — and lets the product line (WasabiRub, KetoRub, OG Heat Duo) ride on the argument instead of the adjective. It's product marketing built like education: mechanism first, catalog second, and compounding as the differentiator no retail brand can copy.",
+   "strategy": {
+    "primary": "Grow topical product consideration and sales — measured through product-page traffic, selector-tool use, and team orders — by owning the “targeted vs. systemic” argument.",
+    "supporting": [
+     "Teach the delivery-mechanism story until “treat the site, spare the system” is associated with SportPharm",
+     "Differentiate on compounding: adjustable strength and ingredients as the anti-mass-market story",
+     "Route consumer demand to the store and clinical demand to prescriber/team channels appropriately"
+    ],
+    "audiences": [
+     {
+      "who": "Athletic trainers & team physicians",
+      "why": "Recommenders and prescribers; respond to mechanism and documentation, not ad copy."
+     },
+     {
+      "who": "Active consumers & masters athletes",
+      "why": "Buy OTC topicals directly; want relief without systemic load."
+     },
+     {
+      "who": "Existing team accounts",
+      "why": "Cross-sell surface: programs already buying services adopt the product line fastest."
+     }
+    ]
+   },
+   "messages": {
+    "emotional": "Treat the ankle. Spare the everything else.",
+    "educational": "Topical delivery concentrates treatment at the site with minimal systemic exposure — the right choice for many localized injuries.",
+    "product": "WasabiRub, KetoRub, and the OG Heat Duo — compounded in-house, adjustable for sensitivity, sport, and treatment plan.",
+    "brand": "We Take Our Drugs Seriously — down to where in the body they go."
+   },
+   "structure": [
+    {
+     "phase": "Argument (Weeks 1–3)",
+     "what": "Mechanism content leads: topical-vs-systemic posts and the whole-body/one-ankle graphic. No hard sell."
+    },
+    {
+     "phase": "Catalog (Weeks 4–8)",
+     "what": "Product spotlights ride the established argument: which rub, when, why. Selector quiz launches."
+    },
+    {
+     "phase": "Sustain & cross-sell (ongoing)",
+     "what": "Monthly rotation; injury-playbook and seasonal crossovers place the right product in the right moment."
+    }
+   ],
+   "stories": [
+    "Why topical delivery beats systemic NSAIDs for localized injuries",
+    "Compounding 101: custom dosing for ingredient sensitivities",
+    "A more targeted approach to anti-inflammatory care",
+    "WasabiRub / KetoRub / OG Heat Duo: which, when, and why"
+   ],
+   "adaptations": [
+    {
+     "ch": "linkedin",
+     "note": "Mechanism-first clinical framing for recommenders; compounding capability as the differentiator story."
+    },
+    {
+     "ch": "instagram",
+     "note": "The consumer surface: “right drug, right site, right dose” cards, product photography, selector-quiz CTA."
+    },
+    {
+     "ch": "reel",
+     "note": "The body-map graphic carries it: pill lights up the whole silhouette, topical lights up one ankle. Instantly legible."
+    },
+    {
+     "ch": "article",
+     "note": "Anchor explainer plus a which-rub-when guide; product pages carry the conversion load."
+    },
+    {
+     "ch": "email",
+     "note": "Segmented: mechanism story to clinical list; selector quiz + offer to consumer list."
+    }
+   ],
+   "landing": [
+    {
+     "t": "Hero",
+     "d": "“Right drug. Right site. Right dose.” — body-map graphic, selector CTA."
+    },
+    {
+     "t": "The argument",
+     "d": "Topical vs. systemic explained in one scroll — the whole-body/one-ankle visual."
+    },
+    {
+     "t": "The lineup",
+     "d": "WasabiRub / KetoRub / OG Heat Duo cards: relief profile, format, OTC vs. Rx clearly separated."
+    },
+    {
+     "t": "Selector",
+     "d": "“Which rub is right for you?” quiz → product page or prescriber conversation."
+    },
+    {
+     "t": "Compounding",
+     "d": "Custom strength/ingredient story; sensitivity accommodations; the in-house lab."
+    },
+    {
+     "t": "For teams",
+     "d": "Bulk/团 account ordering and prescriber pathway — routed to concierge."
+    }
+   ],
+   "visual": [
+    "Ground: brand navy with product-color coding carried from the store (green/blue/red tiers) for instant lineup recognition.",
+    "Motif: the body map — silhouette with a single lit site; the campaign's one-glance argument.",
+    "Photography: macro product texture and application shots; clinical-clean, not lifestyle-glossy.",
+    "Type: declarative three-beat lines (“Right drug. Right site. Right dose.”) in condensed caps."
+   ],
+   "guardrails": [
+    "Keep OTC and Rx products cleanly separated: KetoRub (Rx) content stays educational/HCP-directed; consumer promotion covers OTC products only.",
+    "Efficacy claims stay within labeling; “beats systemic” framing is about delivery profile, not superiority claims against named drugs.",
+    "Compounded products: follow compounding marketing rules — no claims of FDA approval; individualized-per-prescription framing.",
+    "Include drug-facts/appropriate-use pointers; no dosing instructions in social captions.",
+    "The body-map graphic is illustrative — avoid implying zero systemic absorption; say “minimal,” never “none.”"
+   ],
+   "metrics": [
+    {
+     "goal": "Product consideration (primary)",
+     "kpi": "Product-page sessions from campaign UTMs; selector-quiz completions; add-to-cart rate on OTC line"
+    },
+    {
+     "goal": "Clinical adoption",
+     "kpi": "Prescriber/team inquiries for KetoRub & compounded options; team-account cross-sell orders"
+    },
+    {
+     "goal": "Argument reach",
+     "kpi": "Saves/shares on mechanism posts; Reel completion on the body-map video"
+    },
+    {
+     "goal": "Review cadence",
+     "kpi": "Monthly against store analytics; quarterly against team-account order growth"
+    }
+   ]
+  },
+  "assets": [
+   {
+    "id": "li",
+    "type": "linkedin",
+    "title": "LinkedIn mechanism post",
+    "caption": "An oral NSAID treats an ankle sprain by treating the entire body.\n\nStomach, kidneys, cardiovascular system — all along for the ride, so one joint can get a fraction of the dose.\n\nFor localized musculoskeletal injuries, topical delivery flips that ratio: therapeutic concentration at the site, minimal systemic exposure. That's the clinical logic behind our compounded topicals — and why team physicians increasingly reach for them first for the right injuries.\n\nAnd because we compound in-house, dosing isn't one-size-fits-all either: strength and ingredients can be adjusted for sensitivities, sport, and treatment plan.\n\nRight drug, right site, right dose. That's the whole idea.\n\n#SportsMedicine #PainManagement #Compounding #SportsPharmacy",
+    "visual": {
+     "type": "stat",
+     "eyebrow": "Targeted Relief",
+     "big": "Treat the ankle. Spare the everything else.",
+     "small": "Topical vs. systemic NSAIDs for localized injuries — the clinical case for targeted delivery, from our compounding pharmacists."
+    }
+   },
+   {
+    "id": "ig",
+    "type": "instagram",
+    "title": "Instagram product-education post",
+    "caption": "Why swallow a pill for an ankle? 🎯\n\nOral NSAIDs send the dose everywhere — stomach, kidneys, heart — so one joint gets a fraction of it. Topicals flip the ratio: relief at the site, minimal everywhere else.\n\nThat's the idea behind WasabiRub, KetoRub, and the OG Heat Duo — compounded in-house, adjustable for your sensitivities and sport.\n\nRight drug. Right site. Right dose.\n\n#PainRelief #SportsMedicine #WasabiRub #Compounding",
+    "visual": {
+     "type": "stat",
+     "sq": true,
+     "eyebrow": "Targeted Relief",
+     "big": "Right drug. Right site. Right dose.",
+     "small": "The case for topical delivery over systemic NSAIDs — from our compounding pharmacists."
+    }
+   },
+   {
+    "id": "reel",
+    "type": "reel",
+    "title": "Reel — 25s",
+    "cover": {
+     "eyebrow": "Targeted Relief",
+     "hook": "Why swallow a pill for an ankle?",
+     "sub": "Topical vs. systemic — in 25 seconds."
+    },
+    "audio": "Original audio — SportPharm",
+    "script": [
+     {
+      "t": "Hook 0–2s",
+      "x": "“Why are you swallowing a pill… for an ankle?”",
+      "os": "ON SCREEN: A pill? For an ankle?"
+     },
+     {
+      "t": "Beat 3–10s",
+      "x": "Simple graphic: pill → whole-body silhouette lights up. “Oral NSAIDs dose your entire system so one joint gets a fraction.”",
+      "os": "GRAPHIC: whole body lights up."
+     },
+     {
+      "t": "Beat 11–18s",
+      "x": "Graphic flips: topical → only the ankle lights up. “Topicals put the concentration at the site. Minimal everywhere else.”",
+      "os": "GRAPHIC: just the ankle."
+     },
+     {
+      "t": "Beat 19–22s",
+      "x": "“And compounding means the strength and ingredients adjust to the athlete — not the other way around.”",
+      "os": "B-ROLL: compounding lab."
+     },
+     {
+      "t": "CTA 23–25s",
+      "x": "“Which rub is right for you? Link in bio.”",
+      "os": "CTA: Find your rub — bio."
+     }
+    ]
+   },
+   {
+    "id": "art",
+    "type": "article",
+    "title": "Blog article (campaign anchor)",
+    "headline": "A More Targeted Approach: The Clinical Case for Topical Pain Relief",
+    "dek": "For localized injuries, where a medication acts matters as much as what it is. Our pharmacists on topical vs. systemic delivery — and where compounding fits.",
+    "author": "SportPharm Clinical Team",
+    "read": "7 min read",
+    "outline": [
+     "Systemic exposure: the hidden cost of the oral route",
+     "How topical delivery concentrates treatment at the injury",
+     "Which injuries suit topicals — and which don't",
+     "Compounding 101: adjusting strength and ingredients per athlete",
+     "The lineup explained: WasabiRub, KetoRub, OG Heat Duo — which, when, why"
+    ],
+    "cta": "Closes with: product selector link + pharmacist consult CTA."
+   }
+  ]
+ },
+ {
+  "id": "playbooks",
+  "title": "Sport-Specific Injury Playbooks",
+  "campaign": "SportPharm Injury Playbooks Campaign",
+  "prio": "Engine",
+  "channels": [
+   "Blog",
+   "LinkedIn",
+   "IG"
+  ],
+  "camp": {
+   "platform": "Every sport breaks bodies in its own particular way, on its own calendar. The Injury Playbooks campaign turns that predictability into a publishing engine: one sport per month, timed to its season — signature injuries, sideline management, and the products that belong in that sport's kit specifically. It's the searchable, seasonal, endlessly renewable franchise that keeps the whole content program on schedule.",
+   "strategy": {
+    "primary": "Build the recurring franchise that drives consistent search traffic and gives every product and service a sport-specific doorway.",
+    "supporting": [
+     "Own long-tail search for “[sport] injuries” + management queries",
+     "Create a community loop: audiences vote the next sport up the schedule",
+     "Give seasonal and product campaigns a monthly crossover surface"
+    ],
+    "audiences": [
+     {
+      "who": "ATs & team docs by sport",
+      "why": "Each volume speaks to a specific coverage niche — precision beats reach."
+     },
+     {
+      "who": "Coaches & club directors",
+      "why": "Forward playbooks to parents and staff; the shareability layer."
+     },
+     {
+      "who": "Search traffic",
+      "why": "Evergreen queries (“turf burn treatment,” “soccer ankle sprain”) compound over seasons."
+     }
+    ]
+   },
+   "messages": {
+    "emotional": "You already know your sport's injury list. Now there's a playbook for it.",
+    "educational": "Signature injuries, sideline management, and return timelines — sport by sport, from the pharmacy side.",
+    "product": "Each playbook maps the kit for that sport — the preparations and products that belong on that sideline.",
+    "brand": "We Take Our Drugs Seriously — sport by sport, season by season."
+   },
+   "structure": [
+    {
+     "phase": "Volume launch (monthly)",
+     "what": "Each sport gets a launch week: anchor article, LinkedIn post, IG cover, signature-injuries Reel — timed to that sport's pre-season."
+    },
+    {
+     "phase": "In-season echoes",
+     "what": "Mid-season follow-ups from the volume (single-injury cuts, kit-item spotlights) as short assets."
+    },
+    {
+     "phase": "Franchise loop (ongoing)",
+     "what": "“What sport next?” voting; back-catalog re-promotion as each sport's season returns annually."
+    }
+   ],
+   "stories": [
+    "The Soccer Playbook: turf burns, ankle sprains, and match-congestion recovery",
+    "The Football Playbook: pre-season heat, contusions, and stinger protocols",
+    "The Cycling Playbook: road rash, saddle issues, and stage-race recovery",
+    "The Track Playbook: shin splints, hamstrings, and championship tapers"
+   ],
+   "adaptations": [
+    {
+     "ch": "article",
+     "note": "The franchise lives here: one anchor volume per sport, structured identically for search and skimming."
+    },
+    {
+     "ch": "linkedin",
+     "note": "Launch post per volume targets that sport's coverage professionals; “tell us your sport” drives comments."
+    },
+    {
+     "ch": "instagram",
+     "note": "Collectible cover-card series (Vol. 1, Vol. 2…) — the visual franchise; single-injury carousels between volumes."
+    },
+    {
+     "ch": "reel",
+     "note": "“[Sport] breaks bodies on a schedule” countdown of the 3 signature injuries — repeatable template per sport."
+    },
+    {
+     "ch": "email",
+     "note": "Season-timed: each volume goes to subscribers tagged to that sport at pre-season."
+    }
+   ],
+   "landing": [
+    {
+     "t": "Hero",
+     "d": "“Every sport has an injury signature.” — playbook library framing."
+    },
+    {
+     "t": "The library",
+     "d": "Volume grid by sport with season-timing badges; back-catalog included (baseball, basketball, hockey)."
+    },
+    {
+     "t": "Inside a volume",
+     "d": "What every playbook covers: signature injuries, sideline management, the sport's kit."
+    },
+    {
+     "t": "Vote the next sport",
+     "d": "Request form — community loop and email capture."
+    },
+    {
+     "t": "The kit crossover",
+     "d": "Sport-specific kit builds — service tie-in for team accounts."
+    },
+    {
+     "t": "Subscribe",
+     "d": "“Get your sport's playbook at pre-season” — the retention hook."
+    }
+   ],
+   "visual": [
+    "Ground: the light treatment in the brand system — playbook-cover cards on off-white, one accent color band per sport.",
+    "Motif: the volume cover — numbered, collectible, uniform grid; the franchise IS the visual system.",
+    "Photography: one iconic equipment still per sport (cleats, tape, chainring) — never generic action shots.",
+    "Type: big volume numerals, condensed sport names; feels like a coaching-manual series."
+   ],
+   "guardrails": [
+    "Injury content is educational; every volume carries red-flag “see a physician” criteria prominently.",
+    "Return-to-play timelines are ranges with “individual clearance required” framing — never prescriptive dates.",
+    "Product mentions must fit the injury context naturally; no shoehorning the catalog into every volume.",
+    "No real-athlete injury stories without consent; use categorical descriptions.",
+    "Concussion content (any sport) defers entirely to established protocols — no management guidance beyond “remove and refer.”"
+   ],
+   "metrics": [
+    {
+     "goal": "Search engine (primary)",
+     "kpi": "Organic sessions per volume; ranking positions for “[sport] + injury” queries; back-catalog traffic recovery each season"
+    },
+    {
+     "goal": "Franchise health",
+     "kpi": "Volume-over-volume launch engagement; sport-vote submissions; email list growth by sport tag"
+    },
+    {
+     "goal": "Crossover value",
+     "kpi": "Click-through from volumes to product/service pages; kit-consult requests referencing a playbook"
+    },
+    {
+     "goal": "Review cadence",
+     "kpi": "Per-volume launch review; seasonal traffic audit each quarter"
+    }
+   ]
+  },
+  "assets": [
+   {
+    "id": "li",
+    "type": "linkedin",
+    "title": "LinkedIn franchise launch",
+    "caption": "Every sport breaks bodies in its own particular way.\n\nBaseball blisters. Hockey lacerations. Cycling road rash. If you cover a sport, you already know its injury signature — the same five things, every season, on schedule.\n\nSo we're building playbooks around them. One sport at a time: the signature injuries, the sideline management, the products and preparations that belong in that sport's kit specifically.\n\nFirst up for the fall: The Soccer Playbook — turf burns, lateral ankle sprains, and recovering athletes through match congestion.\n\nIf you're an AT or team doc, tell us your sport and we'll move it up the schedule.\n\n#SportsMedicine #AthleticTraining #Soccer #InjuryPrevention",
+    "visual": {
+     "type": "stat",
+     "light": true,
+     "eyebrow": "Injury Playbooks · Vol. 1",
+     "big": "The Soccer Playbook",
+     "small": "Turf burns · lateral ankle sprains · match-congestion recovery. Sideline management from the sports pharmacy side."
+    }
+   },
+   {
+    "id": "ig",
+    "type": "instagram",
+    "title": "Instagram series cover",
+    "caption": "Every sport has an injury signature. ⚽\n\nSoccer's: turf burns, lateral ankle sprains, and the grind of match congestion. Same five things, every season, on schedule.\n\nVol. 1 of our Injury Playbooks is live — sideline management from the sports pharmacy side, one sport at a time.\n\nWhat sport should be Vol. 2? Tell us below. 👇\n\n#Soccer #SportsMedicine #AthleticTraining #InjuryPrevention",
+    "visual": {
+     "type": "stat",
+     "sq": true,
+     "light": true,
+     "eyebrow": "Injury Playbooks · Vol. 1",
+     "big": "The Soccer Playbook",
+     "small": "Turf burns · ankle sprains · match congestion"
+    }
+   },
+   {
+    "id": "reel",
+    "type": "reel",
+    "title": "Reel — 30s",
+    "cover": {
+     "eyebrow": "Injury Playbooks",
+     "hook": "Soccer breaks bodies on a schedule.",
+     "sub": "The 3 injuries every soccer AT sees."
+    },
+    "audio": "Original audio — SportPharm",
+    "script": [
+     {
+      "t": "Hook 0–2s",
+      "x": "“Soccer breaks bodies on a schedule. Here's the schedule.”",
+      "os": "ON SCREEN: Soccer's injury signature."
+     },
+     {
+      "t": "Beat 3–11s",
+      "x": "“Number one: turf burns. Not minor — open skin, infection risk, and they hit keepers and slide-tacklers weekly.”",
+      "os": "ON SCREEN: 1. Turf burns — treat like wounds."
+     },
+     {
+      "t": "Beat 12–20s",
+      "x": "“Number two: lateral ankle sprains — the most common injury in the sport. Early management decides the timeline.”",
+      "os": "ON SCREEN: 2. Ankle sprains — first 48h matter."
+     },
+     {
+      "t": "Beat 21–27s",
+      "x": "“Number three: match congestion. Two games a week means recovery is a clinical problem, not a vibes problem.”",
+      "os": "ON SCREEN: 3. Match congestion — plan recovery."
+     },
+     {
+      "t": "CTA 28–30s",
+      "x": "“Full Soccer Playbook on the blog. Your sport's next — tell us which.”",
+      "os": "CTA: Playbook in bio."
+     }
+    ]
+   },
+   {
+    "id": "art",
+    "type": "article",
+    "title": "Blog article (Vol. 1 anchor)",
+    "headline": "The Soccer Playbook: Turf Burns, Ankle Sprains, and Match-Congestion Recovery",
+    "dek": "Vol. 1 of our sport-by-sport injury franchise: soccer's signature injuries and how to manage them from the sideline and the pharmacy.",
+    "author": "SportPharm Clinical Team",
+    "read": "10 min read",
+    "outline": [
+     "Soccer's injury signature: what the data says shows up every season",
+     "Turf burns: wound care that prevents the infection nobody budgets for",
+     "Lateral ankle sprains: first-48-hours management and return timelines",
+     "Match congestion: recovery when there's a game every 3 days",
+     "The soccer kit: what belongs in it that isn't in a generic kit"
+    ],
+    "cta": "Closes with: sport-request form + links to baseball/basketball/hockey back-catalog posts."
+   }
+  ]
+ },
+ {
+  "id": "team",
+  "title": "Meet the Team / Pharmacist Expertise",
+  "campaign": "SportPharm Behind the Counter Campaign",
+  "prio": "Authority",
+  "channels": [
+   "LinkedIn",
+   "IG"
+  ],
+  "camp": {
+   "platform": "Every other campaign borrows credibility from the same source: the people. Behind the Counter puts SportPharm's credentialed roster — RPh, PharmD, RD/CSCS — on camera and in feed, anchored by the question they answer more than any other: “Can my athlete take this?” Faces outperform logos; a pharmacy whose experts are visible becomes the pharmacy trainers actually call.",
+   "strategy": {
+    "primary": "Humanize SportPharm's authority — make its pharmacists and dietitian recognizable, followable experts whose visibility lifts every other campaign.",
+    "supporting": [
+     "Build the “Ask a Sports Pharmacist” Q&A loop into a self-feeding format",
+     "Establish sports pharmacy as a distinct specialty in the audience's mental map",
+     "Create the spokesperson bench for Reels across all campaigns"
+    ],
+    "audiences": [
+     {
+      "who": "Athletic trainers",
+      "why": "The people who literally call — profiles convert an institution into a person to trust."
+     },
+     {
+      "who": "Sports-med community on LinkedIn",
+      "why": "Peer credibility surface; profile content travels through professional reshares."
+     },
+     {
+      "who": "Prospective team accounts",
+      "why": "Decision-makers buy people; the roster IS the sales deck."
+     }
+    ]
+   },
+   "messages": {
+    "emotional": "“Can my athlete take this?” deserves a person, not a search result.",
+    "educational": "Sports pharmacy is a specialty: interactions, banned-substance risk, and timing around competition are pharmacist territory.",
+    "product": "Concierge access to this team is the service — the profiles show who answers the phone.",
+    "brand": "We Take Our Drugs Seriously — meet the people who take them seriously for you."
+   },
+   "structure": [
+    {
+     "phase": "Format launch (Weeks 1–2)",
+     "what": "“Can my athlete take this?” LinkedIn post + Q&A Reel establish the question as campaign spine."
+    },
+    {
+     "phase": "Roster rollout (Months 1–4)",
+     "what": "One profile per month (lead compounding pharmacist first), interleaved with Q&A episodes answering submitted questions."
+    },
+    {
+     "phase": "Always-on Q&A (ongoing)",
+     "what": "Question intake feeds episodes indefinitely; experts guest across other campaigns' Reels."
+    }
+   ],
+   "stories": [
+    "Faces behind the pharmacy: short profile series",
+    "“Ask a Sports Pharmacist”: Q&As from real trainer questions",
+    "Expert take: rapid response to trending sports-health topics",
+    "A day in the life of a sports pharmacy"
+   ],
+   "adaptations": [
+    {
+     "ch": "linkedin",
+     "note": "Primary surface. Profile features with credential context; Q&A posts invite questions in comments."
+    },
+    {
+     "ch": "instagram",
+     "note": "Portrait-led profile cards; quote squares from Q&A answers; day-in-the-life story sets."
+    },
+    {
+     "ch": "reel",
+     "note": "Rapid-fire Q&A format — one expert, three real questions, 30 seconds. The bench-builder for all campaigns."
+    },
+    {
+     "ch": "article",
+     "note": "Quarterly long-form: “Inside a sports pharmacy” + profile write-ups compiled onto the team page."
+    },
+    {
+     "ch": "email",
+     "note": "Each profile launch to the full list — “meet who answers when you call.”"
+    }
+   ],
+   "landing": [
+    {
+     "t": "Hero",
+     "d": "“The people who answer 'Can my athlete take this?'” — team group treatment."
+    },
+    {
+     "t": "The roster",
+     "d": "Profile cards: name, credentials, specialty, one human detail; links to feature posts."
+    },
+    {
+     "t": "What sports pharmacy is",
+     "d": "The specialty explained — the education layer under the faces."
+    },
+    {
+     "t": "Ask a question",
+     "d": "Q&A intake form feeding the series — the loop's engine."
+    },
+    {
+     "t": "Concierge access",
+     "d": "How teams get this bench on call — the service conversion."
+    },
+    {
+     "t": "Credentials & licensure",
+     "d": "Verification block: licenses, certifications, affiliations."
+    }
+   ],
+   "visual": [
+    "Ground: warmer than the rest of the system — navy softened, generous portrait space, red as accent only.",
+    "Motif: the counter — consistent portrait framing at the pharmacy counter; the title card IS the format.",
+    "Photography: real environmental portraits, hands-at-work, no white-coat stock clichés.",
+    "Type: name + credentials lockup treated with care (credentials are the design); Q&A set like an interview transcript."
+   ],
+   "guardrails": [
+    "Credentials exactly as licensed (RPh, PharmD, RD, CSCS) — verified before every post; no title inflation.",
+    "Q&A answers are general education; anything patient-specific gets “bring this to your pharmacist/physician” treatment.",
+    "No real athlete or client details in day-in-the-life content — HIPAA discipline extends to backgrounds of photos.",
+    "Trending-topic “expert takes” follow the Recovery, Honestly evidence bar — speed never buys a looser standard.",
+    "Team members' consent and comfort govern how much personal detail runs; professional persona only."
+   ],
+   "metrics": [
+    {
+     "goal": "Visibility (primary)",
+     "kpi": "Engagement rate on profile vs. non-profile posts; follower growth following each profile launch"
+    },
+    {
+     "goal": "Q&A loop health",
+     "kpi": "Questions submitted per episode; comment volume; repeat submitters"
+    },
+    {
+     "goal": "Conversion assist",
+     "kpi": "Team-page visits from profile posts; consult requests naming a specific expert"
+    },
+    {
+     "goal": "Review cadence",
+     "kpi": "Monthly; quarterly assessment of which experts/formats resonate"
+    }
+   ]
+  },
+  "assets": [
+   {
+    "id": "li",
+    "type": "linkedin",
+    "title": "LinkedIn Q&A launch",
+    "caption": "“What's the most common question athletic trainers ask you?”\n\nWe asked our pharmacists. The winner, by a wide margin:\n\n“Can my athlete take this?”\n\nSometimes “this” is a supplement from a teammate. Sometimes it's a prescription from an outside provider. Sometimes it's something from a gas station with a label that would make a chemist nervous.\n\nIt's the right question — and it's exactly why sports pharmacy exists as a specialty. Interactions, banned-substance risk, timing around competition: that's pharmacist territory.\n\nThis series introduces the people who answer that question for our teams. First up next week: our lead compounding pharmacist.\n\nHave a “can my athlete take this?” of your own? Drop it in the comments — we'll answer the best ones in a future post.\n\n#SportsPharmacy #AthleticTraining #MeetTheTeam #SportsMedicine",
+    "visual": {
+     "type": "quote",
+     "eyebrow": "Behind the Counter",
+     "quote": "“Can my athlete take this?” is the most important question in the training room. It deserves a pharmacist's answer.",
+     "attrib": "SportPharm Clinical Team"
+    }
+   },
+   {
+    "id": "ig",
+    "type": "instagram",
+    "title": "Instagram profile post",
+    "caption": "The question our pharmacists hear most: “Can my athlete take this?” 💊\n\nSometimes it's a teammate's supplement. Sometimes it's a gas-station energy shot with a label that would make a chemist nervous.\n\nIt's the right question — and answering it is literally the job. Meet the people behind the counter, starting next week with our lead compounding pharmacist.\n\nGot a “can my athlete take this?” Ask below — best ones get answered in the series. 👇\n\n#SportsPharmacy #MeetTheTeam #AthleticTraining",
+    "visual": {
+     "type": "quote",
+     "sq": true,
+     "eyebrow": "Behind the Counter",
+     "quote": "“Can my athlete take this?” deserves a pharmacist's answer.",
+     "attrib": "Faces behind the pharmacy — new series"
+    }
+   },
+   {
+    "id": "reel",
+    "type": "reel",
+    "title": "Reel — 30s (Q&A rapid fire)",
+    "cover": {
+     "eyebrow": "Behind the Counter",
+     "hook": "Questions ATs actually ask us.",
+     "sub": "60 seconds with a sports pharmacist."
+    },
+    "audio": "Original audio — SportPharm",
+    "script": [
+     {
+      "t": "Hook 0–2s",
+      "x": "“Real questions athletic trainers ask a sports pharmacist. Rapid fire. Go.”",
+      "os": "ON SCREEN: Real AT questions. Rapid fire."
+     },
+     {
+      "t": "Beat 3–10s",
+      "x": "Q: “Can my athlete take a teammate's pre-workout?” A: “Not until someone reads the label who knows what a proprietary blend hides.”",
+      "os": "ON SCREEN: Q1 — the teammate's pre-workout."
+     },
+     {
+      "t": "Beat 11–18s",
+      "x": "Q: “Energy drink before a drug-tested meet?” A: “Depends what's in it — and half the time the label won't tell you. Bring it in.”",
+      "os": "ON SCREEN: Q2 — energy drinks + testing."
+     },
+     {
+      "t": "Beat 19–26s",
+      "x": "Q: “Advil before every game?” A: “Routine NSAIDs deserve a conversation, not a habit. There are better patterns.”",
+      "os": "ON SCREEN: Q3 — the Advil habit."
+     },
+     {
+      "t": "CTA 27–30s",
+      "x": "“Send us yours — best questions get the next episode.”",
+      "os": "CTA: Ask in comments."
+     }
+    ]
+   },
+   {
+    "id": "art",
+    "type": "article",
+    "title": "Blog article (quarterly feature)",
+    "headline": "Inside a Sports Pharmacy: The People Who Answer “Can My Athlete Take This?”",
+    "dek": "Profiles of the pharmacists and dietitian behind SportPharm — what sports pharmacy actually is, and why the specialty exists.",
+    "author": "SportPharm",
+    "read": "6 min read",
+    "outline": [
+     "What makes a pharmacy a SPORTS pharmacy",
+     "Profile: the lead compounding pharmacist",
+     "Profile: the sports dietitian (RD, CSCS) and where nutrition meets pharmacy",
+     "The questions that cross the counter in a typical week",
+     "How teams use us: the concierge model in practice"
+    ],
+    "cta": "Closes with: team page link + submit-a-question form feeding the Q&A series."
+   }
+  ]
+ },
+ {
+  "id": "trusted",
+  "title": "Trusted Since 1995 / Social Proof",
+  "campaign": "SportPharm Trusted Since 1995 Campaign",
+  "prio": "Proof",
+  "channels": [
+   "LinkedIn",
+   "IG"
+  ],
+  "camp": {
+   "platform": "Thirty seasons of training rooms is a claim no competitor can copy on a deadline. Trusted Since 1995 converts SportPharm's tenure and testimonial bank — Seton Hall, FIU, St. Thomas, Team USA cycling — into a disciplined proof system: quote cards, mini case studies, and milestone storytelling that close the credibility gap for every prospect the other campaigns open.",
+   "strategy": {
+    "primary": "Convert accumulated trust into decision-stage proof — the campaign prospects encounter right before they say yes.",
+    "supporting": [
+     "Systematize the testimonial bank into reusable, approved proof units",
+     "Tell the 30-season story as institutional durability, not nostalgia",
+     "Support every B2B campaign with a proof layer for retargeting"
+    ],
+    "audiences": [
+     {
+      "who": "Prospective team accounts",
+      "why": "In-evaluation decision-makers; proof content is what they forward to their committee."
+     },
+     {
+      "who": "Current programs",
+      "why": "Featured partners deepen loyalty; testimonial participation is itself a retention touch."
+     },
+     {
+      "who": "The professional community",
+      "why": "Ambient credibility — tenure content earns the benefit of the doubt everywhere else."
+     }
+    ]
+   },
+   "messages": {
+    "emotional": "Thirty seasons. Same phone number. The pharmacy that answers.",
+    "educational": "What programs actually need from a pharmacy — told in trainers' own words, case by case.",
+    "product": "The full service picture: dispensing, kits, compliance, concierge — proven across three decades of programs.",
+    "brand": "We Take Our Drugs Seriously — and have since 1995."
+   },
+   "structure": [
+    {
+     "phase": "Anniversary spine (Weeks 1–2)",
+     "what": "“Thirty seasons” LinkedIn post + milestones Reel set the frame."
+    },
+    {
+     "phase": "Proof cadence (monthly)",
+     "what": "One approved quote card per month; quarterly mini case study built from a live testimonial."
+    },
+    {
+     "phase": "Decision-stage deployment (always-on)",
+     "what": "Proof units retarget landing-page visitors from the B2B campaigns; case studies attach to every proposal."
+    }
+   ],
+   "stories": [
+    "Quote-card series from existing program testimonials",
+    "Mini case study: how a program keeps athletes game-ready",
+    "“Since 1995”: three decades of sports pharmacy, told in milestones",
+    "Partnership spotlights (with consistent non-endorsement language)"
+   ],
+   "adaptations": [
+    {
+     "ch": "linkedin",
+     "note": "Case studies and milestone storytelling; tag featured programs only with their approval."
+    },
+    {
+     "ch": "instagram",
+     "note": "The quote-card series: consistent template, program wordmark treatment per approval, monthly rhythm."
+    },
+    {
+     "ch": "reel",
+     "note": "Milestones format: three decades in 30 seconds; archival photo treatment if assets exist."
+    },
+    {
+     "ch": "article",
+     "note": "Quarterly mini case study: problem → setup → in-season → in-their-words."
+    },
+    {
+     "ch": "email",
+     "note": "Case studies to in-pipeline prospects; anniversary note to full list."
+    }
+   ],
+   "landing": [
+    {
+     "t": "Hero",
+     "d": "“Trusted since 1995.” — tenure statement + program logos (per approval + disclaimer)."
+    },
+    {
+     "t": "The proof wall",
+     "d": "Quote cards from named programs; approved wording only."
+    },
+    {
+     "t": "Case studies",
+     "d": "Mini case-study index — one per quarter, committee-forwardable PDFs."
+    },
+    {
+     "t": "Three decades",
+     "d": "Milestone timeline: 1995 to now; the durability story."
+    },
+    {
+     "t": "Programs served",
+     "d": "Categories (collegiate, pro, national teams) with the non-endorsement disclaimer standing prominently."
+    },
+    {
+     "t": "Start the conversation",
+     "d": "Consult CTA framed as joining a thirty-season roster."
+    }
+   ],
+   "visual": [
+    "Ground: heritage treatment — deep navy with a cream accent unique to this campaign; feels archival, not retro.",
+    "Motif: the year stamp — “EST. 1995” seal geometry; quote cards carry a consistent serif pull-quote style.",
+    "Photography: archival/documentary mix; real facilities over polish; program marks used exactly per approvals.",
+    "Type: the only campaign where the brand serif leads — pull quotes set large in Iowan-style italic."
+   ],
+   "guardrails": [
+    "Testimonials: approved wording only, on file, with written permission per use context (FTC endorsement rules).",
+    "League/organization marks: never imply league endorsement — the standing disclaimer travels with every asset that names a program.",
+    "No performance claims from testimonials (“kept athletes healthy”) — experience-of-service claims only.",
+    "Milestone facts (dates, firsts) verified against records before publication.",
+    "Case studies anonymize any operational detail a program hasn't cleared; programs review before publish."
+   ],
+   "metrics": [
+    {
+     "goal": "Decision support (primary)",
+     "kpi": "Case-study downloads/forwards; proof-page visits from proposal links; close-rate movement on proposals that include case studies"
+    },
+    {
+     "goal": "Credibility reach",
+     "kpi": "Quote-card engagement; profile visits following proof posts"
+    },
+    {
+     "goal": "Partner health",
+     "kpi": "Programs agreeing to be featured; testimonial bank growth per quarter"
+    },
+    {
+     "goal": "Review cadence",
+     "kpi": "Quarterly, aligned to the case-study cycle and sales pipeline review"
+    }
+   ]
+  },
+  "assets": [
+   {
+    "id": "li",
+    "type": "linkedin",
+    "title": "LinkedIn anniversary post",
+    "caption": "Thirty seasons of training rooms teaches you what programs actually need from a pharmacy.\n\nIt isn't a catalog. It's a phone call that gets answered — before a road trip, after an injury, the night before a tournament.\n\nThat's the thread through every program we serve, from collegiate athletics to Team USA cycling: the pharmacy has to move at the speed of the season.\n\nThis series shares how those programs run medication management, recovery, and compliance — in their trainers' own words.\n\n(Programs shown have provided testimonials about their experience with SportPharm; no league endorsement implied.)\n\n#SportsMedicine #AthleticTraining #CollegeAthletics #Since1995",
+    "visual": {
+     "type": "quote",
+     "eyebrow": "Trusted Since 1995",
+     "quote": "“SportPharm moves at the speed of our season — that's what a program actually needs from its pharmacy.”",
+     "attrib": "Composite of program testimonials · final card uses approved quote"
+    }
+   },
+   {
+    "id": "ig",
+    "type": "instagram",
+    "title": "Instagram quote card",
+    "caption": "Thirty seasons. Same phone number. 📞\n\nSince 1995, the job hasn't changed: be the pharmacy that answers before the road trip, after the injury, the night before the tournament.\n\nNew series: how the programs we serve keep athletes game-ready — in their trainers' own words.\n\n(Testimonials reflect programs' experience with SportPharm; no league endorsement implied.)\n\n#Since1995 #SportsMedicine #AthleticTraining",
+    "visual": {
+     "type": "quote",
+     "sq": true,
+     "eyebrow": "Trusted Since 1995",
+     "quote": "“The pharmacy has to move at the speed of the season.”",
+     "attrib": "Program testimonial series"
+    }
+   },
+   {
+    "id": "reel",
+    "type": "reel",
+    "title": "Reel — 30s (milestones)",
+    "cover": {
+     "eyebrow": "Since 1995",
+     "hook": "30 seasons of training rooms.",
+     "sub": "What three decades teaches a pharmacy."
+    },
+    "audio": "Original audio — SportPharm",
+    "script": [
+     {
+      "t": "Hook 0–2s",
+      "x": "“What does a pharmacy learn from 30 seasons of training rooms?”",
+      "os": "ON SCREEN: 30 seasons. Here's what sticks."
+     },
+     {
+      "t": "Beat 3–10s",
+      "x": "“1995: we started with one belief — athletes aren't average patients, and their pharmacy shouldn't be average either.”",
+      "os": "ON SCREEN: 1995 — founded."
+     },
+     {
+      "t": "Beat 11–18s",
+      "x": "“Since then: collegiate programs, pro teams, Team USA cycling. Different sports, same need — a pharmacy that answers.”",
+      "os": "ON SCREEN: Collegiate · Pro · Team USA cycling."
+     },
+     {
+      "t": "Beat 19–26s",
+      "x": "“The lesson of three decades: game-ready is built in the quiet weeks, not the emergency ones.”",
+      "os": "ON SCREEN: Game-ready is built early."
+     },
+     {
+      "t": "CTA 27–30s",
+      "x": "“Program stories, in trainers' own words — new series, follow along.”",
+      "os": "CTA: Follow the series."
+     }
+    ]
+   },
+   {
+    "id": "art",
+    "type": "article",
+    "title": "Blog mini case study",
+    "headline": "How a Collegiate Program Keeps Athletes Game-Ready: A SportPharm Case Study",
+    "dek": "From testimonial to teardown: how one program runs medication management, recovery, and compliance with SportPharm behind the counter.",
+    "author": "SportPharm",
+    "read": "6 min read",
+    "outline": [
+     "The program and the problem: what wasn't working before",
+     "Setup: dispensing, kit management, and the concierge line",
+     "In season: what a typical week of support looks like",
+     "The compliance layer: documentation the program never worries about",
+     "In their words: the trainer's verdict (approved quote)"
+    ],
+    "cta": "Closes with: consult CTA for programs + standard non-endorsement disclaimer."
+   }
+  ]
+ },
+ {
+  "id": "seasonal",
+  "title": "Seasonal & Timely Recovery Content",
+  "campaign": "SportPharm In Season Campaign",
+  "prio": "Calendar",
+  "channels": [
+   "IG",
+   "LinkedIn",
+   "Blog"
+  ],
+  "camp": {
+   "platform": "The sports calendar is the one editorial calendar that never slips. In Season anchors SportPharm's output to it: heat and hydration in August, cold-weather muscle care in winter, pre-season conditioning, the championship stretch. Each tentpole arrives exactly when the audience is living the problem — and each has a natural product moment (Icetra in summer heat, warm-up support in winter) that never has to force its way in.",
+   "strategy": {
+    "primary": "Own the recurring moments of the athletic year — be the first content an AT sees when the season's conditions change.",
+    "supporting": [
+     "Build 6–8 annual tentpoles that improve and re-run year over year",
+     "Attach the right product to the right moment (Icetra/summer, heat products/winter) natively",
+     "Give the whole content program a dependable planning spine"
+    ],
+    "audiences": [
+     {
+      "who": "Athletic trainers",
+      "why": "Live by the same calendar; August content in August is service, not marketing."
+     },
+     {
+      "who": "Coaches & program staff",
+      "why": "Forward seasonal protocols to staff and parents at each transition."
+     },
+     {
+      "who": "Consumer athletes",
+      "why": "Seasonal moments (first marathon, summer training) reach beyond team settings on IG."
+     }
+    ]
+   },
+   "messages": {
+    "emotional": "August is a different sport. So is January. Train like the calendar matters — because it does.",
+    "educational": "Each season changes the clinical picture: heat alters medication behavior, cold changes muscle care, tournaments compress recovery.",
+    "product": "The right product has a season: Icetra's moment is the August practice block.",
+    "brand": "We Take Our Drugs Seriously — in every season the sport is played."
+   },
+   "structure": [
+    {
+     "phase": "Tentpole launch (6–8×/year)",
+     "what": "Each seasonal moment gets the full set: anchor article + LinkedIn protocol post + IG card + Reel, released 2–3 weeks before the moment peaks."
+    },
+    {
+     "phase": "In-moment echoes",
+     "what": "During each window: reminder cuts, protocol one-pagers, product spotlights timed to the conditions."
+    },
+    {
+     "phase": "Annual compounding",
+     "what": "Each tentpole is updated and re-run yearly — traffic and authority accrue to the same URLs season over season."
+    }
+   ],
+   "stories": [
+    "Summer: heat, hydration, and pain management (Icetra tie-in)",
+    "Winter: cold-weather muscle care and warm-up pharmacology",
+    "Pre-season: conditioning-block recovery for every fall sport",
+    "Championship stretch: managing accumulated load in tournament weeks"
+   ],
+   "adaptations": [
+    {
+     "ch": "linkedin",
+     "note": "Protocol framing for professionals: the four-step summer protocol, the winter warm-up brief — save-and-print material."
+    },
+    {
+     "ch": "instagram",
+     "note": "Season cards (“August is a different sport”) + condition-tip carousels; the consumer-facing surface."
+    },
+    {
+     "ch": "reel",
+     "note": "Condition-led hooks (“It's 96° at practice…”) with protocol countdowns; shot in-season for authenticity."
+    },
+    {
+     "ch": "article",
+     "note": "One evergreen anchor per tentpole, updated annually; hosts the printable protocol one-pagers."
+    },
+    {
+     "ch": "email",
+     "note": "Calendar-triggered sends 2 weeks before each moment: “Before camp starts, the August protocol.”"
+    }
+   ],
+   "landing": [
+    {
+     "t": "Hero",
+     "d": "“In Season” — current tentpole featured dynamically by date."
+    },
+    {
+     "t": "Current protocol",
+     "d": "The active season's guide + printable one-pager (email gate)."
+    },
+    {
+     "t": "The season map",
+     "d": "Year-wheel of all tentpoles — what's coming and when to prepare."
+    },
+    {
+     "t": "Product of the moment",
+     "d": "Seasonal product placement (Icetra in summer) with clinical context, not just promo."
+    },
+    {
+     "t": "Archive",
+     "d": "Prior tentpole guides, always accessible off-season for search."
+    },
+    {
+     "t": "Subscribe",
+     "d": "“Get each protocol before the season does” — the calendar-trigger email list."
+    }
+   ],
+   "visual": [
+    "Ground: the brand system with a seasonal temperature shift — warm red-oranges for summer, cool blue-greys for winter, navy constant.",
+    "Motif: the calendar/thermometer — date stamps and condition readings (“96° · Practice #2”) as design elements.",
+    "Photography: real conditions — heat shimmer, frozen fields, taped ankles in snow; weather is the art direction.",
+    "Type: protocol steps numbered big; each tentpole gets a repeatable cover formula (“___ is a different sport.”)."
+   ],
+   "guardrails": [
+    "Heat-illness content includes clear emergency guidance (“this is a medical emergency — activate EMS”) and never positions products as heat-safety solutions.",
+    "Hydration/medication interaction content is educational; individual regimens go to the pharmacist or physician.",
+    "Product seasonal tie-ins stay within label indications; Icetra's summer placement is about cold-therapy timing, not new claims.",
+    "Weather-related urgency never overrides accuracy — no fear-based exaggeration of risk statistics.",
+    "Annual re-runs get a clinical re-review before republishing — evidence can change between seasons."
+   ],
+   "metrics": [
+    {
+     "goal": "Moment ownership (primary)",
+     "kpi": "Traffic spikes aligned to tentpole windows; year-over-year growth on anchor URLs; protocol downloads per season"
+    },
+    {
+     "goal": "Product timing",
+     "kpi": "Icetra/product page traffic and sales lift during aligned windows"
+    },
+    {
+     "goal": "List building",
+     "kpi": "Calendar-trigger email signups; open rates on pre-season sends"
+    },
+    {
+     "goal": "Review cadence",
+     "kpi": "Post-tentpole retro after each window; annual calendar planning review"
+    }
+   ]
+  },
+  "assets": [
+   {
+    "id": "li",
+    "type": "linkedin",
+    "title": "LinkedIn summer tentpole",
+    "caption": "Two-a-days in August are a different sport.\n\nHeat changes everything about recovery: hydration status changes how athletes respond to medication, inflammation behaves differently, and the line between “sore” and “heat casualty” gets thinner every degree.\n\nOur summer protocol, from the pharmacy side:\n• Audit hydration before adjusting any pain management\n• Prefer targeted topicals over systemic meds in heat stress\n• Cold therapy timed to practice blocks — that's where Icetra earns its slot\n• Watch the NSAID-dehydration-kidney triangle in two-a-days\n\nFull summer guide on the blog — built for ATs running August camps.\n\n#HeatSafety #AthleticTraining #SummerTraining #SportsMedicine",
+    "visual": {
+     "type": "stat",
+     "eyebrow": "In Season · Summer",
+     "big": "August is a different sport.",
+     "small": "Heat, hydration, and pain management for two-a-day season — the summer protocol from our pharmacists."
+    }
+   },
+   {
+    "id": "ig",
+    "type": "instagram",
+    "title": "Instagram seasonal post",
+    "caption": "August is a different sport. 🥵\n\nHeat changes the rules: hydration changes how meds behave, and “sore” sits closer to “heat casualty” every degree it climbs.\n\nThe two-a-days protocol from our pharmacists:\n💧 Hydration audit before any pain-management change\n🎯 Topicals over systemic meds under heat stress\n🧊 Cold therapy timed to practice blocks (Icetra's moment)\n⚠️ Watch the NSAID + dehydration combo\n\nFull summer guide — link in bio.\n\n#TwoADays #HeatSafety #AthleticTraining #SummerTraining",
+    "visual": {
+     "type": "stat",
+     "sq": true,
+     "eyebrow": "In Season · Summer",
+     "big": "August is a different sport.",
+     "small": "The two-a-days protocol, from the pharmacy side."
+    }
+   },
+   {
+    "id": "reel",
+    "type": "reel",
+    "title": "Reel — 30s",
+    "cover": {
+     "eyebrow": "In Season · Summer",
+     "hook": "Heat changes how meds work.",
+     "sub": "The August protocol for two-a-days."
+    },
+    "audio": "Original audio — SportPharm",
+    "script": [
+     {
+      "t": "Hook 0–2s",
+      "x": "“It's 96 degrees at practice. Your athlete's meds don't know that. You should.”",
+      "os": "ON SCREEN: Heat changes the rules."
+     },
+     {
+      "t": "Beat 3–11s",
+      "x": "“Dehydration changes how medications behave — especially NSAIDs. Hydration audit comes before any pain-management change.”",
+      "os": "ON SCREEN: 1. Hydration first."
+     },
+     {
+      "t": "Beat 12–19s",
+      "x": "“Under heat stress, targeted topicals beat systemic meds — relief at the site without loading a stressed system.”",
+      "os": "ON SCREEN: 2. Topicals in the heat."
+     },
+     {
+      "t": "Beat 20–26s",
+      "x": "“And time cold therapy to practice blocks — recovery you can schedule.”",
+      "os": "ON SCREEN: 3. Cold, on schedule."
+     },
+     {
+      "t": "CTA 27–30s",
+      "x": "“Full August protocol — link in bio. Built for camp season.”",
+      "os": "CTA: Summer guide in bio."
+     }
+    ]
+   },
+   {
+    "id": "art",
+    "type": "article",
+    "title": "Blog article (summer anchor)",
+    "headline": "The Summer Protocol: Heat, Hydration, and Pain Management for Two-a-Day Season",
+    "dek": "A pharmacist's guide to August: how heat changes medication behavior, and the four-part protocol for running camps safely.",
+    "author": "SportPharm Clinical Team",
+    "read": "8 min read",
+    "outline": [
+     "Why heat rewrites the recovery rulebook",
+     "The hydration-medication interaction ATs should know cold",
+     "Topicals vs. systemic under heat stress",
+     "Scheduling cold therapy around practice blocks (where Icetra fits)",
+     "The NSAID–dehydration–kidney triangle in two-a-days",
+     "Printable: the August protocol one-pager"
+    ],
+    "cta": "Closes with: one-pager download; winter edition teased for the calendar."
+   }
+  ]
+ },
+ {
+  "id": "nutrition",
+  "title": "Athlete Nutrition & Supplement Science",
+  "campaign": "SportPharm Read the Label Campaign",
+  "prio": "Underused asset",
+  "channels": [
+   "LinkedIn",
+   "IG",
+   "Blog"
+  ],
+  "camp": {
+   "platform": "SportPharm employs something almost no pharmacy has: a sports dietitian and pharmacists reviewing the same shelf. Read the Label weaponizes that pairing — the dietitian asks if it works, the pharmacist asks what else it does. The campaign teaches athletes and trainers to read supplement labels with both lenses, turning an underused asset into the brand's most differentiated educational franchise and the natural bridge into Clean Sport.",
+   "strategy": {
+    "primary": "Establish SportPharm's dietitian-plus-pharmacist review as the trusted standard for supplement guidance — and convert trainers into supplement-review service users.",
+    "supporting": [
+     "Teach the label-literacy skills that make the audience feel the need for expert review",
+     "Elevate Sean Casey (RD, CSCS) as a named, followable expert alongside the pharmacists",
+     "Bridge audiences into Clean Sport (banned-substance risk) and concierge services"
+    ],
+    "audiences": [
+     {
+      "who": "Athletic trainers",
+      "why": "Field supplement questions daily without pharmacology backup; the service's direct users."
+     },
+     {
+      "who": "Athletes & parents",
+      "why": "The label-readers themselves; IG-reachable and save-happy for decoder content."
+     },
+     {
+      "who": "S&C coaches & dietitians",
+      "why": "Adjacent professionals who validate and reshare the two-lens method."
+     }
+    ]
+   },
+   "messages": {
+    "emotional": "Your shaker bottle shouldn't require trust. It should survive a close read.",
+    "educational": "Labels are written to be skimmed: proprietary blends hide doses, “pharmaceutical grade” means nothing, and seals vary wildly in rigor.",
+    "product": "SportPharm reviews supplements with two lenses — dietitian efficacy, pharmacist safety — as a service for teams and athletes.",
+    "brand": "We Take Our Drugs Seriously — including the ones sold as powders."
+   },
+   "structure": [
+    {
+     "phase": "Skill launch (Weeks 1–3)",
+     "what": "The label-decoder set: red-flags post, decoder Reel, anchor article. Establishes the two-lens frame."
+    },
+    {
+     "phase": "Serialize (biweekly)",
+     "what": "Alternating dietitian-led (does it work?) and pharmacist-led (what else does it do?) episodes; interaction spotlights."
+    },
+    {
+     "phase": "Service bridge (Months 2–4)",
+     "what": "Supplement-review offer for teams launches; Clean Sport crossover on banned-substance risk in supplements."
+    }
+   ],
+   "stories": [
+    "How to read a supplement label like a pharmacist",
+    "Interactions athletes should know about (meds × supplements)",
+    "Fueling for recovery: the dietitian's non-negotiables",
+    "Third-party testing: what the seals actually mean"
+   ],
+   "adaptations": [
+    {
+     "ch": "linkedin",
+     "note": "The two-lens method as professional thought leadership; label-decoder posts with the full argument."
+    },
+    {
+     "ch": "instagram",
+     "note": "Decoder cards and red-flag carousels — the campaign's save-magnet; label-phrase series is inherently episodic."
+    },
+    {
+     "ch": "reel",
+     "note": "Tub-in-hand label reads: pharmacist picks up a real (blurred-brand) product and reads it aloud. Endlessly repeatable."
+    },
+    {
+     "ch": "article",
+     "note": "Anchor guide with Sean Casey co-byline; deep-dives per label phrase and per interaction class."
+    },
+    {
+     "ch": "email",
+     "note": "“Label of the month” teardown to subscribers; service offer to team list."
+    }
+   ],
+   "landing": [
+    {
+     "t": "Hero",
+     "d": "“Read the label. Both lenses.” — the dietitian/pharmacist pairing stated as the differentiator."
+    },
+    {
+     "t": "The decoder",
+     "d": "Interactive label walkthrough: tap each phrase to see what it hides."
+    },
+    {
+     "t": "Red flags",
+     "d": "The phrase library: proprietary blend, pharmaceutical grade, unrecognized seals — each decoded."
+    },
+    {
+     "t": "Interactions",
+     "d": "Meds × supplements primer with “bring it in” CTA — never DIY guidance."
+    },
+    {
+     "t": "The review service",
+     "d": "How team supplement review works; what programs receive; request form."
+    },
+    {
+     "t": "The experts",
+     "d": "Sean Casey (RD, CSCS) + pharmacist bios — Behind the Counter crossover."
+    }
+   ],
+   "visual": [
+    "Ground: white like a label itself — the campaign's canvas mimics supplement-facts panels on brand navy frames.",
+    "Motif: the label panel — supplement-facts typography (rules, bold headers) repurposed as the design system; red flags literally flagged.",
+    "Photography: tubs and labels macro-shot, brands obscured; the shaker bottle as recurring prop.",
+    "Type: label-style condensed type for the decoder pieces; annotations in a handwriting-adjacent accent for the “close read” feel."
+   ],
+   "guardrails": [
+    "DSHEA discipline: supplements are not drugs — no treatment/cure/prevention claims anywhere, including implied ones.",
+    "Category criticism only — decode phrases and practices, never named competitor products; blur brands in every visual.",
+    "Interaction content ends in “bring it to a pharmacist,” never in self-directed guidance.",
+    "Banned-substance framing follows Clean Sport rules: risk reduction, never guarantees.",
+    "Sean Casey's credentials (RD, CSCS) exact per licensure; dietetics scope-of-practice respected in all dietitian-led content."
+   ],
+   "metrics": [
+    {
+     "goal": "Franchise traction (primary)",
+     "kpi": "Decoder-card saves; label-Reel completion and shares; episode-over-episode engagement"
+    },
+    {
+     "goal": "Service conversion",
+     "kpi": "Supplement-review requests; team-list reply rate; consult bookings from campaign UTMs"
+    },
+    {
+     "goal": "Expert equity",
+     "kpi": "Follower growth attributable to Sean Casey-led posts; question submissions naming him"
+    },
+    {
+     "goal": "Review cadence",
+     "kpi": "Monthly; quarterly review of which lens (dietitian vs. pharmacist) drives more engagement"
+    }
+   ]
+  },
+  "assets": [
+   {
+    "id": "li",
+    "type": "linkedin",
+    "title": "LinkedIn series opener",
+    "caption": "Most supplement labels are designed to be skimmed. Read one properly and it gets interesting.\n\n“Proprietary blend” — doses hidden inside a total. “Pharmaceutical grade” — not a regulated term. A third-party seal — sometimes meaningful, sometimes purchased.\n\nOur sports dietitian and pharmacists review supplements together, because the two lenses catch different things: the dietitian asks whether it does anything, the pharmacist asks what else it does — interactions, banned-substance risk, timing around competition.\n\nThis series teaches both lenses. First post: the five label phrases that should slow you down, and what to check when you see them.\n\n#SportsNutrition #Supplements #AthleteHealth #SportsPharmacy",
+    "visual": {
+     "type": "vs",
+     "eyebrow": "Read the Label",
+     "big": "The dietitian asks if it works. The pharmacist asks what else it does.",
+     "small": "Two clinical lenses on every supplement — interactions, banned-substance risk, and whether the label survives a close read."
+    }
+   },
+   {
+    "id": "ig",
+    "type": "instagram",
+    "title": "Instagram label-decoder post",
+    "caption": "Supplement labels are designed to be skimmed. Don't. 🔍\n\nThree phrases that should slow you down:\n🚩 “Proprietary blend” — doses hidden inside a total\n🚩 “Pharmaceutical grade” — not a regulated term\n🚩 A seal you don't recognize — some are earned, some are purchased\n\nOur dietitian asks if it works. Our pharmacists ask what else it does. Every supplement deserves both questions.\n\nNew label-reading series starts now — save this one. 📌\n\n#Supplements #SportsNutrition #AthleteHealth #ReadTheLabel",
+    "visual": {
+     "type": "vs",
+     "sq": true,
+     "eyebrow": "Read the Label",
+     "big": "3 label phrases that should slow you down",
+     "small": "“Proprietary blend” · “Pharmaceutical grade” · seals you don't recognize"
+    }
+   },
+   {
+    "id": "reel",
+    "type": "reel",
+    "title": "Reel — 30s",
+    "cover": {
+     "eyebrow": "Read the Label",
+     "hook": "Reading a label like a pharmacist.",
+     "sub": "3 red flags in 30 seconds."
+    },
+    "audio": "Original audio — SportPharm",
+    "script": [
+     {
+      "t": "Hook 0–2s",
+      "x": "Pharmacist picks up a supplement tub: “Let me read this the way a pharmacist reads it.”",
+      "os": "ON SCREEN: Label check, pharmacist edition."
+     },
+     {
+      "t": "Beat 3–11s",
+      "x": "“Red flag one: proprietary blend. That's a total with the doses hidden inside it. You don't know what you're taking.”",
+      "os": "ON SCREEN: 🚩 Proprietary blend = hidden doses."
+     },
+     {
+      "t": "Beat 12–19s",
+      "x": "“Red flag two: pharmaceutical grade. Sounds official. Regulated meaning: none.”",
+      "os": "ON SCREEN: 🚩 Not a regulated term."
+     },
+     {
+      "t": "Beat 20–26s",
+      "x": "“Red flag three: a seal you don't recognize. Some are independent labs. Some are clip art. Know the difference.”",
+      "os": "ON SCREEN: 🚩 Verify the seal."
+     },
+     {
+      "t": "CTA 27–30s",
+      "x": "“Full label-reading guide — link in bio. Or bring it to a pharmacist who reads them all day.”",
+      "os": "CTA: Label guide in bio."
+     }
+    ]
+   },
+   {
+    "id": "art",
+    "type": "article",
+    "title": "Blog article (campaign anchor)",
+    "headline": "How to Read a Supplement Label Like a Pharmacist",
+    "dek": "By the SportPharm clinical team with Sean Casey, RD, CSCS. The phrases that hide information, the seals that mean something, and the questions to ask before anything goes in the shaker.",
+    "author": "SportPharm Clinical Team + Sean Casey, RD, CSCS",
+    "read": "9 min read",
+    "outline": [
+     "Why labels are written to be skimmed — and what skimming costs athletes",
+     "“Proprietary blend,” “pharmaceutical grade,” and other phrases decoded",
+     "Third-party seals ranked: which certifications carry weight",
+     "The interaction check: supplements × medications athletes actually take",
+     "The two-lens review: how our dietitian and pharmacists evaluate together"
+    ],
+    "cta": "Closes with: supplement-review offer for teams + link into the Clean Sport strand."
+   }
+  ]
+ },
+ {
+  "id": "wasabi-direct",
+  "title": "Direct-to-Site Sales — WasabiRub & the Rub Lineup",
+  "campaign": "SportPharm Feel It Work Campaign",
+  "prio": "Revenue priority",
+  "channels": [
+   "IG",
+   "FB",
+   "Email",
+   "LinkedIn"
+  ],
+  "landingUrl": "https://wasabirub-campaign.kennady-nickell.chatgpt.site/",
+  "camp": {
+   "platformTag": "Feel It Work.",
+   "platform": [
+    "SportPharm's biggest growth lever is the channel it owns — sportpharm.com. This campaign moves demand for the rubs onto our own store, where we own the customer, the margin, and the relationship instead of renting them from a marketplace.",
+    "WasabiRub is the hero: a triple-action sports topical that combines menthol (cools on contact), capsaicin (a long-lasting nerve desensitizer), and methyl salicylate (works into deep tissue) — three sensations most rubs don't deliver together. IcetraRub (16% menthol, pure cooling) and WasabiRub Super Hot (max heat) round out a cool-to-hot range.",
+    "The ownable position: the rub athletes actually feel working — pharmacist-formulated, TruShield Certified, and bought direct from the people who made it.",
+    "That's what separates SportPharm from a generic drugstore rub: pharmacy-grade formulation, triple-action relief, and a lineup already trusted on professional and collegiate sidelines."
+   ],
+   "strategy": {
+    "primary": "Drive traffic to sportpharm.com and convert direct purchases of WasabiRub, IcetraRub, and WasabiRub Super Hot — growing website sales that don't depend on the marketplace.",
+    "supporting": [
+     "Make WasabiRub's triple-action the clear reason to choose it over generic rubs",
+     "Convert SportPharm's pro- and collegiate-team credibility into consumer confidence",
+     "Lift average order value with the bundles (Fire & Ice, OG Heat, Recovery) on the direct store",
+     "Capture email/SMS along the way for remarketing and repeat orders — a byproduct of the sale, not the goal",
+     "Re-activate past marketplace buyers and team networks as direct purchasers"
+    ],
+    "audiences": [
+     {
+      "who": "Active adults & weekend athletes",
+      "cares": "Relief they can actually feel",
+      "msg": "Three sensations, one rub — feel it work."
+     },
+     {
+      "who": "Athletic trainers & teams",
+      "cares": "Pharmacy-grade, sideline-trusted",
+      "msg": "The rub already in pro and collegiate training rooms — order direct, in bundles."
+     },
+     {
+      "who": "Masters & recovery-focused athletes",
+      "cares": "Dependable muscle & joint relief",
+      "msg": "Pharmacist-formulated recovery you can trust."
+     },
+     {
+      "who": "Past marketplace customers",
+      "cares": "Same product, best source",
+      "msg": "Get it straight from the pharmacists — plus the full lineup and bundles."
+     },
+     {
+      "who": "Coaches & sport parents",
+      "cares": "A trusted topical for sore athletes",
+      "msg": "Formulated by pharmacists, trusted by pros."
+     }
+    ]
+   },
+   "offers": {
+    "intro": "The goal is direct purchases: get traffic to the store and convert it. The offers exist to remove friction from that first direct order and give people a reason to buy now instead of defer — email/SMS capture is a useful byproduct, not the point. The first-order incentive does the heavy lifting; a small stack adds launch urgency, order value, marketplace win-back, and repeat purchase. Codes below are suggestions to create in the store — confirm against margins and set one code per order.",
+    "primary": {
+     "name": "First-order incentive",
+     "offer": "Free shipping on your first direct order — or 10% off, whichever converts better. Auto-applied at checkout (and offered at signup, so we can remarket to anyone who doesn't buy on the first visit).",
+     "code": "FREESHIP1",
+     "alt": "WELCOME10",
+     "why": "Shipping cost is the #1 checkout drop-off on a $29.95 single jar, so free shipping on order #1 is usually the stronger hook to turn a visit into a purchase — run it against WELCOME10 (10% off) and keep the winner. The job is conversion: a reason to buy direct now, not later. Any email/SMS collected along the way is a bonus for remarketing."
+    },
+    "stack": [
+     {
+      "name": "Launch urgency (first 2 weeks)",
+      "code": "FEELIT15",
+      "use": "15% off the lineup during the launch window — spikes the initial push and gives Week 1–2 posts a deadline."
+     },
+     {
+      "name": "Launch close (final week)",
+      "code": "LASTCALL",
+      "use": "“Feel It Work launch pricing ends Sunday” — a hard final-week deadline for the warmest, most-retargeted audience; pair with a bundle bonus. Education without a deadline lets people postpone indefinitely."
+     },
+     {
+      "name": "Order-value threshold",
+      "mechanism": "Automatic · no code",
+      "use": "Free shipping over $50 site-wide — nudges single-jar buyers ($29.95) to add a second jar or step up to a duo. The main AOV lever alongside the bundles."
+     },
+     {
+      "name": "Marketplace win-back",
+      "code": "COMEDIRECT",
+      "use": "15% off for past marketplace buyers, emailed to the reactivation list. If using pack inserts, keep them in SportPharm direct shipments only — never inside marketplace orders (can violate their terms)."
+     },
+     {
+      "name": "Referral",
+      "mechanism": "Give 15% / Get 15%",
+      "use": "Friend gets 15% off their first order, referrer earns a reward — grows the owned audience the pivot depends on."
+     },
+     {
+      "name": "Team / trainer",
+      "code": "TEAM15",
+      "use": "15% off Team Trifecta & WasabiRub Team Bundle — routes B2B and trainer demand to direct."
+     },
+     {
+      "name": "Creator / affiliate codes",
+      "mechanism": "Unique per creator",
+      "use": "e.g. COACHJEN15 — 15% off for their audience; attributes sales to each partner and powers the cross-promotion program."
+     },
+     {
+      "name": "Repeat purchase",
+      "code": "AGAIN10",
+      "use": "10% off a second order within 60 days, on the thank-you page + pack insert — lifts repeat-purchase rate."
+     }
+    ],
+    "note": "Set up in the store platform (e.g. Shopify): one code per order (no stacking with bundles), sensible expirations, and exclude already-discounted bundles from FEELIT15 if margins are tight. Track redemption by code as a conversion KPI. WasabiRub at $29.95 leaves room for a ~10% ($3) or free-ship incentive — confirm the exact shipping cost before committing to free-ship-first."
+   },
+   "messages": {
+    "emotional": "The rub you actually feel working — from the second you rub it in.",
+    "educational": "WasabiRub is triple-action: menthol cools on contact, capsaicin desensitizes over hours, and methyl salicylate carries into deep tissue — three mechanisms for temporary relief of minor muscle and joint aches, in one gel.",
+    "product": "WasabiRub ($29.95), IcetraRub 16% menthol cooling cream ($39.95), and WasabiRub Super Hot ($39.95) — pharmacist-formulated, TruShield Certified, and available direct at sportpharm.com. Save with the Fire & Ice, OG Heat, and Recovery duos.",
+    "brand": "Formulated by pharmacists. Trusted by athletes. Bought direct from the people who made it."
+   },
+   "structureNote": "An aggressive, offer-driven push: educate on why the rub works, help people find their sensation, then convert to a direct purchase — every asset ends at sportpharm.com. Build the welcome, cart/browse-abandon, and post-purchase flows BEFORE launch — for a direct pivot they are core infrastructure, not post-launch add-ons.",
+   "structure": [
+    {
+     "phase": "Week 1 · Meet the rub",
+     "what": "Lead with WasabiRub and the lineup; establish 'feel it work' and the direct-store CTA.",
+     "posts": [
+      "Post 1 — Hero reel: Feel It Work",
+      "Post 2 — Meet the lineup carousel (Wasabi / Icetra / Super Hot)"
+     ]
+    },
+    {
+     "phase": "Week 2 · Why it works",
+     "what": "Triple-action education plus the cool and max-heat options.",
+     "posts": [
+      "Post 3 — WasabiRub triple-action carousel",
+      "Post 4 — IcetraRub cooling spotlight",
+      "Post 5 — WasabiRub Super Hot spotlight"
+     ]
+    },
+    {
+     "phase": "Week 3 · Find your rub",
+     "what": "Cool-to-heat guidance and bundles to lift order value.",
+     "posts": [
+      "Post 6 — Cool → Heat: which rub is right for you?",
+      "Post 7 — Bundle & save (Fire & Ice / OG Heat / Recovery)"
+     ]
+    },
+    {
+     "phase": "Week 4 · Proof & pharmacists",
+     "what": "Team credibility and the pharmacist voice.",
+     "posts": [
+      "Post 8 — Trusted by pros & pharmacists",
+      "Post 9 — Ask Brandon: why triple-action, and how to use it"
+     ]
+    },
+    {
+     "phase": "Week 5 · Buy direct (with a deadline)",
+     "what": "Conversion push with real urgency — “Feel It Work launch pricing ends Sunday” (LASTCALL) — aimed at the warmest, most-retargeted audience so they can’t defer.",
+     "posts": [
+      "Post 10 — Campaign close: launch pricing ends Sunday",
+      "Post 11 — Email sequence",
+      "Post 12 — Stories: polls, quiz & shop links"
+     ]
+    }
+   ],
+   "calendar": {
+    "intro": "A full Monday–Sunday plan across every channel for the five-week push — organic posts, daily Stories, email sends, Meta ad launches/refreshes, creator activations, and the offer windows. The always-on flows below run underneath the whole thing.",
+    "alwaysOn": [
+     "Cart-abandon flow (3 emails: reminder → “will I feel it?” review → free shipping) live the entire campaign",
+     "First-order incentive FREESHIP1 always-on via the signup pop-up (also feeds remarketing)",
+     "Meta ads optimizing daily — exclude recent purchasers from prospecting; watch ROAS + frequency",
+     "Daily Stories with a Shop sticker on every product frame",
+     "Creator codes (e.g. COACHJEN15) active throughout for trackable sales"
+    ],
+    "weeks": [
+     {
+      "label": "Week 1 · The announcement",
+      "focus": "Meet the rub — launch WasabiRub + the lineup",
+      "days": [
+       {
+        "d": "Mon",
+        "items": [
+         {
+          "t": "reel",
+          "x": "Post 1 — Hero reel “Feel It Work” goes live (IG + FB feed & Reels)"
+         },
+         {
+          "t": "email",
+          "x": "Launch broadcast: “Meet the rub athletes actually feel working”"
+         },
+         {
+          "t": "ads",
+          "x": "Launch Meta Ad 1 — “Feel It Work” (cold prospecting, Advantage+)"
+         },
+         {
+          "t": "stories",
+          "x": "Launch-day Stories: teaser + Shop sticker to WasabiRub"
+         }
+        ]
+       },
+       {
+        "d": "Tue",
+        "items": [
+         {
+          "t": "stories",
+          "x": "Poll: heat person or ice person?"
+         },
+         {
+          "t": "ads",
+          "x": "Ad 1 optimization check — let it exit the learning phase, don’t edit yet"
+         }
+        ]
+       },
+       {
+        "d": "Wed",
+        "items": [
+         {
+          "t": "post",
+          "x": "Post 2 — Announcement carousel (meet the lineup: Wasabi / Icetra / Super Hot)"
+         },
+         {
+          "t": "stories",
+          "x": "Lineup frames, each with its own Shop sticker"
+         }
+        ]
+       },
+       {
+        "d": "Thu",
+        "items": [
+         {
+          "t": "ads",
+          "x": "Launch Meta Ad 2 — “Why It Feels Different” (mid-funnel)"
+         },
+         {
+          "t": "stories",
+          "x": "Quiz: which rub matches your sore spot?"
+         }
+        ]
+       },
+       {
+        "d": "Fri",
+        "items": [
+         {
+          "t": "creator",
+          "x": "Creator wave 1 — 2–3 partners post a Story with link + code"
+         },
+         {
+          "t": "stories",
+          "x": "Reshare creator Stories to our channel"
+         }
+        ]
+       },
+       {
+        "d": "Sat",
+        "items": [
+         {
+          "t": "stories",
+          "x": "FAQ frame: how does the triple-action feel?"
+         }
+        ]
+       },
+       {
+        "d": "Sun",
+        "items": [
+         {
+          "t": "stories",
+          "x": "Week-1 recap + “your first order ships free” reminder"
+         },
+         {
+          "t": "offer",
+          "x": "FREESHIP1 running always-on (first-order incentive)"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "label": "Week 2 · Why it works",
+      "focus": "Triple-action education + the cool and max-heat options",
+      "days": [
+       {
+        "d": "Mon",
+        "items": [
+         {
+          "t": "post",
+          "x": "Post 3 — WasabiRub triple-action carousel"
+         },
+         {
+          "t": "email",
+          "x": "Broadcast #2: “Cool, everyday, or max heat? Find your rub”"
+         },
+         {
+          "t": "stories",
+          "x": "Triple-action breakdown (menthol / capsaicin / methyl salicylate)"
+         }
+        ]
+       },
+       {
+        "d": "Tue",
+        "items": [
+         {
+          "t": "stories",
+          "x": "Poll: what do you use a rub for? (pre / post / joint / sleep)"
+         }
+        ]
+       },
+       {
+        "d": "Wed",
+        "items": [
+         {
+          "t": "post",
+          "x": "Post 4 — IcetraRub cooling spotlight"
+         },
+         {
+          "t": "ads",
+          "x": "Refresh Ad 1 creative to fight fatigue"
+         },
+         {
+          "t": "stories",
+          "x": "Icetra frame + Shop sticker"
+         }
+        ]
+       },
+       {
+        "d": "Thu",
+        "items": [
+         {
+          "t": "post",
+          "x": "Post 5 — WasabiRub Super Hot spotlight"
+         },
+         {
+          "t": "stories",
+          "x": "Heat demo + Shop sticker"
+         }
+        ]
+       },
+       {
+        "d": "Fri",
+        "items": [
+         {
+          "t": "creator",
+          "x": "Creator wave 2 (cool-vs-heat angle)"
+         },
+         {
+          "t": "stories",
+          "x": "Creator reshares"
+         }
+        ]
+       },
+       {
+        "d": "Sat",
+        "items": [
+         {
+          "t": "stories",
+          "x": "UGC / customer-review frame"
+         }
+        ]
+       },
+       {
+        "d": "Sun",
+        "items": [
+         {
+          "t": "offer",
+          "x": "Last day of FEELIT15 launch pricing (15% off)"
+         },
+         {
+          "t": "stories",
+          "x": "Countdown: 15% launch offer ends tonight"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "label": "Week 3 · Find your rub",
+      "focus": "Cool-to-heat guidance + bundles for order value",
+      "days": [
+       {
+        "d": "Mon",
+        "items": [
+         {
+          "t": "post",
+          "x": "Post 6 — Cool → Heat: which rub is right for you? (carousel)"
+         },
+         {
+          "t": "ads",
+          "x": "Refresh Ad 2; launch retargeting Meta Ad 3 — “Trusted on Pro Sidelines” (no deadline yet)"
+         },
+         {
+          "t": "stories",
+          "x": "Quiz reshare + Shop stickers"
+         }
+        ]
+       },
+       {
+        "d": "Tue",
+        "items": [
+         {
+          "t": "stories",
+          "x": "Poll: ever bought a rub that did nothing?"
+         }
+        ]
+       },
+       {
+        "d": "Wed",
+        "items": [
+         {
+          "t": "post",
+          "x": "Post 7 — Bundle & save (Fire & Ice / OG Heat / Recovery)"
+         },
+         {
+          "t": "email",
+          "x": "Broadcast #3: “Buy the pair, save on both” + free shipping over $50"
+         },
+         {
+          "t": "stories",
+          "x": "Bundle spotlight + Shop sticker"
+         }
+        ]
+       },
+       {
+        "d": "Thu",
+        "items": [
+         {
+          "t": "stories",
+          "x": "Fire & Ice duo demo"
+         }
+        ]
+       },
+       {
+        "d": "Fri",
+        "items": [
+         {
+          "t": "creator",
+          "x": "Creator wave 3 (bundle focus)"
+         },
+         {
+          "t": "stories",
+          "x": "Creator reshares"
+         }
+        ]
+       },
+       {
+        "d": "Sat",
+        "items": [
+         {
+          "t": "stories",
+          "x": "FAQ: do you have bundles?"
+         }
+        ]
+       },
+       {
+        "d": "Sun",
+        "items": [
+         {
+          "t": "stories",
+          "x": "Recap + shop reminder"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "label": "Week 4 · Proof & pharmacists",
+      "focus": "Team credibility + the pharmacist voice",
+      "days": [
+       {
+        "d": "Mon",
+        "items": [
+         {
+          "t": "post",
+          "x": "Post 8 — Trusted by pros & pharmacists (proof)"
+         },
+         {
+          "t": "stories",
+          "x": "Proof frames (non-endorsement language)"
+         }
+        ]
+       },
+       {
+        "d": "Tue",
+        "items": [
+         {
+          "t": "stories",
+          "x": "Poll: most-used product / heat vs ice, round 2"
+         }
+        ]
+       },
+       {
+        "d": "Wed",
+        "items": [
+         {
+          "t": "post",
+          "x": "Post 9 — Ask Brandon interview (why triple-action, how to use)"
+         },
+         {
+          "t": "stories",
+          "x": "Brandon clips + Shop sticker"
+         }
+        ]
+       },
+       {
+        "d": "Thu",
+        "items": [
+         {
+          "t": "ads",
+          "x": "Refresh Ad 3 with a real customer review"
+         },
+         {
+          "t": "stories",
+          "x": "Review reshare"
+         }
+        ]
+       },
+       {
+        "d": "Fri",
+        "items": [
+         {
+          "t": "creator",
+          "x": "Creator wave 4 (testimonial angle); whitelist 1 creator Story as a Meta Partnership Ad"
+         },
+         {
+          "t": "stories",
+          "x": "Creator reshares"
+         }
+        ]
+       },
+       {
+        "d": "Sat",
+        "items": [
+         {
+          "t": "stories",
+          "x": "FAQ: is it TruShield Certified?"
+         }
+        ]
+       },
+       {
+        "d": "Sun",
+        "items": [
+         {
+          "t": "stories",
+          "x": "Tease the final week: “launch pricing ends next Sunday”"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "label": "Week 5 · Buy direct (deadline)",
+      "focus": "Conversion push with a hard Sunday deadline",
+      "days": [
+       {
+        "d": "Mon",
+        "items": [
+         {
+          "t": "post",
+          "x": "Post 10 — Campaign close: “Launch pricing ends Sunday” (LASTCALL)"
+         },
+         {
+          "t": "email",
+          "x": "Final-week kickoff: “Launch pricing ends Sunday — use LASTCALL”"
+         },
+         {
+          "t": "ads",
+          "x": "Turn on the deadline variant of Ad 3; raise retargeting budget"
+         },
+         {
+          "t": "offer",
+          "x": "LASTCALL live — expires Sunday midnight"
+         }
+        ]
+       },
+       {
+        "d": "Tue",
+        "items": [
+         {
+          "t": "stories",
+          "x": "Countdown: 5 days left + Shop sticker"
+         }
+        ]
+       },
+       {
+        "d": "Wed",
+        "items": [
+         {
+          "t": "email",
+          "x": "Mid-week reminder: “Don’t miss launch pricing”"
+         },
+         {
+          "t": "stories",
+          "x": "Countdown: 4 days + bundle nudge"
+         }
+        ]
+       },
+       {
+        "d": "Thu",
+        "items": [
+         {
+          "t": "stories",
+          "x": "Countdown: 3 days left"
+         }
+        ]
+       },
+       {
+        "d": "Fri",
+        "items": [
+         {
+          "t": "creator",
+          "x": "Creator wave 5 (last-call push)"
+         },
+         {
+          "t": "stories",
+          "x": "Countdown: 2 days + creator reshares"
+         }
+        ]
+       },
+       {
+        "d": "Sat",
+        "items": [
+         {
+          "t": "email",
+          "x": "Last chance: “Ends tomorrow”"
+         },
+         {
+          "t": "stories",
+          "x": "Countdown: 24 hours left"
+         }
+        ]
+       },
+       {
+        "d": "Sun",
+        "items": [
+         {
+          "t": "reel",
+          "x": "Post 12 — Campaign-close emotional reel"
+         },
+         {
+          "t": "email",
+          "x": "“Ends tonight” — midday + evening sends"
+         },
+         {
+          "t": "stories",
+          "x": "All-day countdown to midnight"
+         },
+         {
+          "t": "offer",
+          "x": "LASTCALL expires at midnight — pricing returns to normal"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "note": "Lock the exact email send times and ad-refresh cadence to your audience data before launch. Space creator waves so a fresh partner posts most weeks. Keep FEELIT15 to Weeks 1–2 and LASTCALL to the final week only, so the deadline stays credible."
+   },
+   "storiesIntro": "Run Stories throughout to make it interactive and shoppable, with a Shop link sticker on every product frame. The full Stories package is drafted as an approvable asset below.",
+   "stories": [
+    "Polls: heat person or ice person? · what do you use a rub for (pre-workout / post-workout / nagging joint / sleep)?",
+    "Quiz: which rub matches your sore spot — cool, everyday, or max heat?",
+    "Shop stickers: every product frame links straight to that product on sportpharm.com",
+    "Story FAQ: how the triple-action feels, how to apply, is it TruShield Certified, shipping & bundles"
+   ],
+   "adaptations": [
+    {
+     "ch": "instagram",
+     "items": [
+      "'Feel it work' reels and application demos",
+      "Shoppable product carousels and the 3-jar lineup",
+      "Cool-vs-heat visual language",
+      "Story quizzes/polls with Shop stickers",
+      "UGC and athlete demos"
+     ],
+     "cadence": "3–4 feed posts + daily shoppable Stories."
+    },
+    {
+     "ch": "facebook",
+     "items": [
+      "Community and sport-parent education",
+      "Longer captions with the direct-store link",
+      "Bundle offers and reviews",
+      "Retargeting past visitors and buyers to the store"
+     ],
+     "cadence": "2–3 posts/week + always-on retargeting."
+    },
+    {
+     "ch": "email",
+     "items": [
+      "Owned channel — remarket traffic into direct purchases and drive repeat orders",
+      "Lineup intro, which-rub guide, bundle/offer",
+      "Cart + browse abandonment flows (core — build before launch)",
+      "Past-buyer reactivation"
+     ]
+    },
+    {
+     "ch": "linkedin",
+     "items": [
+      "Trainer/team angle: order direct, team bundles",
+      "Pharmacist-formulated credibility",
+      "Team Trifecta / WasabiRub Team Bundle for programs"
+     ],
+     "cadence": "1–2 posts/week."
+    }
+   ],
+   "paidAds": {
+    "intro": "True paid ads for Meta — built to run as ads (including dark / unpublished posts) that reach beyond our own followers, separate from the organic calendar. All three send to sportpharm.com and are optimized for purchases; repurpose organic creative where noted.",
+    "ads": [
+     {
+      "name": "Feel It Work",
+      "angle": "Cold prospecting · problem → solution",
+      "objective": "Sales / Purchase (Advantage+ shopping or manual conversions)",
+      "audience": "Broad: US adults 25–55; interests fitness, running, gym, CrossFit, sports recovery; + 1% lookalike of purchasers and site visitors. Let Advantage+ expand.",
+      "placement": "Advantage+ placements — IG + FB Feed, Reels, Stories",
+      "format": "9:16 / 1:1 short video (repurpose the Feel It Work reel), captions burned in",
+      "offer": "FREESHIP1 — first order ships free",
+      "creativeEye": "WasabiRub",
+      "creativeHook": "Three sensations. One rub.",
+      "primaryText": "Most rubs do one thing. WasabiRub does three — menthol cools, capsaicin quiets the ache, methyl salicylate works deep. Pharmacist-formulated, trusted on pro sidelines. Feel it work.\n\nFirst order ships free — direct at sportpharm.com.",
+      "headline": "Three sensations. One rub.",
+      "description": "Free shipping on your first order.",
+      "cta": "Shop Now",
+      "note": "Hook in the first 2 seconds; show the gel going on; keep price + Shop CTA on screen. Claims stay within temporary relief of minor muscle/joint aches."
+     },
+     {
+      "name": "Why It Feels Different",
+      "angle": "Interest / engaged · differentiator",
+      "objective": "Sales / Purchase",
+      "audience": "Engaged & interest: video viewers 25%+, IG/FB engagers (365d), interests in muscle rubs / topical pain relief, runners, lifters, pickleball; exclude purchasers.",
+      "placement": "IG + FB Feed and Reels",
+      "format": "Carousel (repurpose the triple-action carousel) or single image",
+      "offer": "FREESHIP1 first order · free shipping over $50",
+      "creativeEye": "Why it works",
+      "creativeHook": "Cool. Quiet the ache. Go deep.",
+      "primaryText": "Swipe to see why WasabiRub feels different. Cool on contact. Quiets the ache for hours. Works into deep tissue — one pharmacist-formulated gel. Feel it work at sportpharm.com.",
+      "headline": "Why WasabiRub feels different",
+      "description": "Triple-action · pharmacist-formulated",
+      "cta": "Shop Now",
+      "note": "Card 1 must earn the swipe; end card is the Shop CTA. No competitor names — position on our own testing depth."
+     },
+     {
+      "name": "Trusted on Pro Sidelines",
+      "angle": "Retargeting · proof + deadline",
+      "objective": "Sales / Purchase — retargeting",
+      "audience": "Warm retargeting: site visitors 30d, product & add-to-cart viewers (exclude purchasers), email + IG engagers. Final week: layer the deadline.",
+      "placement": "IG + FB Feed and Stories",
+      "format": "UGC / review-style video or testimonial static; final-week variant adds the Sunday-deadline overlay",
+      "offer": "LASTCALL (final-week deadline) + FREESHIP1",
+      "creativeEye": "Trusted since 1995",
+      "creativeHook": "Made by pharmacists. Used on pro sidelines.",
+      "primaryText": "Trainers across pro and collegiate sports keep it in the kit — see why, and get yours direct. Feel it work.\n\nLaunch pricing ends Sunday — use LASTCALL at sportpharm.com.",
+      "headline": "Trusted on pro sidelines",
+      "description": "Launch pricing ends Sunday.",
+      "cta": "Shop Now",
+      "note": "Describes use, not endorsement — no league logos or marks. Rotate a real customer review as the proof; only run the deadline variant in the final week."
+     }
+    ],
+    "note": "Meta compliance: no personal-attribute copy (“do you suffer from…”), no before/after or medical claims, and stay within OTC pain-relief language. Install the Meta pixel + Conversions API and set the catalog/UTMs so purchases attribute to each ad. Exclude recent purchasers from prospecting; use the Paid Partnership label for any creator whitelisting."
+   },
+   "creators": {
+    "intro": "A high-leverage, low-cost channel: SportPharm already has relationships with trainers and athletes who used the rubs and have an audience. The ask is simple — a Story with a link and a code — and it drives trackable direct sales, not just impressions.",
+    "deliverable": "1–2 Instagram Stories using WasabiRub in a real training setting, with a link sticker to their trackable URL and their unique code on screen. Higher-tier partners add a Reel or feed post.",
+    "who": [
+     "Past pro & collegiate athletic trainers who have used SportPharm",
+     "Sponsored / affiliated athletes and teams",
+     "PTs, chiros, and strength coaches with engaged followings",
+     "Micro-creators (10k–100k) in the sport-recovery niche — often the best ROI"
+    ],
+    "mechanics": [
+     {
+      "k": "Comp",
+      "v": "Gifted product + affiliate commission on their code; a flat fee for larger creators. Their code gives followers 15% off (ties to the offer stack)."
+     },
+     {
+      "k": "Tracking",
+      "v": "Unique code per creator (e.g. COACHJEN15) + a UTM link sticker — measure by sales, not impressions."
+     },
+     {
+      "k": "Disclosure",
+      "v": "Required: Meta Paid Partnership label + #ad / FTC disclosure. Non-negotiable."
+     },
+     {
+      "k": "Whitelisting",
+      "v": "Ask permission to run their Story/Reel as a Meta Partnership Ad (see Ad 3) — creator content usually converts harder than brand content."
+     },
+     {
+      "k": "Outreach",
+      "v": "Short DM/email + a one-page brief: the code, the link, do/don't, approved claims, and the disclosure requirement."
+     }
+    ],
+    "outreachKit": {
+     "dm": "Hi [Name] — really like what you're doing with [team / your athletes / your content].\n\nI'm with SportPharm, the pharmacists behind WasabiRub — the triple-action rub (menthol + capsaicin + methyl salicylate) a lot of trainers keep in the kit.\n\nWe're doing a direct push and would love to work with you: we'll send product and set you up with your own discount code + a commission on every sale it drives. The ask is simple — one authentic Story using it, with a link sticker + your code.\n\nWant me to send the details and get product out to you this week?",
+     "email": {
+      "subject": "WasabiRub × [Name] — free product + your own code",
+      "body": "Hi [Name],\n\nI'm [Your Name] with SportPharm — the pharmacist-formulated sports rubs (WasabiRub, IcetraRub, Super Hot). We're growing our direct sales at sportpharm.com and would love to partner with you.\n\nThe ask is simple:\n• 1–2 Instagram Stories using WasabiRub in a real training / recovery moment\n• A link sticker to your trackable URL + your unique code on screen\n• (Optional, higher tier) a Reel or feed post\n\nWhat you get:\n• Free product to try and feature\n• [X]% commission on every sale from your code\n• A 15% code for your audience — great for them, easy for you\n\nIt's fully trackable, so you'll see exactly what your Story drives, and we handle the setup. One requirement: the post has to be disclosed as a paid partnership (#ad + Meta's Paid Partnership label). It's an FTC rule — non-negotiable — and we'll send approved language so it's effortless.\n\nIf you're in, reply and I'll send your code, link, and a quick one-pager, and get product in the mail this week.\n\nThanks,\n[Your Name]\nSportPharm · sportpharm.com"
+     },
+     "brief": "SPORTPHARM × [CREATOR] — WASABIRUB STORY BRIEF\n\nTHE ASK\n• 1–2 Instagram Stories using WasabiRub in a real training / recovery setting\n• Add a Link sticker → [your tracked link]\n• Put your code on screen → [YOURCODE] (15% off for your audience)\n• Optional higher tier: a Reel or a feed post\n\nYOUR LINKS & CODE\n• Tracked link: [paste link]\n• Discount code: [YOURCODE]\n• Where it sends: sportpharm.com\n\nWHAT TO SHOW\n• You actually using it — rub it into a shoulder / knee / forearm after a session\n• Keep it real and in your voice; a quick \"here's what I use\" beats a scripted ad\n• Show the jar/label; it's pharmacist-formulated and triple-action (cools, quiets the ache, works deep)\n\nOK TO SAY (within the label)\n• \"Triple-action: menthol, capsaicin, methyl salicylate\"\n• \"Temporarily relieves minor aches and pains of muscles and joints\"\n• \"Pharmacist-formulated\" · \"TruShield Certified\"\n• \"I use it after training / on sore muscles\"\n\nPLEASE DON'T SAY\n• \"Cures / heals / fixes injuries\" or anything about treating a condition or injury\n• \"Anti-inflammatory drug,\" any medical or diagnosis claim, or guaranteed results\n• That any league or team officially endorses it\n\nDISCLOSURE (required — FTC)\n• Turn on Meta's \"Paid partnership\" label, AND\n• Add #ad (clearly visible) to the Story\n• Posts without disclosure can't run\n\nTIMELINE\n• Posting window: [dates]\n• Send us a screenshot / screen-record when the Story is live\n\nHOW YOU GET PAID\n• [X]% commission on sales from [YOURCODE], paid [monthly / net-30] via [method]\n• Free product ships this week\n\nQuestions? [Your Name] · [email] · SportPharm"
+    },
+    "note": "Keep every creator within OTC label claims (temporary relief of minor muscle/joint aches) — no cure/heal, no “fixes injuries.” Provide the approved-language sheet up front so their Story stays compliant, and describe pro/team use as use, not endorsement."
+   },
+   "landingHero": {
+    "h": "Three sensations. One rub.",
+    "d": "WasabiRub's triple-action — menthol cools, capsaicin quiets the ache, methyl salicylate goes deep. Pharmacist-formulated, TruShield Certified. Feel it work — direct at sportpharm.com.",
+    "buttons": [
+     "Shop WasabiRub — $29.95",
+     "Shop the lineup"
+    ],
+    "note": "Money-copy: lead with the differentiator (triple-action) — it's the reason to choose us over a drugstore rub. A/B this headline against the punchier “Three sensations. One rub. Feel it work.” and keep the dek to one line."
+   },
+   "landing": [
+    {
+     "t": "The triple-action difference",
+     "d": "Menthol cools, capsaicin desensitizes, methyl salicylate works deep — what most rubs don't combine."
+    },
+    {
+     "t": "Meet the lineup",
+     "d": "WasabiRub ($29.95) · IcetraRub 16% menthol ($39.95) · WasabiRub Super Hot ($39.95)."
+    },
+    {
+     "t": "Find your rub",
+     "d": "A cool-to-heat selector that routes to the right product."
+    },
+    {
+     "t": "Bundle & save",
+     "d": "Fire & Ice Duo $64.99 · OG Heat Duo $59.99 · Recovery Duo $64.99."
+    },
+    {
+     "t": "Trusted by pros & pharmacists",
+     "d": "Used across professional and collegiate training rooms; formulated by sports pharmacists (non-endorsement language)."
+    },
+    {
+     "t": "How to use",
+     "d": "Application guidance and when to reach for cool vs. heat."
+    },
+    {
+     "t": "Reviews",
+     "d": "Real customer ratings (WasabiRub 5.0)."
+    },
+    {
+     "t": "Shipping & guarantee",
+     "d": "Direct-order shipping, returns, and support."
+    },
+    {
+     "t": "FAQ + label information",
+     "d": "OTC drug facts, active ingredients, and use directions."
+    }
+   ],
+   "visualFeel": "Energetic, sensory, and product-forward — heat and cool made visual. Premium but approachable; this is a consumer conversion campaign, not a clinical one.",
+   "visualSwatches": [
+    {
+     "c": "#D6202A",
+     "l": "SportPharm red"
+    },
+    {
+     "c": "#2E9E5B",
+     "l": "WasabiRub green"
+    },
+    {
+     "c": "#1C86C9",
+     "l": "Icetra blue"
+    },
+    {
+     "c": "#E8632A",
+     "l": "Super Hot orange"
+    },
+    {
+     "c": "#1C1F23",
+     "l": "Charcoal"
+    }
+   ],
+   "visual": {
+    "use": [
+     "Macro product texture and real application shots — the gel going on",
+     "Heat / cool visual language (thermal reds vs. icy blues) to signal sensation",
+     "The three-jar lineup as a recognizable range shot",
+     "Real athletes mid-workout and in recovery, diverse across sport/age/gender",
+     "Bold 'feel it' typography with a clear price and Shop CTA",
+     "Pharmacist and pharmacy cues for credibility",
+     "UGC-style demos and honest reviews"
+    ],
+    "avoid": [
+     "Naming or disparaging any other retailer or marketplace in public creative",
+     "Disease-treatment or 'cure/heal' claims — stay within OTC pain-relief language",
+     "Implying official league (NFL/NBA/MLB/Olympic) endorsement",
+     "Hiding the price or the Shop button",
+     "A sterile clinical look — this campaign should feel energetic",
+     "Fake lab or fake 'as seen on' scenes"
+    ]
+   },
+   "guardrails": {
+    "use": [
+     "“Temporarily relieves minor aches and pains of muscles and joints” (OTC external analgesic language)",
+     "“Triple-action: menthol, capsaicin, and methyl salicylate”",
+     "“Pharmacist-formulated” / “Formulated by pharmacists”",
+     "“TruShield Certified”",
+     "“Available direct at sportpharm.com”",
+     "Actual prices — WasabiRub $29.95 · IcetraRub $39.95 · Super Hot $39.95 · Fire & Ice Duo $64.99 · OG Heat Duo $59.99 · Recovery Duo $64.99"
+    ],
+    "avoid": [
+     "“Cures,” “heals,” “eliminates inflammation,” or any disease-treatment claim",
+     "“Only triple-action rub on the market” unless substantiation is on file — otherwise soften to “a triple-action sports rub”",
+     "Implying official NFL/NBA/MLB/Olympic endorsement — describe use, never endorsement",
+     "Naming or knocking any other retailer in public-facing creative",
+     "Guaranteeing results or promising specific recovery timelines",
+     "Misstating price, active ingredients, or promo/bundle terms"
+    ],
+    "note": "OTC external analgesic — keep every efficacy claim within label indications. Channel strategy is internal and never appears in public creative. Pro/collegiate-team references describe use, not endorsement, and carry the standard non-endorsement line."
+   },
+   "metrics": [
+    {
+     "goal": "Direct revenue (primary)",
+     "kpi": "sportpharm.com revenue for the three rubs; share of rub revenue direct vs. marketplace; new-customer direct orders"
+    },
+    {
+     "goal": "Conversion",
+     "kpi": "Sessions → add-to-cart → checkout; product-page conversion by UTM; ROAS on paid social; welcome-offer opt-ins and redemption by code; recovered-cart-flow revenue"
+    },
+    {
+     "goal": "Order value",
+     "kpi": "Bundle attach rate; average order value lift from Fire & Ice / OG Heat / Recovery duos"
+    },
+    {
+     "goal": "Remarketing & retention",
+     "kpi": "Email/SMS captures (for remarketing); repeat-purchase rate; reactivated past marketplace buyers"
+    },
+    {
+     "goal": "Review cadence",
+     "kpi": "Weekly during the push, watching direct-revenue share and ROAS"
+    }
+   ]
+  },
+  "assets": [
+   {
+    "id": "w1",
+    "type": "reel2",
+    "title": "Post 1 · Hero reel — Feel It Work",
+    "week": "Week 1",
+    "chs": [
+     "Instagram",
+     "Facebook"
+    ],
+    "purpose": "Introduce WasabiRub and the 'feel it work' promise; drive to the store.",
+    "cover": {
+     "eyebrow": "WasabiRub",
+     "hook": "Three sensations. One rub.",
+     "sub": "Feel it work."
+    },
+    "audio": "Trending energetic track or original — SportPharm",
+    "scenes": [
+     "Athlete finishes a hard set, reaches for WasabiRub",
+     "Close-up: gel rubbed into a shoulder / knee",
+     "Cool-then-warm sensation visualized (icy blue → thermal red)",
+     "Text: menthol cools · capsaicin desensitizes · methyl salicylate goes deep",
+     "Athlete back in motion",
+     "Three-jar lineup + TruShield mark",
+     "End card: shop direct"
+    ],
+    "vo": "Most rubs give you one feeling. WasabiRub gives you three — menthol to cool, capsaicin to quiet the ache, and methyl salicylate that works into deep tissue. Pharmacist-formulated. Trusted by athletes. Feel it work — now direct at sportpharm.com.",
+    "endcard": [
+     "WASABIRUB · $29.95",
+     "Feel it work.",
+     "Shop direct — sportpharm.com"
+    ],
+    "caption": "You don’t rub in WasabiRub and wait. You feel it work.\n\nThree actions in one gel: menthol cools on contact, capsaicin quiets the ache over hours, and methyl salicylate carries into deep tissue — for temporary relief of minor muscle and joint pain.\n\nPharmacist-formulated. TruShield Certified. Trusted in pro and collegiate training rooms.\n\nGet it straight from the pharmacists who made it — link in bio.\n\n#WasabiRub #SportPharm #MuscleRecovery #SportsRecovery"
+   },
+   {
+    "id": "w2",
+    "type": "carousel",
+    "title": "Post 2 · Meet the lineup carousel",
+    "week": "Week 1",
+    "chs": [
+     "Instagram",
+     "Facebook"
+    ],
+    "series": "The Lineup",
+    "slides": [
+     "Meet the rubs.\n\nThree sensations. One pharmacy.",
+     "WasabiRub\n\nTriple-action heat + cool. The everyday hero. $29.95",
+     "IcetraRub\n\n16% menthol. Pure cooling relief. $39.95",
+     "WasabiRub Super Hot\n\nMax heat, intensified. $39.95",
+     "All three: pharmacist-formulated. TruShield Certified.",
+     "Trusted in pro & collegiate training rooms.",
+     "Feel it work.\n\nShop direct — sportpharm.com"
+    ],
+    "note": "Make each product slide shoppable (product tag / Shop sticker) linking to sportpharm.com."
+   },
+   {
+    "id": "w3",
+    "type": "carousel",
+    "title": "Post 3 · WasabiRub triple-action",
+    "week": "Week 2",
+    "chs": [
+     "Instagram",
+     "LinkedIn"
+    ],
+    "series": "Why It Works",
+    "slides": [
+     "Why WasabiRub feels different.",
+     "Most rubs do one thing. WasabiRub does three.",
+     "1. Menthol\n\nCools on contact — the first thing you feel.",
+     "2. Capsaicin\n\nA long-lasting nerve desensitizer — quiets the ache over hours.",
+     "3. Methyl salicylate\n\nCarries into deep tissue.",
+     "Three actions, melted into one uniform gel.",
+     "For temporary relief of minor muscle & joint aches.",
+     "Pharmacist-formulated. Feel it work — sportpharm.com"
+    ]
+   },
+   {
+    "id": "w4",
+    "type": "staticpv",
+    "title": "Post 4 · IcetraRub cooling spotlight",
+    "week": "Week 2",
+    "chs": [
+     "Instagram",
+     "Facebook"
+    ],
+    "eye": "SportPharm · IcetraRub",
+    "big": "When you need cool,\nnot heat.",
+    "items": [
+     "16% menthol cooling cream",
+     "Fast, clean cooling relief",
+     "Great for fresh strains, swelling days, and post-ice sessions",
+     "Pharmacist-formulated · TruShield Certified",
+     "$39.95 — direct at sportpharm.com"
+    ],
+    "cta": "Shop IcetraRub — sportpharm.com",
+    "note": "Cool-blue visual treatment. Keep claims within OTC external analgesic language."
+   },
+   {
+    "id": "w5",
+    "type": "staticpv",
+    "title": "Post 5 · WasabiRub Super Hot spotlight",
+    "week": "Week 2",
+    "chs": [
+     "Instagram",
+     "Facebook"
+    ],
+    "eye": "SportPharm · Super Hot",
+    "big": "When regular heat\nisn’t enough.",
+    "items": [
+     "WasabiRub Super Hot — intensified heat",
+     "For deep, stubborn muscle tightness",
+     "The max-heat end of the lineup",
+     "Pharmacist-formulated · TruShield Certified",
+     "$39.95 — direct at sportpharm.com"
+    ],
+    "cta": "Shop Super Hot — sportpharm.com",
+    "note": "Thermal-orange visual treatment. Note it is the strongest heat; include use directions."
+   },
+   {
+    "id": "w6",
+    "type": "carousel",
+    "title": "Post 6 · Cool → Heat: which rub?",
+    "week": "Week 3",
+    "chs": [
+     "Instagram",
+     "Facebook"
+    ],
+    "series": "Find Your Rub",
+    "slides": [
+     "Which rub is right for you?",
+     "Start with the sensation you want.",
+     "COOL — IcetraRub\n\n16% menthol. Fresh strains, swelling, post-ice. $39.95",
+     "EVERYDAY — WasabiRub\n\nCool + heat, triple-action. Your daily driver. $29.95",
+     "MAX HEAT — Super Hot\n\nDeep, stubborn tightness. $39.95",
+     "Can’t decide? The Fire & Ice Duo has both ends. $64.99",
+     "Find yours — sportpharm.com"
+    ]
+   },
+   {
+    "id": "w7",
+    "type": "staticpv",
+    "title": "Post 7 · Bundle & save",
+    "week": "Week 3",
+    "chs": [
+     "Instagram",
+     "Facebook",
+     "Email"
+    ],
+    "eye": "SportPharm · Bundles",
+    "big": "Buy the pair.\nSave on both.",
+    "items": [
+     "Fire & Ice Duo — heat + cool · $64.99",
+     "OG Heat Duo · $59.99",
+     "Recovery Duo · $64.99",
+     "Team programs: Team Trifecta & WasabiRub Team Bundle",
+     "Only direct at sportpharm.com"
+    ],
+    "cta": "Shop bundles — sportpharm.com",
+    "note": "Confirm live bundle contents/prices before publishing; bundles are the AOV lever."
+   },
+   {
+    "id": "w8",
+    "type": "staticpv",
+    "title": "Post 8 · Trusted by pros & pharmacists",
+    "week": "Week 4",
+    "chs": [
+     "Instagram",
+     "LinkedIn",
+     "Facebook"
+    ],
+    "eye": "SportPharm",
+    "big": "Made by pharmacists.\nUsed on pro sidelines.",
+    "items": [
+     "Formulated by sports pharmacists",
+     "Used across professional and collegiate training rooms",
+     "TruShield Certified for banned-substance screening",
+     "The same rubs — now direct to you",
+     "Feel it work — sportpharm.com"
+    ],
+    "cta": "Shop direct — sportpharm.com",
+    "note": "Describes use, not endorsement. Carry the standard non-endorsement line; no league logos."
+   },
+   {
+    "id": "w9",
+    "type": "interview",
+    "title": "Post 9 · Ask Brandon — triple-action & how to use",
+    "week": "Week 4",
+    "chs": [
+     "Instagram",
+     "Facebook",
+     "LinkedIn"
+    ],
+    "cover": {
+     "eyebrow": "Ask Brandon",
+     "hook": "Why three ingredients?",
+     "sub": "45–60 second video"
+    },
+    "q": "Why did you formulate WasabiRub with three actives instead of one?",
+    "a": "Because relief isn’t one thing. Menthol gives you that immediate cool, capsaicin works on the nerve signal over a longer window, and methyl salicylate carries into the deeper tissue. Most rubs pick one lane. We built WasabiRub to do all three in a single uniform gel — formulated by pharmacists, for the athletes and trainers who rely on it every day.",
+    "followups": [
+     "“When should I reach for IcetraRub instead of WasabiRub?”",
+     "“How much do I use, and how often?”",
+     "“What makes Super Hot different?”",
+     "“Why buy direct from sportpharm.com?”"
+    ],
+    "note": "Keep answers within OTC label indications; end on the direct-store CTA."
+   },
+   {
+    "id": "w10",
+    "type": "staticpv",
+    "title": "Post 10 · Campaign close — launch pricing ends Sunday",
+    "week": "Week 5",
+    "chs": [
+     "Instagram",
+     "Facebook",
+     "Email"
+    ],
+    "eye": "SportPharm · Final week",
+    "big": "Launch pricing\nends Sunday.",
+    "items": [
+     "Feel It Work launch pricing — last chance",
+     "Use LASTCALL before Sunday midnight",
+     "WasabiRub $29.95 · duos from $59.99",
+     "First order still ships free (FREESHIP1)",
+     "Shop before it ends — sportpharm.com"
+    ],
+    "cta": "Shop before Sunday — sportpharm.com",
+    "note": "Aim at the warmest retargeting audiences and the email list — the hard deadline is the point. Set LASTCALL to expire Sunday midnight; pair with a final-week bundle bonus."
+   },
+   {
+    "id": "w11",
+    "type": "email",
+    "title": "Post 11 · Email sequence — 3 sends",
+    "week": "Weeks 1–5",
+    "chs": [
+     "Email"
+    ],
+    "emails": [
+     {
+      "s": "Welcome — your first order ships free",
+      "d": "Welcome flow triggered by signup: free shipping on order #1 via FREESHIP1 (or 10% off, WELCOME10). Meet WasabiRub + the lineup, one tap to shop."
+     },
+     {
+      "s": "Cool, everyday, or max heat? Find your rub",
+      "d": "Which-rub guide with the cool-to-heat selector; nudge toward a duo, and free shipping over $50."
+     },
+     {
+      "s": "Buy the pair, save on both",
+      "d": "Bundle offer (Fire & Ice / OG Heat / Recovery) + FEELIT15 during launch. Plus cart/browse-abandon and past-buyer reactivation (COMEDIRECT)."
+     }
+    ],
+    "note": "Email is the owned channel this pivot is built around; add cart/browse-abandon and past-buyer reactivation flows."
+   },
+   {
+    "id": "w12",
+    "type": "stories",
+    "title": "Post 12 · Stories — polls, quiz & shop links",
+    "week": "All weeks",
+    "chs": [
+     "Instagram"
+    ],
+    "polls": [
+     {
+      "q": "Heat person or ice person?",
+      "opts": [
+       "Heat",
+       "Ice"
+      ]
+     },
+     {
+      "q": "What do you use a rub for?",
+      "opts": [
+       "Pre-workout",
+       "Post-workout",
+       "Nagging joint",
+       "Sleep"
+      ]
+     },
+     {
+      "q": "Ever bought a rub that did nothing?",
+      "opts": [
+       "Yes",
+       "Too many times"
+      ]
+     }
+    ],
+    "quiz": {
+     "q": "Fresh strain that’s hot and swollen — reach for cool or heat first?",
+     "opts": [
+      "Cool",
+      "Heat"
+     ],
+     "answer": "Cool. Reach for IcetraRub’s 16% menthol for that fresh, swollen, still-angry stage; bring heat in as it settles."
+    },
+    "faq": [
+     "How does the triple-action actually feel?",
+     "How much do I apply?",
+     "Is it TruShield Certified?",
+     "Which rub for my sore spot?",
+     "Is there a first-order discount?",
+     "Do you have bundles?",
+     "How fast does direct shipping arrive?"
+    ],
+    "note": "Put a Shop sticker on every product frame linking to sportpharm.com."
+   },
+   {
+    "id": "w13",
+    "type": "staticpv",
+    "title": "Post 13 · First-order offer — your first order ships free",
+    "week": "Weeks 1–5 · always-on",
+    "chs": [
+     "Instagram",
+     "Facebook",
+     "Email"
+    ],
+    "eye": "SportPharm · First order",
+    "big": "Your first order\nships free.",
+    "items": [
+     "Free shipping on your first direct order — code FREESHIP1",
+     "Or 10% off your first order (WELCOME10) — we’re testing which converts better",
+     "Shop the full lineup direct at sportpharm.com",
+     "Join for drops & bundle deals (optional)"
+    ],
+    "cta": "Shop your first order — sportpharm.com",
+    "note": "First-order conversion creative — the point is the purchase; it also captures email/SMS for remarketing. Mirrors the on-site pop-up. Confirm free-ship cost vs. 10% before committing."
+   },
+   {
+    "id": "w14",
+    "type": "email",
+    "title": "Post 14 · Cart-abandon flow — 3 emails (core, build before launch)",
+    "week": "Pre-launch infrastructure",
+    "chs": [
+     "Email"
+    ],
+    "emails": [
+     {
+      "s": "Left something in your cart?",
+      "d": "Email 1 (~1 hr): plain reminder with the item image and a one-tap return to checkout. No discount yet — most people just got distracted."
+     },
+     {
+      "s": "“Will I actually feel it?”",
+      "d": "Email 2 (~24 hr): answer the #1 objection with a real customer review + the triple-action explainer (menthol cools, capsaicin quiets, methyl salicylate goes deep)."
+     },
+     {
+      "s": "Here’s free shipping to finish up",
+      "d": "Email 3 (~48 hr): small incentive to recover the near-miss — free shipping (FREESHIP1) or 10% (WELCOME10)."
+     }
+    ],
+    "note": "For a direct-store pivot this is CORE, not optional — build it before launch. Add a parallel browse-abandon flow (viewed a product, didn’t add to cart) and a post-purchase repeat flow (AGAIN10). This is where direct revenue leaks, and where a 3-part flow recovers a meaningful share of near-misses."
+   }
+  ]
+ }
+];

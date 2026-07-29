@@ -52,6 +52,7 @@ const Store = (() => {
       planRules: { ...DEFAULT_PLAN_RULES },
       reminders: SEED_REMINDERS.map((r, i) => ({ resolved: false, ...r, order: i, createdAt: now(), updatedAt: now() })),
       metrics: {},    /* rowKey -> { col: value }, plus .margin — HQ-level rollup */
+      campReview: {}, /* "campId:sec:<key>" | "campId:asset:<id>" -> { status, thread[] } */
       flags: {},      /* one-off markers: migrations, dismissals */
       invites: [],
       activity: [],
@@ -797,6 +798,80 @@ const Store = (() => {
     return refused;
   }
 
+  /* =========================================================================
+     CAMPAIGN REVIEW — native, not embedded.
+
+     Briefs are content (hq-campaign-data.js) and treated as read-only; only
+     the review layer is stored, so a brief can be rewritten without wiping
+     anyone's feedback. Keyed per section and per asset.
+  ========================================================================= */
+  const briefs = () => (typeof CAMPAIGN_BRIEFS !== 'undefined' ? CAMPAIGN_BRIEFS : []);
+  const brief = id => briefs().find(c => c.id === id) || null;
+
+  function reviewOf(key) {
+    const s = load();
+    if (!s.campReview) s.campReview = {};
+    if (!s.campReview[key]) s.campReview[key] = { status: 'pending', thread: [] };
+    if (!s.campReview[key].thread) s.campReview[key].thread = [];
+    return s.campReview[key];
+  }
+  const rk = (campId, part) => campId + ':' + part;
+
+  const reviewState = (campId, part) => reviewOf(rk(campId, part)).status || 'pending';
+  function setReviewState(campId, part, status, label) {
+    const r = reviewOf(rk(campId, part));
+    r.status = status;
+    r.at = now();
+    r.by = (currentUser() || {}).id || null;
+    log((REVIEW_STATES[status] || {}).logged || 'reviewed', label || part);
+    save();
+  }
+
+  const reviewThread = (campId, part) => reviewOf(rk(campId, part)).thread;
+  function addReviewNote(campId, part, text, parentId) {
+    const me = currentUser();
+    if (!me || !text.trim()) return null;
+    const thread = reviewThread(campId, part);
+    const note = { id: uid('n'), by: me.id, at: now(), text: text.trim(), replies: [] };
+    if (parentId) {
+      const parent = thread.find(n => n.id === parentId);
+      if (parent) { parent.replies = parent.replies || []; parent.replies.push(note); }
+    } else {
+      thread.push(note);
+    }
+    log('left a note', part);
+    save();
+    return note;
+  }
+  function removeReviewNote(campId, part, noteId) {
+    const r = reviewOf(rk(campId, part));
+    r.thread = (r.thread || []).filter(n => n.id !== noteId);
+    r.thread.forEach(n => { n.replies = (n.replies || []).filter(x => x.id !== noteId); });
+    save();
+  }
+
+  /* How far through a campaign's assets the team is. */
+  function campaignProgress(campId) {
+    const c = brief(campId);
+    if (!c) return { total: 0, done: 0, approved: 0, changes: 0 };
+    const states = (c.assets || []).map(a => reviewState(campId, 'asset:' + a.id));
+    return {
+      total: states.length,
+      done: states.filter(x => x !== 'pending').length,
+      approved: states.filter(x => x === 'approved').length,
+      changes: states.filter(x => x === 'changes').length
+    };
+  }
+  function campaignNoteCount(campId) {
+    const r = load().campReview || {};
+    let n = 0;
+    Object.keys(r).forEach(k => {
+      if (k.indexOf(campId + ':') !== 0) return;
+      (r[k].thread || []).forEach(t => { n += 1 + (t.replies || []).length; });
+    });
+    return n;
+  }
+
   /* ------------------------------- playbook ------------------------------ */
   /* Ticked operational actions in the launch playbook. Kept in `flags` so they
      survive the plan being rewritten around them. */
@@ -933,6 +1008,8 @@ const Store = (() => {
     addArticleNote, removeArticleNote, noteCount,
     media, mediaItem, addMedia, updateMedia, removeMedia, mediaUsedBy,
     metricsOf, setMetric, setMargin,
+    briefs, brief, reviewState, setReviewState, reviewThread,
+    addReviewNote, removeReviewNote, campaignProgress, campaignNoteCount,
     addIdea, voteIdea, setIdeaState, removeIdea, promoteIdea, ideaToArticle,
     platforms, platform, addPlatform, updatePlatform, removePlatform, setPlatformStatus,
     reminders, reminder, addReminder, updateReminder, toggleReminder, removeReminder,

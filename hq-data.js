@@ -126,7 +126,30 @@ const SEED_PROJECTS = [
    table and approval lives in the Content Studio — campaigns/index.html —
    which is mounted inside HQ and talks to its own Supabase project. Opening a
    campaign here deep-links into it with ?c=<id>. */
-const CAMPAIGN_STUDIO = 'campaigns/index.html';
+/* Where a section or asset stands in review. */
+const REVIEW_STATES = {
+  pending:  { label: 'Not looked at', tone: 'muted', logged: 'reopened' },
+  approved: { label: 'Approved',      tone: 'green', logged: 'approved' },
+  changes:  { label: 'Needs changes', tone: 'red',   logged: 'asked for changes' }
+};
+
+/* The brief sections, in the order they read. */
+const BRIEF_SECTIONS = [
+  { key: 'platform',    label: 'Campaign Platform' },
+  { key: 'strategy',    label: 'The Strategy' },
+  { key: 'offers',      label: 'Offers & Incentives' },
+  { key: 'messages',    label: 'Message Hierarchy' },
+  { key: 'structure',   label: 'Campaign Structure' },
+  { key: 'calendar',    label: 'Weekly Calendar' },
+  { key: 'stories',     label: 'Supporting Stories' },
+  { key: 'adaptations', label: 'Platform Adaptations' },
+  { key: 'paidAds',     label: 'Paid Ads · Meta' },
+  { key: 'creators',    label: 'Creator Cross-Promotion' },
+  { key: 'landing',     label: 'Landing Page' },
+  { key: 'visual',      label: 'Visual Direction' },
+  { key: 'guardrails',  label: 'Claim & Compliance Guardrails' },
+  { key: 'metrics',     label: 'Metrics' }
+];
 
 /* The one campaign actually in flight. Project Planning's Campaign view shows
    only this by default so it reads as "what does the push still need" rather
