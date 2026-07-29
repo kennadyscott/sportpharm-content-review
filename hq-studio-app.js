@@ -2025,6 +2025,18 @@ function adminHTML(){
 async function boot(){
   LIVE = true;                       /* HQ's store is the shared one */
   sessionEmail = HQStudioBridge.email();
+  /* The badge used to describe the Studio's own Supabase connection. HQ holds
+     the data now, so it has to describe HQ's — saying DEMO MODE while edits
+     genuinely persist would be worse than saying nothing. */
+  var _b = SCOPED('mode-badge');
+  if(_b){
+    var shared = (typeof Cloud !== 'undefined' && Cloud.enabled);
+    _b.textContent = shared ? 'Shared with the team' : 'Saved on this device';
+    _b.className = shared ? 'mode-badge' : 'mode-badge off';
+    _b.title = shared
+      ? 'Approvals and notes sync to everyone in HQ.'
+      : 'Saved in HQ on this browser. Connect Supabase in hq-config.js so the team sees it.';
+  }
   var _solo = HQStudioBridge.campaignId();
   if(_solo && STRANDS.some(function(s){return s.id===_solo;})){
     soloMode = true; activeId = _solo; ROOT.classList.add("solo");
