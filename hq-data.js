@@ -671,6 +671,9 @@ const PLAN_FORMATS = ['Post', 'Carousel', 'Reel', 'Stories', 'Email', 'Blog', 'M
 
 const DEFAULT_PLAN_RULES = {
   requireReview: true,
+  /* The campaign signs off the creative before the Plan schedules it. Only a
+     definite "needs changes" blocks — silence from the Studio does not. */
+  requireBriefApproval: true,
   avoidWeekends: true,
   perWeek: 4
 };

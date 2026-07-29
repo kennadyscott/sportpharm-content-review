@@ -758,6 +758,19 @@ const Store = (() => {
 
   /* Honors the require-review rule: a drafting piece cannot jump straight to
      scheduled. Returns the titles it refused so the UI can say why. */
+  /* The Studio signs off creative before the Plan schedules it. We only refuse
+     on a definite negative verdict — if the Studio has said nothing about a
+     piece, that is silence, not rejection, and blocking on silence would make
+     the Plan unusable. */
+  function briefBlocks(p) {
+    const rules = planRules();
+    if (!rules.requireBriefApproval) return null;
+    if (!p.assetId || typeof StudioSync === 'undefined') return null;
+    const v = StudioSync.assetStatus(p.campaign, p.assetId);
+    if (!v || v.ok) return null;
+    return v.label;
+  }
+
   function bulkStatus(ids, status) {
     const rules = planRules();
     const refused = [];
@@ -765,6 +778,7 @@ const Store = (() => {
       const p = piece(id);
       if (!p) return;
       if (status === 'scheduled' && rules.requireReview && p.status === 'drafting') { refused.push(p.title); return; }
+      if (status === 'scheduled' && briefBlocks(p)) { refused.push(p.title + ' — brief ' + briefBlocks(p).toLowerCase()); return; }
       p.status = status;
       p.updatedAt = now();
     });
@@ -789,7 +803,7 @@ const Store = (() => {
   function bulkSchedule(ids, startDate) {
     const rules = planRules();
     const all = ids.map(piece).filter(Boolean);
-    const eligible = all.filter(p => !(rules.requireReview && p.status === 'drafting'));
+    const eligible = all.filter(p => !(rules.requireReview && p.status === 'drafting') && !briefBlocks(p));
     const refused = all.filter(p => eligible.indexOf(p) === -1).map(p => p.title);
     const dates = nextDates(startDate, eligible.length);
     eligible.forEach((p, i) => { p.status = 'scheduled'; p.date = dates[i]; p.updatedAt = now(); });
@@ -1014,7 +1028,7 @@ const Store = (() => {
     platforms, platform, addPlatform, updatePlatform, removePlatform, setPlatformStatus,
     reminders, reminder, addReminder, updateReminder, toggleReminder, removeReminder,
     pieces, piece, planRules, setPlanRules, addPiece, updatePiece, removePieces,
-    bulkStatus, bulkMove, bulkSchedule, nextDates,
+    bulkStatus, bulkMove, bulkSchedule, nextDates, briefBlocks,
     invite, setRole, removeUser, setPasscode,
     actionDone, tickAction,
     resetAll

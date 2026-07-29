@@ -17,6 +17,7 @@
     calMonth: null        /* 'YYYY-MM' shown in calendar view */
   };
 
+  let wiredSync = false;
   let pbOpen = null;   /* week index open; null = auto (today's week) */
   let pbHidden = false;
 
@@ -27,7 +28,7 @@
     const fchip = p.facing ? `<span class="face-chip fc-${p.facing}">${FACING[p.facing].short}</span>` : '';
     return `<tr class="pl-row ${checked ? 'sel' : ''}" data-piece="${p.id}">
       <td class="pl-ck"><input type="checkbox" data-sel="${p.id}" ${checked ? 'checked' : ''} aria-label="Select ${esc(p.title)}"></td>
-      <td class="pl-title">${esc(p.title)} ${fchip}${p.assetId ? '<span class="pl-linked" title="Has a brief in the Content Studio">brief</span>' : ''}</td>
+      <td class="pl-title">${esc(p.title)} ${fchip}${approvalChip(p)}</td>
       <td><span class="pl-fmt fmt-${p.format.toLowerCase()}">${esc(p.format)}</span></td>
       <td><span class="tag t-${ch.tone}">${esc(ch.label)}</span></td>
       <td><span class="pl-st t-${st.tone}"><i></i>${st.label}</span></td>
@@ -136,6 +137,36 @@
     </section>`;
   }
 
+  /* What the Content Studio says about this piece's creative. Three states,
+     and "not heard" is deliberately distinct from "not approved". */
+  function approvalChip(p) {
+    if (!p.assetId) return '';
+    if (typeof StudioSync === 'undefined') return '';
+    const v = StudioSync.assetStatus(p.campaign, p.assetId);
+    if (!v) return `<span class="pl-appr unknown" title="The Studio hasn’t recorded a verdict for this asset">brief</span>`;
+    return `<span class="pl-appr ${v.ok ? 'ok' : 'no'}" title="${esc(v.label)} in the Content Studio">${
+      v.ok ? '✓ approved' : esc(v.label.toLowerCase())}</span>`;
+  }
+
+  /* Says plainly where the approval data is coming from, and when it is not. */
+  function syncBanner() {
+    if (typeof StudioSync === 'undefined') return '';
+    const st = StudioSync.state;
+    const sum = StudioSync.summarise(Store.pieces());
+    if (st === 'loading' || st === 'idle') return `<div class="pl-sync">Checking the Studio for approvals…</div>`;
+    if (st === 'error') return `<div class="pl-sync bad">Couldn’t reach the Content Studio — ${esc(StudioSync.error)}.
+      Approval status below is unavailable, not negative.</div>`;
+    if (st === 'empty') return `<div class="pl-sync warn">
+      <b>The Studio has no approvals recorded yet.</b> It only saves to the shared database when a
+      reviewer is <em>signed in</em> — signed out, their sign-off stays in their own browser and
+      nothing here can see it. Worth confirming with Brandon and Jessie before a real review round.</div>`;
+    return `<div class="pl-sync ok">
+      <b>${sum.approved}</b> of ${sum.linked} briefed pieces approved in the Studio${
+        sum.changes ? ` · <b>${sum.changes}</b> need changes` : ''}${
+        sum.unknown ? ` · ${sum.unknown} not yet reviewed` : ''}.
+      <span>Read-only — approving happens in Campaigns.</span></div>`;
+  }
+
   const campOf = id => Store.campaign(id);
   const stOf = s => PLAN_STATUS[s] || PLAN_STATUS.drafting;
   const chOf = c => CHANNELS[c] || { label: c, tone: 'blue' };
@@ -212,7 +243,7 @@
     const fchip = p.facing ? `<span class="face-chip fc-${p.facing}">${FACING[p.facing].short}</span>` : '';
     return `<tr class="pl-row ${checked ? 'sel' : ''}" data-piece="${p.id}">
       <td class="pl-ck"><input type="checkbox" data-sel="${p.id}" ${checked ? 'checked' : ''} aria-label="Select ${esc(p.title)}"></td>
-      <td class="pl-title">${esc(p.title)} ${fchip}${p.assetId ? '<span class="pl-linked" title="Has a brief in the Content Studio">brief</span>' : ''}</td>
+      <td class="pl-title">${esc(p.title)} ${fchip}${approvalChip(p)}</td>
       <td>${c ? `<span class="pl-camp">${esc(c.title)}</span>` : '<span class="pl-dim">—</span>'}</td>
       <td><span class="pl-fmt fmt-${p.format.toLowerCase()}">${esc(p.format)}</span></td>
       <td><span class="tag t-${ch.tone}">${esc(ch.label)}</span></td>
@@ -333,6 +364,8 @@
           <span class="role-sep"></span>
           <span class="role-mine">${svg('cal')}<b>Content Plan</b> — scheduled &amp; shipped</span>
         </div>
+
+        ${syncBanner()}
 
         ${playbookHTML()}
 
@@ -488,6 +521,13 @@
         const p = Store.addPiece({});
         HQ.render(); openPieceSheet(p.id);
       });
+      if (typeof StudioSync !== 'undefined') {
+        StudioSync.refresh();
+        if (!wiredSync) {
+          wiredSync = true;
+          StudioSync.onChange(() => { if (HQ.route().view === 'plan') HQ.render(); });
+        }
+      }
       if (HQ.wireProjToggle) HQ.wireProjToggle(root);
       const rb = root.querySelector('#pl-rules');
       if (rb) rb.addEventListener('click', openRulesSheet);
