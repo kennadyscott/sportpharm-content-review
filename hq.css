@@ -1803,3 +1803,40 @@ ol.b-list li::marker { color: var(--red); font-weight: 700; }
 }
 .pl-hint { display: block; font-size: .74rem; color: var(--ink-faint); line-height: 1.5; margin-top: .35rem; }
 .pl-hint code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem; color: var(--ink-soft); }
+
+/* Who owns what — Campaigns approves the creative, Content Plan ships it */
+.role-bar {
+  display: flex; align-items: center; gap: .7rem; flex-wrap: wrap;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 999px;
+  padding: .4rem .5rem .4rem .9rem; margin-bottom: 1.1rem; width: fit-content; max-width: 100%;
+}
+.role-mine, .role-other {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .8rem; color: var(--ink-soft); white-space: nowrap;
+}
+.role-mine { color: var(--navy); }
+.role-mine b { color: var(--navy); }
+.role-mine svg { width: 14px; height: 14px; color: var(--green); }
+.role-other { border-radius: 999px; padding: .25rem .7rem; transition: background .12s ease; }
+.role-other:hover { background: var(--line-soft); color: var(--navy); }
+.role-other svg { width: 14px; height: 14px; color: var(--ink-faint); }
+.role-sep { width: 1px; height: 16px; background: var(--line); flex: none; }
+@media (max-width: 620px) { .role-bar { border-radius: 14px; } }
+
+/* Project Planning — which campaign the Campaign view is scoped to */
+.camp-scope {
+  display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+  background: var(--paper); border: 1px solid var(--line);
+  border-left: 3px solid var(--red); border-radius: 12px;
+  padding: .55rem .8rem; margin-bottom: .9rem;
+}
+.camp-scope-now { display: inline-flex; align-items: center; gap: .45rem; font-size: .86rem; color: var(--ink-soft); }
+.camp-scope-now svg { width: 15px; height: 15px; color: var(--red); }
+.camp-scope-now b { color: var(--navy); }
+.camp-scope-now i {
+  font-style: normal; font-size: .64rem; font-weight: 800; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--red); background: #FDE9E8;
+  padding: .1rem .4rem; border-radius: 999px;
+}
+.camp-scope .btn:last-child { margin-left: auto; }
+.camp-scope .btn svg { width: 14px; height: 14px; }

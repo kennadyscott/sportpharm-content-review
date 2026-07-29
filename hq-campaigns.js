@@ -39,6 +39,12 @@
         </div>
       </div>
 
+      <div class="role-bar">
+        <span class="role-mine">${svg('check')}<b>Campaigns</b> — creative approval</span>
+        <span class="role-sep"></span>
+        <button class="role-other" data-go="#/plan">${svg('cal')}<b>Content Plan</b> — scheduled &amp; shipped</button>
+      </div>
+
       <div class="metric-grid" style="margin-bottom:1.2rem">
         <div class="metric-card big"><h3>${t.campaigns}</h3><p>Campaigns briefed</p></div>
         <div class="metric-card big"><h3>${t.assets}</h3><p>Assets drafted for review</p></div>

@@ -247,6 +247,7 @@
      Monthly answers "what lands this month"; Campaign answers "what does the
      Feel It Work push still need". Nothing moves — only the grouping. */
   let projView = 'project';   /* month | project | campaign */
+  let showAllCampaigns = false;
 
   const VIEWS = [
     ['month',    'Monthly',  'By the month it’s due'],
@@ -299,11 +300,14 @@
 
     tasks.forEach(t => push(t.campaign || '', t));
     const order = Store.campaigns().map(c => c.id);
-    const keys = [...map.keys()].sort((a, b) => {
+    let keys = [...map.keys()].sort((a, b) => {
       if (!a) return 1;
       if (!b) return -1;
       return order.indexOf(a) - order.indexOf(b);
     });
+    /* Default to the campaign actually in flight — the other ten are briefed,
+       not being worked. `showAllCampaigns` opens the rest. */
+    if (!showAllCampaigns) keys = keys.filter(k => k === CURRENT_CAMPAIGN);
     return keys.map(k => {
       const c = Store.campaign(k);
       return {
@@ -344,6 +348,9 @@
       campaign: 'The same tasks, read as "what does this campaign still need before it can run".'
     }[projView];
 
+    const cur = Store.campaign(CURRENT_CAMPAIGN);
+    const otherCount = Store.campaigns().length - 1;
+
     return `<div class="wrap">
       <div class="page-head">
         <div><h1>Project Planning</h1><p>${esc(blurb)}</p></div>
@@ -357,6 +364,16 @@
         ${VIEWS.map(([k, label, hint]) =>
           `<button data-pview="${k}" class="${projView === k ? 'on' : ''}" title="${esc(hint)}">${label}</button>`).join('')}
       </div>
+
+      ${projView === 'campaign' ? `
+        <div class="camp-scope">
+          <span class="camp-scope-now">${svg('mega')}<b>${esc(cur ? cur.title : 'Current campaign')}</b>
+            <i>in flight</i></span>
+          <button class="btn btn-outline btn-sm" id="camp-scope-toggle">
+            ${showAllCampaigns ? 'Just the current campaign' : 'See all campaigns (' + otherCount + ' more)'}
+          </button>
+          <button class="btn btn-ghost btn-sm" data-go="#/campaigns">Open the Studio${svg('arrow')}</button>
+        </div>` : ''}
 
       ${projView === 'project' ? projectCards() : groupedView(projView)}
     </div>`;
@@ -610,6 +627,8 @@
       } else {
         root.querySelectorAll('[data-pview]').forEach(b =>
           b.addEventListener('click', () => { projView = b.dataset.pview; HQ.render(); }));
+        const cs = root.querySelector('#camp-scope-toggle');
+        if (cs) cs.addEventListener('click', () => { showAllCampaigns = !showAllCampaigns; HQ.render(); });
         wireTaskRows(root);
         const np = root.querySelector('#new-project');
         if (np) np.addEventListener('click', () => {

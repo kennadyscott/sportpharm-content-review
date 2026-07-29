@@ -128,6 +128,11 @@ const SEED_PROJECTS = [
    campaign here deep-links into it with ?c=<id>. */
 const CAMPAIGN_STUDIO = 'campaigns/index.html';
 
+/* The one campaign actually in flight. Project Planning's Campaign view shows
+   only this by default so it reads as "what does the push still need" rather
+   than a wall of eleven. Change this line when the next one starts. */
+const CURRENT_CAMPAIGN = 'wasabi-direct';
+
 const SEED_CAMPAIGNS = [
   { id: 'wasabi-direct', title: 'Feel It Work', strand: 'Direct-to-site sales — WasabiRub & the rub lineup',
     prio: 'Revenue priority', tone: 'red', assets: 14, channels: ['IG', 'FB', 'Email', 'LinkedIn'],

@@ -326,6 +326,12 @@
           </div>
         </div>
 
+        <div class="role-bar">
+          <button class="role-other" data-go="#/campaigns">${svg('check')}<b>Campaigns</b> — creative approval</button>
+          <span class="role-sep"></span>
+          <span class="role-mine">${svg('cal')}<b>Content Plan</b> — scheduled &amp; shipped</span>
+        </div>
+
         ${playbookHTML()}
 
         <div class="today-pills" style="margin-bottom:1rem">${counts}</div>

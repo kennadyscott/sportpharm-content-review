@@ -247,16 +247,16 @@ const HQ = (() => {
 
   /* ============================== ROUTER ============================== */
   const CONTENT_KIDS = [
-    { id: 'content', label: 'Articles', icon: 'pen' },
-    { id: 'media',   label: 'Media',    icon: 'image' },
-    { id: 'plan',    label: 'Plan',     icon: 'cal' }
+    { id: 'content',   label: 'Articles',  icon: 'pen' },
+    { id: 'ideas',     label: 'Idea Bank', icon: 'bulb' },
+    { id: 'media',     label: 'Media',     icon: 'image' },
+    { id: 'campaigns', label: 'Campaigns', icon: 'mega' }
   ];
   const NAV = [
     { id: 'today',     label: 'Today',            icon: 'today' },
     { id: 'projects',  label: 'Project Planning', icon: 'board' },
-    { id: 'ideas',     label: 'Idea Bank',        icon: 'bulb' },
+    { id: 'plan',      label: 'Content Plan',     icon: 'cal' },
     { parent: 'Content', icon: 'doc', children: CONTENT_KIDS },
-    { id: 'campaigns', label: 'Campaigns', icon: 'mega' },
     { id: 'strategy',  label: 'Branding',  icon: 'quote' },
     { id: 'analytics', label: 'Analytics', icon: 'chart' },
     { id: 'platforms', label: 'Platforms', icon: 'coin' },
@@ -293,6 +293,7 @@ const HQ = (() => {
     const me = Store.currentUser();
     const c = counts();
     const badge = { projects: c.open, content: c.content, ideas: c.ideas, platforms: c.evaluating, plan: c.planning };
+    /* the Content parent rolls up only its own children, not Content Plan */
     const link = (n, sub) => `
       <a class="rail-link ${sub ? 'sub' : ''} ${n.id === v ? 'on' : ''}" href="#/${n.id}">
         ${svg(n.icon)}<span>${n.label}</span>
