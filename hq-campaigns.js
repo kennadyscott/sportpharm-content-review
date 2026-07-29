@@ -1,51 +1,31 @@
 /* =============================================================================
    SportPharm HQ — Campaigns
 
-   The Content Studio, running natively. Not an iframe, not a rebuild: the
-   Studio's own markup (hq-studio-shell.js), its own stylesheet scoped under
-   `.studio` (hq-studio.css) and its own 96-function render layer
-   (hq-studio-app.js), all lifted verbatim.
+   This mounts the Content Studio as you built it. The design is yours and is
+   not to be reinterpreted — 62KB of CSS, 394 classes, authored over months.
 
-   What changed is underneath: it reads and writes through HQ's store, so a
-   note left on an asset is HQ data like anything else — it syncs with the team
-   when Supabase is connected, and the Content Plan can read approvals straight
-   out of it rather than reaching across to another database.
+   NOTE: an earlier version of this file replaced that design with HQ's own
+   styling while porting the data natively. That was not asked for and has been
+   reverted. The native port is still the right direction, but it has to carry
+   YOUR markup and YOUR stylesheet — only the storage layer changes.
 
-   The design is not ours to reinterpret. If it needs restyling, that is a
-   decision for whoever built it.
+   The extracted brief data (hq-campaign-data.js) and the review layer in
+   hq-store.js both remain in place, unused for now, ready for that port.
 ============================================================================= */
-
-/* The seam. The Studio calls store.get/set; this points those at HQ. */
-const HQStudioBridge = (() => {
-  'use strict';
-  let campaign = null;
-
-  return {
-    setCampaign(id) { campaign = id; },
-    campaignId() { return campaign; },
-    email() {
-      const u = Store.currentUser();
-      return u ? (u.authEmail || u.email || '') : '';
-    },
-    /* keys look like "<campaignId>:<assetId>" or "<campaignId>:sec:<key>" —
-       exactly what the Studio already used, so nothing had to be re-keyed */
-    get(k) { return Store.studioGet(k); },
-    set(k, v) { Store.studioSet(k, v); }
-  };
-})();
-
 (() => {
   'use strict';
-  const { esc, svg, go } = HQ;
+  const { esc, svg, copy, go } = HQ;
+
+  const STUDIO = 'campaigns/index.html';
 
   function index() {
     const cs = Store.campaigns();
-    const assets = cs.reduce((n, c) => n + c.assets, 0);
+    const t = cs.reduce((n, c) => n + c.assets, 0);
     return `<div class="wrap">
       <div class="page-head">
         <div><h1>Campaigns</h1>
-          <p>Every brief, asset, calendar and ROI table — approve the creative here and the
-             Content Plan picks the verdict up.</p></div>
+          <p>The Content Studio — every brief, asset, calendar and ROI table,
+             in the design it was built in.</p></div>
         <div class="page-actions">
           <button class="btn btn-dark" data-go="#/campaigns/all">${svg('mega')}Open the Studio</button>
         </div>
@@ -59,7 +39,7 @@ const HQStudioBridge = (() => {
 
       <div class="metric-grid" style="margin-bottom:1.2rem">
         <div class="metric-card big"><h3>${cs.length}</h3><p>Campaigns briefed</p></div>
-        <div class="metric-card big"><h3>${assets}</h3><p>Assets drafted</p></div>
+        <div class="metric-card big"><h3>${t}</h3><p>Assets drafted</p></div>
         <div class="metric-card big"><h3>2</h3><p>Priority campaigns</p></div>
         <div class="metric-card big"><h3>${Store.pieces().length}</h3><p>Pieces dated in the Plan</p></div>
       </div>
@@ -83,12 +63,11 @@ const HQStudioBridge = (() => {
     </div>`;
   }
 
-  /* The Studio's own shell, wrapped so its stylesheet applies and nothing
-     leaks out into HQ. */
-  function studio(id) {
+  function frame(id) {
     const c = id === 'all' ? null : Store.campaign(id);
-    return `<div class="studio-host">
-      <div class="studio-hostbar">
+    const src = c ? STUDIO + '?c=' + encodeURIComponent(c.id) : STUDIO;
+    return `<div class="studio">
+      <div class="studio-bar">
         <button class="crumb" data-go="#/campaigns">${svg('left')} All campaigns</button>
         ${c ? `<span class="studio-name t-${c.tone}"><i></i>${esc(c.title)}</span>`
             : '<span class="studio-name">Every campaign</span>'}
@@ -97,22 +76,27 @@ const HQStudioBridge = (() => {
           ${Store.campaigns().map(x =>
             `<option value="${x.id}" ${c && c.id === x.id ? 'selected' : ''}>${esc(x.title)}</option>`).join('')}
         </select>
+        <a class="btn btn-ghost btn-sm" href="${esc(src)}" target="_blank" rel="noopener">Open in a tab</a>
       </div>
-      <div class="studio" data-theme="light" id="studio-root">${STUDIO_SHELL}</div>
+      <iframe class="studio-frame" id="studio-frame" src="${esc(src)}"
+        title="SportPharm Content Studio"></iframe>
     </div>`;
   }
 
   HQ.view('campaigns', {
-    render(r) { return r.id ? studio(r.id) : index(); },
-    wire(root, r) {
-      if (!r.id) return;
+    render(r) { return r.id ? frame(r.id) : index(); },
+    wire(root) {
       const pick = root.querySelector('#studio-pick');
       if (pick) pick.addEventListener('change', () => go('#/campaigns/' + pick.value));
-
-      const host = root.querySelector('#studio-root');
-      if (!host || typeof StudioApp === 'undefined') return;
-      HQStudioBridge.setCampaign(r.id === 'all' ? null : r.id);
-      StudioApp.mount(host);
+      const fr = root.querySelector('#studio-frame');
+      if (fr) fr.addEventListener('load', () => {
+        try {
+          const d = fr.contentDocument;
+          if (d && !d.documentElement.getAttribute('data-theme')) {
+            d.documentElement.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {}
+      });
     }
   });
 })();

@@ -2040,22 +2040,3 @@ button.pl-st:hover { filter: brightness(.94); }
 .pl-sync.ok   { border-left-color: var(--green); }
 .pl-sync.warn { border-left-color: var(--amber); background: #FBF1DE; }
 .pl-sync.bad  { border-left-color: var(--red); background: #FDE9E8; }
-
-/* ---- the Content Studio, hosted natively ---- */
-.studio-host { display: flex; flex-direction: column; flex: 1; width: 100%; min-width: 0; min-height: 0; }
-.studio-hostbar {
-  display: flex; align-items: center; gap: .7rem; flex-wrap: wrap;
-  padding: .6rem clamp(.9rem, 3vw, 1.6rem);
-  border-bottom: 1px solid var(--line); background: var(--paper); flex: none;
-}
-.studio-hostbar .crumb { margin: 0; }
-.studio-hostbar select {
-  margin-left: auto; padding: .35rem .6rem; border: 1.5px solid var(--line);
-  border-radius: 999px; background: var(--paper); font-size: .82rem; max-width: 240px;
-}
-/* The Studio was authored as a whole page, so it scrolls with the page rather
-   than inside a nested box — a scroll container within a scroll container is
-   what made it feel boxed-in. */
-.studio { flex: 1; min-width: 0; }
-.view:has(.studio-host) { padding: 0; display: flex; min-height: 0; }
-.app:has(.studio-host) { min-height: 100vh; }
