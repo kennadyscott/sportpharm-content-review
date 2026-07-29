@@ -504,8 +504,8 @@
           ${svg('mega')}
           <div>
             <h2>The brief</h2>
-            <p>Fourteen sections and ${c.assets} drafted assets — read it, approve the creative and
-               leave notes, all in HQ.</p>
+            <p>The brief as built — ${c.assets} drafted assets, the weekly calendar, the
+               guardrails. Creative approval happens in here.</p>
           </div>
           <button class="btn btn-dark btn-sm" data-go="#/campaigns/${esc(c.id)}">Open the brief${svg('arrow')}</button>
         </div>
