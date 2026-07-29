@@ -1864,3 +1864,40 @@ ol.b-list li::marker { color: var(--red); font-weight: 700; }
   background: var(--bg-2); padding: .1rem .4rem; border-radius: 999px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;
 }
+
+/* ------------- Campaign cockpit: the whole campaign on one page ------------- */
+.cc-stats { margin-bottom: 1rem; }
+.cc-work { margin-bottom: 1.3rem; }
+
+.cc-pieces { display: grid; gap: .15rem; max-height: 420px; overflow-y: auto; }
+.cc-piece {
+  display: flex; align-items: center; gap: .7rem; text-align: left; width: 100%;
+  padding: .5rem .55rem; border-radius: 9px; transition: background .12s ease;
+}
+.cc-piece:hover { background: var(--line-soft); }
+.cc-piece-date {
+  font-size: .72rem; font-weight: 700; color: var(--ink-faint);
+  min-width: 3.4rem; flex: none; white-space: nowrap;
+}
+.cc-piece-body { flex: 1; min-width: 0; }
+.cc-piece-title {
+  display: block; font-size: .86rem; font-weight: 500; color: var(--navy);
+  line-height: 1.35; overflow: hidden; text-overflow: ellipsis;
+}
+.cc-piece-meta { display: block; font-size: .72rem; color: var(--ink-faint); margin-top: .05rem; }
+
+.cc-brief {
+  background: var(--paper); border: 1px solid var(--line);
+  border-top: 3px solid var(--red); border-radius: 16px; overflow: hidden;
+}
+.cc-brief-head {
+  display: flex; align-items: center; gap: .8rem;
+  padding: .9rem 1.1rem; border-bottom: 1px solid var(--line);
+}
+.cc-brief-head > svg { width: 20px; height: 20px; color: var(--red); flex: none; }
+.cc-brief-head h2 { font-size: 1.05rem; }
+.cc-brief-head p { font-size: .78rem; color: var(--ink-faint); line-height: 1.5; margin-top: .1rem; max-width: 62ch; }
+.cc-brief-head .btn { margin-left: auto; flex: none; }
+/* tall enough to actually read a brief in, short enough that the work above
+   is still reachable without a long scroll back */
+.cc-brief-frame { width: 100%; height: 78vh; min-height: 520px; border: none; display: block; background: var(--bg); }

@@ -397,6 +397,78 @@
     });
   }
 
+  /* Everything about the campaign in flight, on one page: its tasks, its dated
+     pieces, and the actual brief embedded from the Content Studio — so you can
+     read what was agreed without leaving the place you plan the work. */
+  function campaignCockpit() {
+    const c = Store.campaign(CURRENT_CAMPAIGN);
+    if (!c) return groupedView('campaign');
+
+    const tasks = Store.allTasks().filter(t => t.campaign === c.id);
+    const openTasks = tasks.filter(t => t.status !== 'shipped');
+    const pieces = Store.pieces().filter(p => p.campaign === c.id)
+      .sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999'));
+    const linked = pieces.filter(p => p.assetId).length;
+
+    const pieceRow = p => {
+      const st = PLAN_STATUS[p.status] || PLAN_STATUS.drafting;
+      const ch = CHANNELS[p.channel] || { label: p.channel, tone: 'blue' };
+      const d = p.date ? dueLabel(p.date) : null;
+      return `<button class="cc-piece" data-piece="${p.id}">
+        <span class="cc-piece-date">${p.date ? esc(new Date(p.date + 'T12:00:00')
+          .toLocaleDateString(undefined, { month: 'short', day: 'numeric' })) : '—'}</span>
+        <span class="cc-piece-body">
+          <span class="cc-piece-title">${esc(p.title)}${p.assetId
+            ? '<span class="pl-linked">brief</span>' : ''}</span>
+          <span class="cc-piece-meta">${esc(p.format)} · ${esc(ch.label)}</span>
+        </span>
+        <span class="pl-st t-${st.tone}"><i></i>${st.label}</span>
+      </button>`;
+    };
+
+    return `
+      <div class="metric-grid cc-stats">
+        <div class="metric-card stat"><h3>${c.assets}</h3><p>Assets briefed</p></div>
+        <div class="metric-card stat"><h3>${openTasks.length}</h3><p>Tasks still open</p></div>
+        <div class="metric-card stat"><h3>${pieces.length}</h3><p>Pieces dated</p></div>
+        <div class="metric-card stat"><h3>${linked}</h3><p>Linked to a brief</p></div>
+      </div>
+
+      <div class="col-2 stack cc-work">
+        <section class="panel">
+          <div class="panel-head"><h2>What it still needs</h2>
+            <span class="note">${openTasks.length} open</span></div>
+          ${tasks.length ? tasks.map(taskRow).join('')
+            : '<p class="panel-empty">No tasks tagged to this campaign yet.</p>'}
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><h2>What ships, and when</h2>
+            <span class="note">from the Content Plan</span></div>
+          <div class="cc-pieces">
+            ${pieces.length ? pieces.map(pieceRow).join('')
+              : '<p class="panel-empty">Nothing dated yet.</p>'}
+          </div>
+        </section>
+      </div>
+
+      <section class="cc-brief">
+        <div class="cc-brief-head">
+          ${svg('mega')}
+          <div>
+            <h2>The brief</h2>
+            <p>Live from the Content Studio — the same one Brandon and Jessie review.
+               Creative approval happens in here.</p>
+          </div>
+          <a class="btn btn-ghost btn-sm" href="campaigns/index.html?c=${esc(c.id)}"
+             target="_blank" rel="noopener">Open in a tab</a>
+        </div>
+        <iframe class="cc-brief-frame" id="cc-brief-frame"
+          src="campaigns/index.html?c=${esc(c.id)}"
+          title="${esc(c.title)} — campaign brief"></iframe>
+      </section>`;
+  }
+
   function projectCards() {
     const ps = Store.projects();
     return `<div class="proj-grid">
@@ -510,6 +582,7 @@
 
       ${projView === 'project' ? projectCards()
         : projView === 'tasks' ? taskBoard()
+        : projView === 'campaign' && !showAllCampaigns ? campaignCockpit()
         : groupedView(projView)}
     </div>`;
   }
@@ -765,6 +838,17 @@
         if (cs) cs.addEventListener('click', () => { showAllCampaigns = !showAllCampaigns; HQ.render(); });
         wireTaskRows(root);
         wireTaskBoard(root);
+        root.querySelectorAll('[data-piece]').forEach(b =>
+          b.addEventListener('click', () => go('#/plan')));
+        const bf = root.querySelector('#cc-brief-frame');
+        if (bf) bf.addEventListener('load', () => {
+          try {
+            const d = bf.contentDocument;
+            if (d && !d.documentElement.getAttribute('data-theme')) {
+              d.documentElement.setAttribute('data-theme', 'light');
+            }
+          } catch (e) {}
+        });
         const np = root.querySelector('#new-project');
         if (np) np.addEventListener('click', () => {
           const proj = Store.createProject({ name: 'New project' });
