@@ -836,6 +836,16 @@ const LAUNCH_STANDING = {
 };
 
 /* -------------------------------- ideas ---------------------------------- */
+/* A running log to start from — undated, which is what puts them in the log
+   rather than on a day. Tags are free text; they group by eye, not by schema. */
+const SEED_TODOS = [
+  { id: 'td1', title: 'Compress the site imagery — the ~2MB PNG pass', tag: 'Website' },
+  { id: 'td2', title: 'Chase the TruShield one-pager copy', tag: 'Clean Sport' },
+  { id: 'td3', title: 'Confirm FREESHIP1 is live in-store before week one', tag: 'Feel It Work' },
+  { id: 'td4', title: 'Ask Brandon who signs off articles', tag: 'CMS' },
+  { id: 'td5', title: 'Sideline Ready checklist — get the download made', tag: 'Sideline Ready' }
+];
+
 const SEED_IDEAS = [
   { id: 'i1', text: 'A "what does this ingredient actually do" explainer series — menthol, capsaicin, methyl salicylate, lidocaine', by: 'u-jessie', area: 'content', votes: 2, state: 'open' },
   { id: 'i2', text: 'Let athletic trainers request a kit audit directly from the Sideline Ready checklist page', by: 'u-brandon', area: 'pro', votes: 3, state: 'open' },

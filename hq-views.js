@@ -38,45 +38,95 @@
     </div>`;
   }
 
+  /* =========================================================================
+     TODAY — the week, the way ClearK12 organises it.
+
+     Days read downwards, each its own section with everything on it: the items
+     you added, and the project work due that day. A todo with no day is the
+     running log — that is the only thing that separates the two, so moving
+     work between them is just setting or clearing a date.
+
+     Deliberately not carried over: capacity planning and the 1:1. Those answer
+     questions this team has not asked.
+  ========================================================================= */
+  let weekStart = null;                 /* null = the current week */
+  let weekMode = 'day';                 /* day | week */
+
+  const DAY_TONE = ['red', 'amber', 'green', 'blue', 'navy'];
+  const ordinal = n => {
+    const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
+  const longDay = iso => {
+    const d = new Date(iso + 'T12:00:00');
+    return d.toLocaleDateString(undefined, { weekday: 'short' }) + ', ' +
+           d.toLocaleDateString(undefined, { month: 'long' }) + ' ' + ordinal(d.getDate());
+  };
+  const rangeLabel = start => {
+    const a = new Date(start + 'T12:00:00'), b = new Date(Store.addDays(start, 4) + 'T12:00:00');
+    const m = d => d.toLocaleDateString(undefined, { month: 'short' });
+    return m(a) + ' ' + a.getDate() + ' – ' + (m(a) === m(b) ? '' : m(b) + ' ') + b.getDate();
+  };
+
+  /* One line, whether it came from the week or from a project. */
+  function todoRow(t) {
+    const ed = Store.can('edit');
+    return `<div class="wk-row ${t.done ? 'done' : ''}">
+      <input type="checkbox" ${t.done ? 'checked' : ''} data-todock="${t.id}"
+             aria-label="${esc(t.title)}" ${ed ? '' : 'disabled'}>
+      <span class="wk-title" ${ed ? `data-itodo="${t.id}"` : ''}>${esc(t.title)}</span>
+      ${t.repeats ? `<span class="wk-rep" title="Repeats ${esc(t.repeats)}">↻</span>` : ''}
+      ${t.tag ? `<span class="wk-tag">${esc(t.tag)}</span>` : ''}
+      ${ed ? `<button class="wk-x" data-tododel="${t.id}" aria-label="Remove">${svg('close')}</button>` : ''}
+    </div>`;
+  }
+  function taskRowInDay(t) {
+    return `<div class="wk-row from-task" data-task="${t.project.id}:${t.id}" tabindex="0" role="button">
+      <span class="wk-dot t-${areaOf(t.project.area).tone}"></span>
+      <span class="wk-title">${esc(t.title)}</span>
+      <span class="wk-tag from">${esc(t.project.name)}</span>
+    </div>`;
+  }
+
+  function daySection(iso, i) {
+    const { todos: ts, tasks } = Store.dayItems(iso);
+    const total = ts.length + tasks.length;
+    const done = ts.filter(t => t.done).length;
+    const isToday = iso === Store.today();
+    return `<section class="wk-day t-${DAY_TONE[i % DAY_TONE.length]} ${isToday ? 'now' : ''}">
+      <div class="wk-day-head">
+        <h3>${esc(longDay(iso))}</h3>
+        ${isToday ? '<span class="wk-today">Today</span>' : ''}
+        <span class="wk-count">${done}/${total}</span>
+      </div>
+      ${total ? ts.map(todoRow).join('') + tasks.map(taskRowInDay).join('')
+              : '<p class="wk-empty">Nothing planned.</p>'}
+      ${Store.can('edit') ? `<form class="wk-add" data-addday="${iso}">
+        <input placeholder="+ add item" aria-label="Add an item to ${esc(longDay(iso))}">
+      </form>` : ''}
+    </section>`;
+  }
+
   HQ.view('today', {
     render() {
       const me = Store.currentUser();
-      const tasks = Store.allTasks();
-      const mine = tasks.filter(t => t.owner === me.id && t.status !== 'shipped');
-      const moving = tasks.filter(t => t.status === 'building' || t.status === 'review');
-      const soon = tasks.filter(t => t.due && t.status !== 'shipped' && daysSince(t.due) > -8)
-        .sort((a, b) => a.due.localeCompare(b.due)).slice(0, 5);
-      const quiet = tasks.filter(t => t.status !== 'shipped' && daysSince(t.updatedAt) > 14)
-        .sort((a, b) => a.updatedAt.localeCompare(b.updatedAt)).slice(0, 4);
+      const start = weekStart || Store.mondayOf(Store.today());
+      const days = Store.weekDays(start);
+      const log = Store.runningLog();
+      const assigned = Store.assignedToMe();
+      const logDone = log.filter(t => t.done).length;
 
-      /* the content queue — what is actually stuck waiting on a person */
-      const stats = Store.articleStats();
-      const inReview = Store.articles().filter(a => a.status === 'review');
-      const sendBacks = Store.articles().filter(a => a.status === 'changes');
-      const scheduled = Store.articles().filter(a => a.status === 'scheduled')
-        .sort((a, b) => (a.scheduledFor || '').localeCompare(b.scheduledFor || ''));
-
-      let line;
-      if (mine.length === 0) line = 'nothing is waiting on you.';
-      else if (mine.length === 1) line = 'one thing is waiting on <em>you</em>.';
-      else line = `<em>${mine.length} things</em> are waiting on you.`;
-
-      const feed = Store.activity().slice(0, 8);
-
-      const LV_ORDER = ['blocker', 'important', 'note'];
+      const LV = ['blocker', 'important', 'note'];
       const rems = Store.reminders().slice().sort((a, b) =>
-        LV_ORDER.indexOf(a.level) - LV_ORDER.indexOf(b.level) ||
-        (a.due || '9999').localeCompare(b.due || '9999'));
+        LV.indexOf(a.level) - LV.indexOf(b.level) || (a.due || '9999').localeCompare(b.due || '9999'));
       const remOpen = rems.filter(r => !r.resolved);
-      const remDone = rems.filter(r => r.resolved);
       const gates = remOpen.filter(r => r.level === 'blocker').length;
-
       const remRow = r => {
         const lv = REMINDER_LEVELS[r.level] || REMINDER_LEVELS.important;
         const d = r.due ? dueLabel(r.due) : null;
         return `<div class="rem ${r.resolved ? 'done' : ''}" data-rem="${r.id}">
           <input type="checkbox" ${r.resolved ? 'checked' : ''} data-remck="${r.id}"
-                 aria-label="${r.resolved ? 'Reopen' : 'Resolve'} — ${esc(r.text)}" ${Store.can('edit') ? '' : 'disabled'}>
+                 aria-label="Resolve — ${esc(r.text)}" ${Store.can('edit') ? '' : 'disabled'}>
           <span class="rem-lv lv-${r.level}">${lv.label}</span>
           <span class="rem-text">${esc(r.text)}</span>
           ${d ? `<span class="due ${d.tone}">${esc(d.txt)}</span>` : ''}
@@ -85,103 +135,117 @@
 
       return `<div class="wrap">
         <section class="today-hero">
-          <h1>${greeting()}, ${esc(me.name.split(' ')[0])}. <br>${line}</h1>
-          <p class="today-sub">Everything SportPharm is building, writing, marketing and deciding — in one
-            place, so it stops living in eleven browser tabs and one person’s memory.</p>
-          <div class="today-pills">
-            <span class="pill t-blue"><b>${tasks.filter(t => t.status !== 'shipped').length}</b> open tasks</span>
-            <span class="pill t-red"><b>${stats.review + stats.changes}</b> articles in the review loop</span>
-            <span class="pill t-green"><b>${stats.published}</b> live on the site</span>
-            <span class="pill t-amber"><b>${Store.campaigns().length}</b> campaigns briefed</span>
-          </div>
+          <h1>${greeting()}, ${esc(me.name.split(' ')[0])}.</h1>
+          <p class="today-sub">Your week, and what is still on you.</p>
         </section>
 
-        <section class="panel rem-panel stack">
+        ${assigned.length ? `<section class="panel asg">
+          <div class="panel-head"><h2>Assigned to you</h2>
+            <span class="asg-n">${assigned.length}</span>
+            <span class="note" style="margin-left:auto">someone is waiting on these</span></div>
+          ${assigned.map(t => `<div class="asg-row">
+            <span class="wk-dot t-${areaOf(t.project.area).tone}"></span>
+            <span class="asg-body" data-task="${t.project.id}:${t.id}" tabindex="0" role="button">
+              <span class="asg-title">${esc(t.title)}</span>
+              <span class="asg-from">${esc(t.project.name)}</span>
+            </span>
+            ${Store.can('edit') ? `<select class="asg-plan" data-planday="${t.project.id}:${t.id}"
+                aria-label="Plan ${esc(t.title)} into a day">
+              <option value="">Plan…</option>
+              ${days.map(d => `<option value="${d}">${esc(longDay(d))}</option>`).join('')}
+            </select>` : ''}
+          </div>`).join('')}
+        </section>` : ''}
+
+        <div class="wk-head">
+          <h2>Your week <span>${esc(rangeLabel(start))}</span></h2>
+          <div class="seg wk-mode">
+            <button data-wkmode="week" class="${weekMode === 'week' ? 'on' : ''}">The week</button>
+            <button data-wkmode="day" class="${weekMode === 'day' ? 'on' : ''}">By day</button>
+          </div>
+          <div class="wk-nav">
+            <button data-wknav="-7" aria-label="Previous week">${svg('left')}</button>
+            <button data-wknav="0">This week</button>
+            <button data-wknav="7" aria-label="Next week">${svg('right')}</button>
+          </div>
+        </div>
+
+        <div class="wk-grid ${weekMode === 'week' ? 'across' : ''}">
+          <div class="wk-days">${days.map(daySection).join('')}</div>
+
+          <section class="wk-log">
+            <div class="wk-day-head">
+              <h3>Running task log</h3>
+              <span class="wk-count">${logDone}/${log.length}</span>
+            </div>
+            <p class="wk-note">Anything without a day. Give one a date and it moves into the week.</p>
+            ${log.length ? log.map(todoRow).join('') : '<p class="wk-empty">Nothing waiting.</p>'}
+            ${Store.can('edit') ? `<form class="wk-add" data-addday="">
+              <input placeholder="+ add item" aria-label="Add to the running log">
+            </form>` : ''}
+          </section>
+        </div>
+
+        <section class="panel rem-panel stack" style="margin-top:1.4rem">
           <div class="panel-head">
             <h2>Before launch</h2>
-            <span class="note">${gates ? gates + ' gate' + (gates === 1 ? '' : 's') + ' still closed' : remOpen.length ? 'no closed gates — the rest is judgment' : 'everything revisited'}</span>
-            ${Store.can('edit') ? `<button class="btn btn-outline btn-sm" id="rem-add" style="margin-left:auto">${svg('plus')}Add a reminder</button>` : ''}
+            <span class="note">${gates ? gates + ' gate' + (gates === 1 ? '' : 's') + ' still closed'
+              : remOpen.length ? 'no closed gates — the rest is judgment' : 'everything revisited'}</span>
           </div>
-          <p class="rem-sub">Fine in a prototype, not fine the day real people arrive. Kept here so they get
-            re-seen instead of re-found. Click one for the full why.</p>
-          ${remOpen.length ? remOpen.map(remRow).join('') : '<p class="panel-empty">Nothing open. Launch when ready.</p>'}
-          ${remDone.length ? `<details class="rem-done-wrap"><summary>${remDone.length} resolved</summary>
-            ${remDone.map(remRow).join('')}</details>` : ''}
+          ${remOpen.length ? remOpen.map(remRow).join('')
+            : '<p class="panel-empty">Nothing open. Launch when ready.</p>'}
         </section>
-
-        <div class="col-2 stack">
-          <section class="panel">
-            <div class="panel-head"><h2>Waiting on you</h2></div>
-            ${mine.length ? mine.map(taskRow).join('') : '<p class="panel-empty">Nothing assigned to you right now. That’s allowed.</p>'}
-          </section>
-          <section class="panel">
-            <div class="panel-head"><h2>In the review loop</h2><span class="note">nothing ships past this</span></div>
-            ${inReview.concat(sendBacks).length ? inReview.concat(sendBacks).map(a => {
-              const st = ARTICLE_STATES[a.status];
-              const open = Store.openChecks(a).length;
-              const mineToClear = a.status === 'review' && Store.canApprove(a);
-              return `<button class="row t-${st.tone}" data-go="#/content/${a.id}">
-                <i class="row-dot"></i>
-                <span class="row-body">
-                  <span class="row-title">${esc(a.title)}</span>
-                  <span class="row-meta">${esc(st.label)} · ${esc(a.author)}${
-                    open ? ' · ' + open + ' unchecked' : ''}${
-                    mineToClear ? ' · <b>you can sign this off</b>' : ''}</span>
-                </span>
-                <span class="row-side">${svg('arrow')}</span>
-              </button>`;
-            }).join('') : '<p class="panel-empty">Nothing is waiting on a reviewer.</p>'}
-            ${scheduled.length ? `<div class="today-sched">
-              ${scheduled.slice(0, 3).map(a => `<button class="sched-row" data-go="#/content/${a.id}">
-                ${svg('cal')}<span>${esc(a.title)}</span><b>${esc(a.scheduledFor)}</b></button>`).join('')}
-            </div>` : ''}
-          </section>
-        </div>
-
-        <div class="col-2 stack">
-          <section class="panel">
-            <div class="panel-head"><h2>Coming up</h2><span class="note">by date</span></div>
-            ${soon.length ? soon.map(taskRow).join('') : '<p class="panel-empty">Nothing dated in the near term.</p>'}
-          </section>
-          <section class="panel">
-            <div class="panel-head"><h2>Moving</h2><span class="note">across the team</span></div>
-            ${moving.length ? moving.map(taskRow).join('') : '<p class="panel-empty">Nothing in progress yet.</p>'}
-          </section>
-        </div>
-
-        <div class="col-2 stack">
-          <section class="panel">
-            <div class="panel-head"><h2>Quiet for a while</h2><span class="note">just noticing</span></div>
-            ${quiet.length ? quiet.map(taskRow).join('') : '<p class="panel-empty">Everything has been touched recently.</p>'}
-          </section>
-          <section class="panel">
-            <div class="panel-head"><h2>Lately</h2></div>
-            ${feed.length ? `<ul class="activity">${feed.map(f => {
-              const u = Store.user(f.by);
-              return `<li><b>${esc(u ? u.name.split(' ')[0] : 'Someone')}</b> ${esc(f.action)}${f.target ? ' — ' + esc(f.target) : ''} · ${ago(f.at)}</li>`;
-            }).join('')}</ul>` : '<p class="panel-empty">Nothing logged yet.</p>'}
-          </section>
-        </div>
       </div>`;
     },
+
     wire(root) {
       wireTaskRows(root);
-      root.querySelectorAll('[data-remck]').forEach(ck =>
-        ck.addEventListener('change', e => {
-          e.stopPropagation();
-          Store.toggleReminder(ck.dataset.remck);
+
+      root.querySelectorAll('[data-wkmode]').forEach(b =>
+        b.addEventListener('click', () => { weekMode = b.dataset.wkmode; HQ.render(); }));
+      root.querySelectorAll('[data-wknav]').forEach(b =>
+        b.addEventListener('click', () => {
+          const n = Number(b.dataset.wknav);
+          const start = weekStart || Store.mondayOf(Store.today());
+          weekStart = n === 0 ? null : Store.addDays(start, n);
           HQ.render();
         }));
+
+      root.querySelectorAll('[data-todock]').forEach(c =>
+        c.addEventListener('change', e => { e.stopPropagation(); Store.toggleTodo(c.dataset.todock); HQ.render(); }));
+      root.querySelectorAll('[data-tododel]').forEach(b =>
+        b.addEventListener('click', () => { Store.removeTodo(b.dataset.tododel); HQ.render(); }));
+      HQ.inlineText(root, '[data-itodo]', (el, v) => {
+        Store.updateTodo(el.dataset.itodo, { title: v }); HQ.render();
+      });
+
+      root.querySelectorAll('[data-addday]').forEach(f =>
+        f.addEventListener('submit', e => {
+          e.preventDefault();
+          const inp = f.querySelector('input');
+          if (!inp.value.trim()) return;
+          Store.addTodo({ title: inp.value.trim(), day: f.dataset.addday || null });
+          HQ.render();
+        }));
+
+      /* Planning an assigned task is just giving it a date — it then shows up
+         in that day alongside everything else. */
+      root.querySelectorAll('[data-planday]').forEach(sel =>
+        sel.addEventListener('change', () => {
+          if (!sel.value) return;
+          const [pid, tid] = sel.dataset.planday.split(':');
+          Store.updateTask(pid, tid, { due: sel.value });
+          HQ.render();
+          toast('Planned.');
+        }));
+
+      root.querySelectorAll('[data-remck]').forEach(ck =>
+        ck.addEventListener('change', e => { e.stopPropagation(); Store.toggleReminder(ck.dataset.remck); HQ.render(); }));
       root.querySelectorAll('[data-rem]').forEach(row =>
         row.addEventListener('click', e => {
           if (e.target.closest('input')) return;
           openReminderSheet(row.dataset.rem);
         }));
-      const add = root.querySelector('#rem-add');
-      if (add) add.addEventListener('click', () => {
-        const r = Store.addReminder({ text: 'New reminder' });
-        HQ.render(); openReminderSheet(r.id);
-      });
     }
   });
 

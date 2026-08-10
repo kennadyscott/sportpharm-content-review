@@ -51,6 +51,8 @@ const Store = (() => {
       plan: LAUNCH_PIECES.map((p, i) => ({ notes: '', owner: null, ...p, order: i, createdAt: now(), updatedAt: now() })),
       planRules: { ...DEFAULT_PLAN_RULES },
       reminders: SEED_REMINDERS.map((r, i) => ({ resolved: false, ...r, order: i, createdAt: now(), updatedAt: now() })),
+      todos: SEED_TODOS.map((t, i) => ({ done: false, repeats: null, tag: '', detail: '',
+        day: null, order: i, createdAt: now(), ...t })),
       metrics: {},    /* rowKey -> { col: value }, plus .margin — HQ-level rollup */
       campReview: {}, /* "campId:sec:<key>" | "campId:asset:<id>" -> { status, thread[] } */
       flags: {},      /* one-off markers: migrations, dismissals */
@@ -1031,6 +1033,8 @@ const Store = (() => {
     unpublishArticle, dueToPublish, runSchedule, articleStats, publishedFeed,
     addArticleNote, removeArticleNote, noteCount,
     media, mediaItem, addMedia, updateMedia, removeMedia, mediaUsedBy,
+    todos, todo, addTodo, updateTodo, toggleTodo, removeTodo,
+    mondayOf, addDays, weekDays, dayItems, runningLog, assignedToMe,
     metricsOf, setMetric, setMargin,
     briefs, brief, reviewState, setReviewState, reviewThread,
     addReviewNote, removeReviewNote, campaignProgress, campaignNoteCount,
