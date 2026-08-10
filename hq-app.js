@@ -280,25 +280,36 @@ const HQ = (() => {
   }
 
   /* ============================== ROUTER ============================== */
-  const CONTENT_KIDS = [
-    { id: 'content',   label: 'Articles',  icon: 'pen' },
-    { id: 'ideas',     label: 'Idea Bank', icon: 'bulb' },
-    { id: 'media',     label: 'Media',     icon: 'image' },
-    { id: 'campaigns', label: 'Campaigns', icon: 'mega' }
+  /* Two rails: the section down the left, and each section's own rail inside
+     it. Marketing and Analytics are groups; everything under them is its own
+     surface rather than a tab bar hidden one level down. */
+  const MARKETING_KIDS = [
+    { id: 'campaigns', label: 'Campaigns',    icon: 'mega' },
+    { id: 'plan',      label: 'Content Plan', icon: 'cal' },
+    { id: 'content',   label: 'Articles',     icon: 'pen' },
+    { id: 'media',     label: 'Media',        icon: 'image' },
+    { id: 'ideas',     label: 'Idea Bank',    icon: 'bulb' },
+    { id: 'strategy',  label: 'Branding',     icon: 'quote' }
   ];
+  const ANALYTICS_KIDS = [
+    { id: 'analytics', label: 'Overview',  icon: 'chart' },
+    { id: 'kpis',      label: 'KPIs',      icon: 'today' },
+    { id: 'platforms', label: 'Platforms', icon: 'coin' }
+  ];
+  const GROUPS = { Marketing: MARKETING_KIDS, Analytics: ANALYTICS_KIDS };
+
   const NAV = [
-    { id: 'today',     label: 'Today',            icon: 'today' },
-    { id: 'projects',  label: 'Project Planning', icon: 'board' },
-    { parent: 'Content', icon: 'doc', children: CONTENT_KIDS },
-    { id: 'strategy',  label: 'Branding',  icon: 'quote' },
-    { id: 'analytics', label: 'Analytics', icon: 'chart' },
-    { id: 'platforms', label: 'Platforms', icon: 'coin' },
-    { id: 'team',      label: 'Team',      icon: 'team' },
-    { id: 'settings',  label: 'Settings',  icon: 'gear' }
+    { id: 'today',    label: 'Today',            icon: 'today' },
+    { id: 'projects', label: 'Project Planning', icon: 'board' },
+    { parent: 'Marketing', icon: 'doc',  children: MARKETING_KIDS },
+    { id: 'orders',   label: 'Orders',           icon: 'box' },
+    { parent: 'Analytics', icon: 'chart', children: ANALYTICS_KIDS },
+    { id: 'team',     label: 'Team',     icon: 'team' },
+    { id: 'settings', label: 'Settings', icon: 'gear' }
   ];
   /* flat list for the palette and anything that wants every route */
   const NAV_FLAT = NAV.flatMap(n => n.children ? n.children : [n]);
-  let contentOpen = null; /* null = follow the route; true/false = user's toggle */
+  const groupOpen = {};   /* per group: undefined = follow the route */
 
   const views = {};
   function view(id, def) { views[id] = def; }
@@ -316,7 +327,7 @@ const HQ = (() => {
       open: Store.allTasks().filter(t => t.status !== 'shipped').length,
       content: s.review + s.changes,
       ideas: Store.ideas().filter(d => d.state === 'open').length,
-      evaluating: Store.platforms().filter(p => p.status === 'evaluating' || p.status === 'trial').length,
+      orders: Store.orders().filter(o => o.status !== 'complete').length,
       planning: Store.pieces().filter(p => p.status === 'drafting' || p.status === 'review').length
     };
   }
@@ -325,7 +336,7 @@ const HQ = (() => {
     const { view: v } = route();
     const me = Store.currentUser();
     const c = counts();
-    const badge = { projects: c.open + c.planning, content: c.content, ideas: c.ideas, platforms: c.evaluating };
+    const badge = { projects: c.open, content: c.content, ideas: c.ideas, plan: c.planning, orders: c.orders };
     /* the Content parent rolls up only its own children, not Content Plan */
     const link = (n, sub) => `
       <a class="rail-link ${sub ? 'sub' : ''} ${n.id === v ? 'on' : ''}" href="#/${n.id}">
@@ -335,10 +346,10 @@ const HQ = (() => {
     $('#rail-nav').innerHTML = NAV.map(n => {
       if (!n.children) return link(n, false);
       const activeChild = n.children.some(k => k.id === v);
-      const open = contentOpen === null ? activeChild : contentOpen;
+      const open = groupOpen[n.parent] === undefined ? activeChild : groupOpen[n.parent];
       const kidBadge = n.children.reduce((t, k) => t + (badge[k.id] || 0), 0);
       return `
-        <button class="rail-link rail-parent ${activeChild && !open ? 'on' : ''}" data-navtoggle aria-expanded="${open}">
+        <button class="rail-link rail-parent ${activeChild && !open ? 'on' : ''}" data-navtoggle="${esc(n.parent)}" aria-expanded="${open}">
           ${svg(n.icon)}<span>${n.parent}</span>
           ${!open && kidBadge ? `<span class="rail-count">${kidBadge}</span>` : ''}
           <span class="rail-caret ${open ? 'open' : ''}">${svg('down')}</span>
@@ -348,7 +359,7 @@ const HQ = (() => {
     const tg = $('#rail-nav').querySelector('[data-navtoggle]');
     if (tg) tg.addEventListener('click', () => {
       const activeChild = CONTENT_KIDS.some(k => k.id === route().view);
-      const open = contentOpen === null ? activeChild : contentOpen;
+      const open = groupOpen[n.parent] === undefined ? activeChild : groupOpen[n.parent];
       contentOpen = !open;
       renderRail();
     });

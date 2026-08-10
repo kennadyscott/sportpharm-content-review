@@ -70,56 +70,24 @@ const OFFER_CODES = [
 ];
 
 /* ------------------------------- projects -------------------------------- */
+/* Project Planning is for projects now — campaigns and the content plan moved
+   to Marketing. One project to start; the rest get built as they are needed. */
 const SEED_PROJECTS = [
   {
-    id: 'p-cms', name: 'CMS & publishing', area: 'content', tone: 'blue',
-    goal: 'Get articles written, reviewed and published from HQ instead of by hand-editing HTML.',
-    due: '2026-09-15',
-    tasks: [
-      { id: 't1', title: 'Point articles.html at the published feed', status: 'next', owner: null, due: '2026-08-14' },
-      { id: 't2', title: 'Run supabase/hq.sql — hq_kv, hq_members, and the published_articles view', status: 'next', owner: null, due: '2026-08-07' },
-      { id: 't3', title: 'Move the 3 existing articles into the CMS', status: 'next', owner: null, due: '2026-08-21', campaign: 'recovery' },
-      { id: 't4', title: 'Agree who approves an article before it goes live', status: 'next', owner: null, due: '2026-08-12' },
-      { id: 't5', title: 'Decide the image budget — the site is carrying ~2MB PNGs', status: 'someday', owner: null, due: '' }
-    ]
-  },
-  {
-    id: 'p-direct', name: 'Direct-to-site sales', area: 'commerce', tone: 'amber',
-    goal: 'Make sportpharm.com the primary sales channel. The President’s stated priority.',
-    due: '2026-10-31',
-    tasks: [
-      { id: 't1', title: 'Stand up Stripe + native promotion codes', status: 'next', owner: null, due: '2026-09-05', campaign: 'wasabi-direct' },
-      { id: 't2', title: 'Cart abandonment flow — 3 emails, build before launch', status: 'next', owner: null, due: '2026-09-12', campaign: 'wasabi-direct' },
-      { id: 't3', title: 'Set up the offer codes in-store (FREESHIP1 first)', status: 'next', owner: null, due: '2026-09-05', campaign: 'wasabi-direct' },
-      { id: 't4', title: 'Mailchimp connected for email + abandoned cart', status: 'next', owner: null, due: '2026-09-19', campaign: 'wasabi-direct' },
-      { id: 't5', title: 'Run the Feel It Work campaign', status: 'someday', owner: null, due: '', campaign: 'wasabi-direct' }
-    ]
-  },
-  {
-    id: 'p-site', name: 'Website build-out', area: 'site', tone: 'navy',
-    goal: 'Close the gaps on the 43-page static site while the Next.js + Payload port is still ahead of us.',
+    id: 'p-web', name: 'Website Redesign', area: 'site', tone: 'navy',
+    goal: 'Rebuild sportpharm.com on the new masterbrand, and stop hand-editing 43 static pages.',
     due: '2026-11-30',
     tasks: [
-      { id: 't1', title: 'Compress the imagery — the ~2MB PNG pass never happened', status: 'next', owner: null, due: '2026-08-29' },
-      { id: 't2', title: 'Wire the public contact forms into Leads', status: 'next', owner: null, due: '2026-09-05', campaign: 'trusted' },
-      { id: 't3', title: 'Build the 4 pathway landing pages', status: 'next', owner: null, due: '2026-09-26', campaign: 'playbooks' },
-      { id: 't4', title: 'pro-hero.png and pro-support.png still missing on Sports Medicine', status: 'next', owner: null, due: '2026-08-22' },
-      { id: 't5', title: 'Pro / Healthcare persona pages are still on placeholder photos', status: 'someday', owner: null, due: '' },
-      { id: 't6', title: 'Decide: merge Injuries and Recovery, or keep the split', status: 'next', owner: null, due: '2026-08-29' }
-    ]
-  },
-  {
-    id: 'p-pro', name: 'Professional channel', area: 'pro', tone: 'green',
-    goal: 'Turn the Sports Medicine page into a real B2B pipeline — ATs, team physicians, compliance staff.',
-    due: '2026-12-15',
-    tasks: [
-      { id: 't1', title: 'Sideline Ready audit checklist — the actual downloadable', status: 'next', owner: null, due: '2026-09-12', campaign: 'sideline-ready' },
-      { id: 't2', title: 'KetoRub / TruShield one-pager for compliance staff', status: 'next', owner: null, due: '2026-09-19', campaign: 'clean-sport' },
-      { id: 't3', title: 'Consult request form on the 8 service cards', status: 'next', owner: null, due: '2026-09-26', campaign: 'dispensing' },
-      { id: 't4', title: 'Decide whether professionals need a login at all', status: 'someday', owner: null, due: '' }
+      { id: 't1', title: 'Agree the page inventory — what survives, what merges, what goes', status: 'next', owner: null, due: '2026-08-14' },
+      { id: 't2', title: 'Apply the new brand palette and type across the templates', status: 'next', owner: null, due: '2026-08-28' },
+      { id: 't3', title: 'Compress the imagery — the ~2MB PNG pass never happened', status: 'next', owner: null, due: '2026-08-29' },
+      { id: 't4', title: 'Point articles.html at the published feed', status: 'next', owner: null, due: '2026-09-05' },
+      { id: 't5', title: 'Wire the contact forms into Leads', status: 'next', owner: null, due: '2026-09-12' },
+      { id: 't6', title: 'Decide: merge Injuries and Recovery, or keep the split', status: 'someday', owner: null, due: '' }
     ]
   }
 ];
+
 
 /* ------------------------------- campaigns -------------------------------- */
 /* The index only. Every brief, asset mockup, comment thread, calendar, ROI
@@ -584,43 +552,11 @@ const PLATFORM_CATS = [
   { id: 'ops',      label: 'Ops',       tone: 'green' }
 ];
 
-const SEED_PLATFORMS = [
-  { id: 'pl-stripe', name: 'Stripe', cat: 'commerce', status: 'evaluating', cost: 0,
-    pricing: '2.9% + 30¢ per transaction. Promotion Codes included, no add-on.',
-    what: 'Payments for direct sales, plus the native promo codes the whole offer stack depends on (FREESHIP1, FEELIT15, LASTCALL).',
-    judge: 'It is the assumed default. The real question is whether we launch on it before Payload exists or wait — waiting costs us the direct-sales window.',
-    verdict: '', owner: null, decideBy: '2026-08-22' },
-  { id: 'pl-mailchimp', name: 'Mailchimp', cat: 'email', status: 'evaluating', cost: 26,
-    pricing: 'Standard ~$26/mo at our list size; scales with contacts.',
-    what: 'Email sends, the welcome sequence, and abandoned cart — which we decided is core, not a nice-to-have.',
-    judge: 'Does abandoned cart work without a real backend? If it needs Payload anyway, this waits.',
-    verdict: '', owner: null, decideBy: '2026-09-05' },
-  { id: 'pl-meta', name: 'Meta Ads', cat: 'paid', status: 'evaluating', cost: 0,
-    pricing: 'Budget, not a licence fee — so there is no list price to quote. Nobody has set a number yet; put yours in the cost field.',
-    what: 'The three-ad structure in the Feel It Work brief: cold prospecting reel, mid-funnel carousel, retargeting proof.',
-    judge: 'Cost per order against a $29.95–$39.95 basket. Set a monthly ceiling before the first ad runs, and if CPO exceeds margin at 4 weeks, stop.',
-    verdict: '', owner: null, decideBy: '2026-09-12' },
-  { id: 'pl-vercel', name: 'Vercel', cat: 'infra', status: 'evaluating', cost: 20,
-    pricing: 'Pro $20/mo per seat.',
-    what: 'Where Next.js + Payload lands when we stop being a static site.',
-    judge: 'Only worth paying for once the port actually starts. GitHub Pages is free and currently sufficient.',
-    verdict: '', owner: null, decideBy: '2026-10-31' },
-  { id: 'pl-payload', name: 'Payload CMS', cat: 'infra', status: 'evaluating', cost: 0,
-    pricing: 'Self-hosted, free. Cloud tier exists if we do not want to run Postgres.',
-    what: 'The long-term CMS. Auth, roles, and the employee submission workflow, natively.',
-    judge: 'HQ’s CMS is the blueprint for this. Build it here first, learn the workflow, then port the model.',
-    verdict: 'Deferred on purpose — HQ proves the workflow before we commit to the stack.', owner: null, decideBy: '2026-11-30' },
-  { id: 'pl-supabase', name: 'Supabase', cat: 'infra', status: 'trial', cost: 0,
-    pricing: 'Free tier covers us today. Pro is $25/mo when we outgrow it.',
-    what: 'Already running the Content Studio. Now also the CMS store and the shared HQ workspace.',
-    judge: 'It is doing two real jobs already. The question is only whether Payload eventually replaces it.',
-    verdict: 'Keeping it. Two projects in production already.', owner: null, decideBy: '' },
-  { id: 'pl-marketplaces', name: 'Third-party marketplaces', cat: 'commerce', status: 'passed', cost: 0,
-    pricing: 'Referral fees per order.',
-    what: 'Reselling through channels we do not control.',
-    judge: 'Weighed against owning the customer relationship and the margin on sportpharm.com.',
-    verdict: 'De-prioritised in favour of direct. The full reasoning is deliberately not written down here — ask Brandon.', owner: null, decideBy: '' }
-];
+/* Wiped 2026-07-29 at the team's request. The previous contents were seeded by
+   me, not by them — including a $1,500/mo Meta figure that existed in no
+   document. Platforms starts empty; add what you actually pay for. */
+const SEED_PLATFORMS = [];
+
 
 /* ------------------------------ launch gates ----------------------------- */
 const REMINDER_LEVELS = {
@@ -838,6 +774,53 @@ const LAUNCH_STANDING = {
 /* -------------------------------- ideas ---------------------------------- */
 /* A running log to start from — undated, which is what puts them in the log
    rather than on a day. Tags are free text; they group by eye, not by schema. */
+/* ---------------------------------------------------------------------------
+   ORDERS
+
+   Julia rewrites this email from scratch every time and it lands differently
+   each time, so Enova, the invoicing team and the warehouse all interpret it
+   fresh. The CEO's ask: one internal form covering every base — who is
+   ordering, what, what is free, what SWAG, how they pay, how it ships — that
+   produces a consistent record, can be printed, and can be tracked.
+
+   The status list is the real handoff, not a workflow we invented: Julia
+   submits, Enova acknowledges, invoicing raises it, it ships, it is done.
+--------------------------------------------------------------------------- */
+const ORDER_STATES = {
+  draft:     { label: 'Draft',          tone: 'muted', hint: 'Being filled in. Nobody has seen it.' },
+  submitted: { label: 'Sent to Enova',  tone: 'blue',  hint: 'With the vendor to pick and pack.' },
+  ack:       { label: 'Acknowledged',   tone: 'amber', hint: 'Enova has it and confirmed.' },
+  invoiced:  { label: 'Invoiced',       tone: 'amber', hint: 'Invoice raised and sent.' },
+  shipped:   { label: 'Shipped',        tone: 'green', hint: 'Out the door, tracking known.' },
+  complete:  { label: 'Complete',       tone: 'green', hint: 'Delivered and closed.' }
+};
+const ORDER_FLOW = ['draft', 'submitted', 'ack', 'invoiced', 'shipped', 'complete'];
+
+const PAY_METHODS = ['Invoice', 'Credit card', 'Purchase order', 'Prepaid', 'No charge'];
+const SHIP_METHODS = ['Ground', '2-day', 'Overnight', 'Freight', 'Customer pickup'];
+
+/* Catalogue for the line-item picker — real prices from the live store. */
+const ORDER_CATALOG = [
+  { sku: 'BUNDLE-TRIFECTA', name: 'Team Trifecta Bundle', price: 269.95,
+    note: '3 WasabiRub · 3 Super Hot · 3 IcetraRub' },
+  { sku: 'BUNDLE-WASABI-TEAM', name: 'WasabiRub Team Bundle', price: 240.95, note: '' },
+  { sku: 'BUNDLE-FIREICE', name: 'Fire & Ice Bundle', price: 64.99, note: '' },
+  { sku: 'BUNDLE-OGHEAT', name: 'OG Heat Bundle', price: 59.99, note: '' },
+  { sku: 'BUNDLE-RECOVERY', name: 'Recovery Bundle', price: 64.99, note: '' },
+  { sku: 'WASABIRUB', name: 'WasabiRub', price: 29.95, note: '' },
+  { sku: 'ICETRARUB', name: 'IcetraRub', price: 39.95, note: '' },
+  { sku: 'SUPERHOT', name: 'WasabiRub Super Hot', price: 39.95, note: '' }
+];
+const SWAG_ITEMS = ['SportPharm hat', 'SportPharm tee', 'Stickers', 'Water bottle', 'Towel', 'Sample pack'];
+
+/* Who the form goes to. Kept here so nobody has to remember the distribution. */
+const ORDER_RECIPIENTS = [
+  { to: 'orders@sportpharm.com', role: 'Enova — pick & pack' },
+  { to: 'AdminUnit@sportpharm.com', role: 'Admin, cc' }
+];
+
+const SEED_ORDERS = [];
+
 const SEED_TODOS = [
   { id: 'td1', title: 'Compress the site imagery — the ~2MB PNG pass', tag: 'Website' },
   { id: 'td2', title: 'Chase the TruShield one-pager copy', tag: 'Clean Sport' },

@@ -51,6 +51,7 @@ const Store = (() => {
       plan: LAUNCH_PIECES.map((p, i) => ({ notes: '', owner: null, ...p, order: i, createdAt: now(), updatedAt: now() })),
       planRules: { ...DEFAULT_PLAN_RULES },
       reminders: SEED_REMINDERS.map((r, i) => ({ resolved: false, ...r, order: i, createdAt: now(), updatedAt: now() })),
+      orders: SEED_ORDERS.map((o, i) => ({ order: i, ...o })),
       todos: SEED_TODOS.map((t, i) => ({ done: false, repeats: null, tag: '', detail: '',
         day: null, order: i, createdAt: now(), ...t })),
       metrics: {},    /* rowKey -> { col: value }, plus .margin — HQ-level rollup */
@@ -977,6 +978,124 @@ const Store = (() => {
     return allTasks().filter(t => t.owner === me.id && t.status !== 'shipped' && !t.due);
   }
 
+  /* =========================================================================
+     ORDERS
+
+     One record per order, carrying everything the email used to carry — and
+     the same record moves through the handoff rather than being retyped at
+     each step. `message()` renders the note to Enova from the record, so the
+     wording is the form's job and not Julia's.
+  ========================================================================= */
+  const orders = () => load().orders;
+  const order = id => load().orders.find(o => o.id === id) || null;
+
+  function addOrder(fields) {
+    const me = currentUser();
+    const o = {
+      id: uid('o'), ref: 'SP-' + String(load().orders.length + 1).padStart(4, '0'),
+      status: 'draft', raisedBy: me ? me.id : null,
+      org: '', contactName: '', contactEmail: '', contactPhone: '',
+      shipTo: '', lines: [], freebies: [], swag: [], approvedBy: '',
+      pay: 'Invoice', poNumber: '', ship: 'Ground', shipCost: 0,
+      needBy: '', notes: '', tracking: '', history: [],
+      createdAt: now(), updatedAt: now(), order: -Date.now() / 1000, ...fields
+    };
+    load().orders.unshift(o);
+    log('raised an order', o.ref);
+    save();
+    return o;
+  }
+  function updateOrder(id, patch) {
+    const o = order(id);
+    if (!o) return null;
+    Object.assign(o, patch, { updatedAt: now() });
+    save();
+    return o;
+  }
+  function removeOrder(id) {
+    const s = load();
+    s.orders = s.orders.filter(o => o.id !== id);
+    save();
+  }
+  /* Every move is stamped, so "where is this" has an answer without asking. */
+  function setOrderStatus(id, status, note) {
+    const o = order(id);
+    if (!o) return { ok: false, error: 'Gone.' };
+    if (status !== 'draft' && !orderReady(o).ok) return orderReady(o);
+    const me = currentUser();
+    o.history = (o.history || []).concat([{
+      at: now(), by: me ? me.id : null, from: o.status, to: status, note: note || ''
+    }]);
+    o.status = status;
+    o.updatedAt = now();
+    log('order ' + (ORDER_STATES[status] || {}).label.toLowerCase(), o.ref);
+    save();
+    return { ok: true };
+  }
+  /* The point of the form is that nothing leaves half-filled. */
+  function orderReady(o) {
+    const missing = [];
+    if (!o.org.trim() && !o.contactName.trim()) missing.push('who it is for');
+    if (!o.contactEmail.trim()) missing.push('a contact email');
+    if (!o.shipTo.trim()) missing.push('a shipping address');
+    if (!(o.lines || []).length) missing.push('at least one line');
+    if (!o.pay) missing.push('how they are paying');
+    return missing.length
+      ? { ok: false, error: 'Still needs ' + missing.join(', ') + '.' }
+      : { ok: true };
+  }
+  const orderTotal = o => (o.lines || []).reduce((n, l) =>
+    n + (Number(l.price) || 0) * (Number(l.qty) || 0), 0) + (Number(o.shipCost) || 0);
+
+  /* The note to Enova, written from the record. */
+  function orderMessage(o) {
+    const money = n => '$' + (Number(n) || 0).toFixed(2);
+    const L = [];
+    L.push('Good morning Team,');
+    L.push('');
+    L.push('Could we please get this order processed as soon as possible?');
+    if (o.pay === 'Invoice') L.push('Invoicing team — they would like to be invoiced for this order, please.');
+    L.push('');
+    L.push('ORDER  ' + o.ref);
+    (o.lines || []).forEach(l => {
+      L.push('  ' + l.qty + ' × ' + l.name + '   ' + money((Number(l.price) || 0) * (Number(l.qty) || 0)));
+      if (l.note) L.push('      ' + l.note);
+    });
+    if ((o.freebies || []).length) {
+      L.push('');
+      L.push('NO CHARGE' + (o.approvedBy ? ' (approved by ' + o.approvedBy + ')' : ''));
+      o.freebies.forEach(f => L.push('  ' + f.qty + ' × ' + f.name));
+    }
+    if ((o.swag || []).length) {
+      L.push('');
+      L.push('SWAG');
+      o.swag.forEach(x => L.push('  ' + x));
+    }
+    L.push('');
+    L.push('PRICING');
+    L.push('  Items    ' + money(orderTotal(o) - (Number(o.shipCost) || 0)));
+    L.push('  Shipping ' + money(o.shipCost));
+    L.push('  Total    ' + money(orderTotal(o)));
+    L.push('');
+    L.push('PAYMENT   ' + o.pay + (o.poNumber ? '  ·  PO ' + o.poNumber : ''));
+    L.push('SHIPPING  ' + o.ship + (o.needBy ? '  ·  needed by ' + o.needBy : ''));
+    L.push('');
+    L.push('SHIP TO');
+    L.push('  ' + (o.contactName || ''));
+    if (o.org) L.push('  ' + o.org);
+    (o.shipTo || '').split('\n').filter(Boolean).forEach(x => L.push('  ' + x.trim()));
+    L.push('');
+    L.push('CONTACT');
+    L.push('  ' + (o.contactName || '') + (o.contactEmail ? '  ·  ' + o.contactEmail : '') +
+           (o.contactPhone ? '  ·  ' + o.contactPhone : ''));
+    if (o.notes) { L.push(''); L.push('NOTES'); L.push('  ' + o.notes); }
+    const me = currentUser();
+    L.push('');
+    L.push('Thank you all for your help — any questions, let me know.');
+    if (me) L.push(me.name + ' · SportPharm');
+    return L.join('\n');
+  }
+
   /* ------------------------------- playbook ------------------------------ */
   /* Ticked operational actions in the launch playbook. Kept in `flags` so they
      survive the plan being rewritten around them. */
@@ -1114,6 +1233,8 @@ const Store = (() => {
     media, mediaItem, addMedia, updateMedia, removeMedia, mediaUsedBy,
     todos, todo, addTodo, updateTodo, toggleTodo, removeTodo,
     mondayOf, addDays, weekDays, dayItems, runningLog, assignedToMe,
+    orders, order, addOrder, updateOrder, removeOrder, setOrderStatus,
+    orderReady, orderTotal, orderMessage,
     metricsOf, setMetric, setMargin,
     briefs, brief, reviewState, setReviewState, reviewThread,
     addReviewNote, removeReviewNote, campaignProgress, campaignNoteCount,
