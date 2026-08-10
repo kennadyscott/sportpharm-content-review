@@ -898,6 +898,85 @@ const Store = (() => {
     return n;
   }
 
+  /* =========================================================================
+     THE WEEK — days, and the running log
+
+     Straight from the ClearK12 model: a todo with a `day` belongs to that day,
+     and a todo with no day is the running task log. Nothing else distinguishes
+     them, so moving work between the two is just setting or clearing a date.
+
+     A day section also shows project tasks due that day, because "what am I
+     doing Monday" doesn't care which list a thing came from.
+  ========================================================================= */
+  const todos = () => load().todos;
+  const todo = id => load().todos.find(t => t.id === id) || null;
+
+  const ymd = d => d.toISOString().slice(0, 10);
+  /* Monday of whatever week that date falls in. */
+  function mondayOf(iso) {
+    const d = new Date((iso || today()) + 'T12:00:00');
+    const off = (d.getDay() + 6) % 7;          /* Sun=0 -> 6, Mon=1 -> 0 */
+    d.setDate(d.getDate() - off);
+    return ymd(d);
+  }
+  function addDays(iso, n) {
+    const d = new Date(iso + 'T12:00:00');
+    d.setDate(d.getDate() + n);
+    return ymd(d);
+  }
+  /* Mon–Fri. Weekend work happens, but planning it here would imply it should. */
+  const weekDays = start => [0, 1, 2, 3, 4].map(i => addDays(start, i));
+
+  function addTodo(fields) {
+    const me = currentUser();
+    const t = {
+      id: uid('td'), title: 'New item', detail: '', day: null, done: false,
+      repeats: null, tag: '', owner: me ? me.id : null,
+      order: -Date.now() / 1000, createdAt: now(), ...fields
+    };
+    load().todos.unshift(t);
+    save();
+    return t;
+  }
+  function updateTodo(id, patch) {
+    const t = todo(id);
+    if (!t) return null;
+    Object.assign(t, patch);
+    save();
+    return t;
+  }
+  function toggleTodo(id) {
+    const t = todo(id);
+    if (!t) return;
+    t.done = !t.done;
+    t.doneAt = t.done ? now() : null;
+    save();
+  }
+  function removeTodo(id) {
+    const s = load();
+    s.todos = s.todos.filter(t => t.id !== id);
+    save();
+  }
+
+  /* Everything on a given day: what you put there, plus project work due then. */
+  function dayItems(iso) {
+    const me = currentUser();
+    const mine = todos().filter(t => t.day === iso).sort((a, b) => a.order - b.order);
+    const tasks = allTasks().filter(t =>
+      t.due === iso && t.status !== 'shipped' && (!me || !t.owner || t.owner === me.id));
+    return { todos: mine, tasks };
+  }
+  /* The running log — anything not yet given a day. */
+  const runningLog = () => todos().filter(t => !t.day).sort((a, b) => a.order - b.order);
+
+  /* Work somebody handed you. The question isn't which day — it's whether you
+     know about it — so it stands on its own until you plan it. */
+  function assignedToMe() {
+    const me = currentUser();
+    if (!me) return [];
+    return allTasks().filter(t => t.owner === me.id && t.status !== 'shipped' && !t.due);
+  }
+
   /* ------------------------------- playbook ------------------------------ */
   /* Ticked operational actions in the launch playbook. Kept in `flags` so they
      survive the plan being rewritten around them. */
