@@ -40,8 +40,22 @@ const ROLES = {
 const SEED_USERS = [
   { id: 'u-brandon', name: 'Brandon Welch', email: 'brandonw@sportpharm.com', role: 'owner',  tone: 'navy',  title: 'President',          pass: 'summit-anchor-40' },
   { id: 'u-jessie',  name: 'Jessie T',      email: 'jessiet@sportpharm.com',  role: 'editor', tone: 'red',   title: 'Marketing',          pass: 'summit-anchor-40' },
-  { id: 'u-kennady', name: 'Kennady Scott', email: 'kennady.nickell@gmail.com', role: 'owner', tone: 'blue', title: 'Build & web',        pass: 'summit-anchor-40' }
+  { id: 'u-kennady', name: 'Kennady Scott', email: 'kennady.nickell@gmail.com', role: 'owner', tone: 'blue', title: 'Build & web',        pass: 'summit-anchor-40' },
+  /* Julia and Marissa raise the orders, so they need seats to message and to
+     fill the form. Nobody has given me their addresses, so the seats exist
+     without one and Team shows them as needing an invite rather than my
+     guessing an address that silently never reaches them. */
+  { id: 'u-julia',   name: 'Julia',         email: '', role: 'editor', tone: 'amber', title: 'Orders',    pass: 'summit-anchor-40', invite: true },
+  { id: 'u-marissa', name: 'Marissa',       email: '', role: 'editor', tone: 'green', title: 'Orders',    pass: 'summit-anchor-40', invite: true }
 ];
+
+/* -------------------------------- messages -------------------------------
+   One thread per person plus a Team room. Threads, not a single log, because
+   the ask was to pick who it goes to — and because "did Julia see it" is the
+   question people actually have. Seeded empty: nobody has said anything yet
+   and inventing a conversation would be lying about what happened. */
+const SEED_MESSAGES = [];
+const TEAM_THREAD = 'team';
 
 /* ------------------------------- products -------------------------------- */
 /* Live-store facts. Referenced by the CMS (product tie-ins) and Branding. */

@@ -328,6 +328,7 @@ const HQ = (() => {
       content: s.review + s.changes,
       ideas: Store.ideas().filter(d => d.state === 'open').length,
       orders: Store.orders().filter(o => o.status !== 'complete').length,
+      unread: Store.unreadTotal(),
       planning: Store.pieces().filter(p => p.status === 'drafting' || p.status === 'review').length
     };
   }
@@ -336,13 +337,19 @@ const HQ = (() => {
     const { view: v } = route();
     const me = Store.currentUser();
     const c = counts();
-    const badge = { projects: c.open, content: c.content, ideas: c.ideas, plan: c.planning, orders: c.orders };
+    const badge = { projects: c.open, content: c.content, ideas: c.ideas, plan: c.planning,
+                    orders: c.orders, today: c.unread };
     /* the Content parent rolls up only its own children, not Content Plan */
     const link = (n, sub) => `
       <a class="rail-link ${sub ? 'sub' : ''} ${n.id === v ? 'on' : ''}" href="#/${n.id}">
         ${svg(n.icon)}<span>${n.label}</span>
-        ${badge[n.id] ? `<span class="rail-count">${badge[n.id]}</span>` : ''}
+        ${badge[n.id] ? `<span class="rail-count ${n.id === 'today' ? 'alert' : ''}">${badge[n.id]}</span>` : ''}
       </a>`;
+    /* The tab title carries it too, so an unread message is visible from a
+       different tab. This is the whole of the notification for now — until
+       Supabase is connected there is no server to push from, so a message
+       only reaches someone else when their browser next loads the state. */
+    document.title = (c.unread ? `(${c.unread}) ` : '') + 'SportPharm HQ';
     $('#rail-nav').innerHTML = NAV.map(n => {
       if (!n.children) return link(n, false);
       const activeChild = n.children.some(k => k.id === v);
@@ -356,13 +363,18 @@ const HQ = (() => {
         </button>
         ${open ? n.children.map(k => link(k, true)).join('') : ''}`;
     }).join('');
-    const tg = $('#rail-nav').querySelector('[data-navtoggle]');
-    if (tg) tg.addEventListener('click', () => {
-      const activeChild = CONTENT_KIDS.some(k => k.id === route().view);
-      const open = groupOpen[n.parent] === undefined ? activeChild : groupOpen[n.parent];
-      contentOpen = !open;
-      renderRail();
-    });
+    /* Every group, not just the first — and each remembers its own state, so
+       opening Marketing does not fold Analytics away underneath you. */
+    $('#rail-nav').querySelectorAll('[data-navtoggle]').forEach(tg =>
+      tg.addEventListener('click', () => {
+        const parent = tg.dataset.navtoggle;
+        const grp = NAV.find(x => x.parent === parent);
+        if (!grp) return;
+        const activeChild = grp.children.some(k => k.id === route().view);
+        const open = groupOpen[parent] === undefined ? activeChild : groupOpen[parent];
+        groupOpen[parent] = !open;
+        renderRail();
+      }));
     $('#rail-me').innerHTML = me ? `${avatar(me)}
       <span><b>${esc(me.name)}</b><span>${esc(ROLES[me.role].label)} · Sign out</span></span>` : '';
     $('#tb-right').innerHTML =

@@ -51,6 +51,7 @@
   ========================================================================= */
   let weekStart = null;                 /* null = the current week */
   let weekMode = 'day';                 /* day | week */
+  let msgTo = null;                     /* open thread; null = the Team room */
 
   const DAY_TONE = ['red', 'amber', 'green', 'blue', 'navy'];
   const ordinal = n => {
@@ -107,6 +108,71 @@
     </section>`;
   }
 
+  /* ----------------------------- messages -----------------------------
+     Left rail picks who it goes to, right side is the conversation. Runs of
+     messages from the same person on the same day group together, because
+     the repeated name is noise once you know who is talking. */
+  function msgPanel(me) {
+    const list = Store.threads();
+    const to = msgTo || (list[0] && list[0].id);
+    const open = list.find(t => t.id === to) || list[0];
+    const all = Store.threadMessages(to);
+
+    const day = t => new Date(t).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    const clock = t => new Date(t).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    const today = day(new Date().toISOString());
+
+    let lastDay = null, lastBy = null;
+    const thread = all.slice(-80).map(m => {
+      const d = day(m.at);
+      const rule = d !== lastDay ? `<div class="msg-day"><span>${d === today ? 'Today' : esc(d)}</span></div>` : '';
+      const runOn = d === lastDay && m.by === lastBy;
+      lastDay = d; lastBy = m.by;
+      const who = Store.user(m.by);
+      const mine = m.by === (me && me.id);
+      return rule + `<div class="msg ${mine ? 'me' : 'them'} ${runOn ? 'run' : ''} ${m.done ? 'is-done' : ''}">
+        ${runOn ? '' : `<span class="msg-who">${esc(who ? who.name.split(' ')[0] : 'Someone')}</span>`}
+        <span class="msg-line">
+          <button class="msg-tick" data-msgdone="${m.id}" aria-pressed="${!!m.done}"
+                  title="${m.done ? 'Mark not done' : 'Mark done'}">${m.done ? '✓' : ''}</button>
+          <span class="msg-bubble">${esc(m.text)}</span>
+        </span>
+        <span class="msg-at">${clock(m.at)}${m.done ? ' · done' : ''}</span>
+      </div>`;
+    }).join('');
+
+    const who = list.map(t => {
+      const n = Store.unreadIn(t.id);
+      const last = Store.lastInThread(t.id);
+      return `<button class="msg-who-row ${t.id === to ? 'on' : ''}" data-msgto="${esc(t.id)}">
+        <span class="msg-av t-${t.tone}">${t.isRoom ? svg('team') : esc(t.name.slice(0, 1))}</span>
+        <span class="msg-who-body">
+          <span class="msg-who-name">${esc(t.name)}</span>
+          <span class="msg-who-last">${last ? esc(last.text.slice(0, 44)) : esc(t.title || 'No messages yet')}</span>
+        </span>
+        ${n ? `<span class="msg-dot">${n}</span>` : ''}
+      </button>`;
+    }).join('');
+
+    return `<section class="panel msgs">
+      <div class="panel-head"><h2>Messages</h2>
+        <span class="note" style="margin-left:auto">Pick who it goes to</span></div>
+      <div class="msg-body">
+        <div class="msg-who-list">${who}</div>
+        <div class="msg-main">
+          <div class="msg-thread" id="msg-thread">${all.length ? thread
+            : `<p class="wk-empty">Nothing here yet. Say something to ${esc(open ? open.name : 'the team')}.</p>`}</div>
+          ${Store.can('edit') ? `<form class="msg-form" id="msg-form" autocomplete="off">
+            <input id="msg-input" type="text" maxlength="2000"
+                   placeholder="Message ${esc(open ? open.name.split(' ')[0] : 'the team')}…"
+                   aria-label="Write a message">
+            <button class="btn btn-dark btn-sm" type="submit">Send</button>
+          </form>` : ''}
+        </div>
+      </div>
+    </section>`;
+  }
+
   HQ.view('today', {
     render() {
       const me = Store.currentUser();
@@ -139,23 +205,27 @@
           <p class="today-sub">Your week, and what is still on you.</p>
         </section>
 
-        ${assigned.length ? `<section class="panel asg">
-          <div class="panel-head"><h2>Assigned to you</h2>
-            <span class="asg-n">${assigned.length}</span>
-            <span class="note" style="margin-left:auto">someone is waiting on these</span></div>
-          ${assigned.map(t => `<div class="asg-row">
-            <span class="wk-dot t-${areaOf(t.project.area).tone}"></span>
-            <span class="asg-body" data-task="${t.project.id}:${t.id}" tabindex="0" role="button">
-              <span class="asg-title">${esc(t.title)}</span>
-              <span class="asg-from">${esc(t.project.name)}</span>
-            </span>
-            ${Store.can('edit') ? `<select class="asg-plan" data-planday="${t.project.id}:${t.id}"
-                aria-label="Plan ${esc(t.title)} into a day">
-              <option value="">Plan…</option>
-              ${days.map(d => `<option value="${d}">${esc(longDay(d))}</option>`).join('')}
-            </select>` : ''}
-          </div>`).join('')}
-        </section>` : ''}
+        <div class="td-top">
+          ${msgPanel(me)}
+          <section class="panel asg">
+            <div class="panel-head"><h2>Assigned to you</h2>
+              ${assigned.length ? `<span class="asg-n">${assigned.length}</span>` : ''}</div>
+            ${assigned.length ? `<p class="wk-note">Someone is waiting on these.</p>
+            ${assigned.map(t => `<div class="asg-row">
+              <span class="wk-dot t-${areaOf(t.project.area).tone}"></span>
+              <span class="asg-body" data-task="${t.project.id}:${t.id}" tabindex="0" role="button">
+                <span class="asg-title">${esc(t.title)}</span>
+                <span class="asg-from">${esc(t.project.name)}</span>
+              </span>
+              ${Store.can('edit') ? `<select class="asg-plan" data-planday="${t.project.id}:${t.id}"
+                  aria-label="Plan ${esc(t.title)} into a day">
+                <option value="">Plan…</option>
+                ${days.map(d => `<option value="${d}">${esc(longDay(d))}</option>`).join('')}
+              </select>` : ''}
+            </div>`).join('')}`
+            : '<p class="wk-empty">Nothing is waiting on you.</p>'}
+          </section>
+        </div>
 
         <div class="wk-head">
           <h2>Your week <span>${esc(rangeLabel(start))}</span></h2>
@@ -200,6 +270,44 @@
 
     wire(root) {
       wireTaskRows(root);
+
+      /* ---- messages ---- */
+      const openTo = msgTo || ((Store.threads()[0] || {}).id);
+      const th = root.querySelector('#msg-thread');
+      /* Open at the newest message, like every chat app. */
+      if (th) th.scrollTop = th.scrollHeight;
+      if (openTo) Store.markThreadRead(openTo);
+
+      root.querySelectorAll('[data-msgto]').forEach(b =>
+        b.addEventListener('click', () => {
+          msgTo = b.dataset.msgto;
+          Store.markThreadRead(msgTo);
+          HQ.render();
+        }));
+
+      root.querySelectorAll('[data-msgdone]').forEach(b =>
+        b.addEventListener('click', () => {
+          /* Hold the scroll position — ticking something halfway up the
+             thread should not fling you back to the bottom. */
+          const keep = th ? th.scrollTop : 0;
+          Store.toggleMessageDone(b.dataset.msgdone);
+          HQ.render();
+          const again = HQ.$('#msg-thread');
+          if (again) again.scrollTop = keep;
+        }));
+
+      const mf = root.querySelector('#msg-form');
+      if (mf) mf.addEventListener('submit', e => {
+        e.preventDefault();
+        const box = root.querySelector('#msg-input');
+        const text = box.value.trim();
+        if (!text) return;
+        Store.sendMessage(openTo, text);
+        Store.markThreadRead(openTo);
+        HQ.render();
+        const again = HQ.$('#msg-input');
+        if (again) again.focus();
+      });
 
       root.querySelectorAll('[data-wkmode]').forEach(b =>
         b.addEventListener('click', () => { weekMode = b.dataset.wkmode; HQ.render(); }));

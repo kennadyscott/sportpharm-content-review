@@ -31,8 +31,10 @@ const Store = (() => {
     return {
       users: SEED_USERS.map((u, i) => ({
         id: u.id, name: u.name, email: u.email, role: u.role, tone: u.tone,
-        title: u.title, seed: !!u.seed, pass: hash(u.pass), createdAt: now(), order: i
+        title: u.title, seed: !!u.seed, invite: !!u.invite,
+        pass: hash(u.pass), createdAt: now(), order: i
       })),
+      messages: SEED_MESSAGES.slice(),
       projects: SEED_PROJECTS.map(p => ({
         ...p,
         tasks: p.tasks.map((t, i) => ({ notes: '', createdAt: now(), updatedAt: now(), ...t, order: i }))
@@ -81,6 +83,15 @@ const Store = (() => {
           });
         }
       });
+      /* Seats added by a later build. `users` already exists, so the top-level
+         backfill above skips it and Julia and Marissa would never appear in a
+         store that was created before they were added. Match on id, and never
+         overwrite a seat someone has already claimed. */
+      if (Array.isArray(state.users)) {
+        base.users.forEach(u => {
+          if (!state.users.some(x => x.id === u.id)) state.users.push(u);
+        });
+      }
     } catch (e) { state = seed(); }
     if (runSchedule()) save();
     return state;
@@ -979,6 +990,89 @@ const Store = (() => {
   }
 
   /* =========================================================================
+     MESSAGES
+
+     Threads, not one shared log: you pick who it goes to. A message carries
+     `to` — either a user id (a DM) or 'team' (the room everyone sees).
+
+     Two pieces of state that look similar and are not:
+       done  — shared. If Jessie has dealt with it, Brandon should see that.
+       read  — personal, and deliberately kept in localStorage outside the
+               synced state, because otherwise opening a thread is a write,
+               and a write is a sync for everyone.
+  ========================================================================= */
+  const MSG_CAP = 600;
+
+  function messages() {
+    const s = load();
+    if (!Array.isArray(s.messages)) s.messages = [];
+    return s.messages;
+  }
+
+  /* Everyone but me, plus the Team room. Seed accounts are demo rows, not
+     people, so they are not somewhere you can send a message. */
+  function threads() {
+    const me = currentUser();
+    const list = [{ id: TEAM_THREAD, name: 'Team', title: 'Everyone', tone: 'navy', isRoom: true }];
+    load().users.filter(u => !u.seed && (!me || u.id !== me.id))
+      .sort((a, b) => (a.order || 0) - (b.order || 0))
+      .forEach(u => list.push({ id: u.id, name: u.name, title: u.title || '', tone: u.tone || 'navy' }));
+    return list;
+  }
+
+  /* A DM belongs to a thread if I am either end of it. The room is simply
+     everything addressed to 'team'. */
+  function threadMessages(to) {
+    const me = currentUser();
+    const mine = me ? me.id : null;
+    return messages().filter(m => to === TEAM_THREAD
+      ? m.to === TEAM_THREAD
+      : (m.to === to && m.by === mine) || (m.to === mine && m.by === to));
+  }
+
+  function sendMessage(to, text) {
+    const t = (text || '').trim();
+    if (!t || !to) return null;
+    const me = currentUser();
+    const m = { id: uid('msg'), by: me ? me.id : null, to, text: t.slice(0, 2000), at: now() };
+    const list = messages();
+    list.push(m);
+    if (list.length > MSG_CAP) list.splice(0, list.length - MSG_CAP);
+    save();
+    return m;
+  }
+
+  function toggleMessageDone(id) {
+    const m = messages().find(x => x.id === id);
+    if (!m) return null;
+    m.done = !m.done;
+    m.doneBy = m.done ? ((currentUser() || {}).id || null) : null;
+    m.updatedAt = now();
+    save();
+    return m;
+  }
+
+  const readKey = to => 'sphq-msgread-' + ((currentUser() || {}).id || 'anon') + '-' + to;
+  function lastReadAt(to) { try { return localStorage.getItem(readKey(to)) || ''; } catch (e) { return ''; } }
+  function markThreadRead(to) { try { localStorage.setItem(readKey(to), now()); } catch (e) {} }
+
+  /* Unread = addressed to me (or to the room), by someone else, since I last
+     looked at that particular thread. */
+  function unreadIn(to) {
+    const me = currentUser();
+    const since = lastReadAt(to);
+    return threadMessages(to).filter(m =>
+      m.by !== (me && me.id) && String(m.at) > since).length;
+  }
+  function unreadTotal() { return threads().reduce((n, t) => n + unreadIn(t.id), 0); }
+
+  /* The newest line in a thread, for the preview under each name. */
+  function lastInThread(to) {
+    const list = threadMessages(to);
+    return list.length ? list[list.length - 1] : null;
+  }
+
+  /* =========================================================================
      ORDERS
 
      One record per order, carrying everything the email used to carry — and
@@ -1233,6 +1327,8 @@ const Store = (() => {
     media, mediaItem, addMedia, updateMedia, removeMedia, mediaUsedBy,
     todos, todo, addTodo, updateTodo, toggleTodo, removeTodo,
     mondayOf, addDays, weekDays, dayItems, runningLog, assignedToMe,
+    messages, threads, threadMessages, sendMessage, toggleMessageDone,
+    lastReadAt, markThreadRead, unreadIn, unreadTotal, lastInThread,
     orders, order, addOrder, updateOrder, removeOrder, setOrderStatus,
     orderReady, orderTotal, orderMessage,
     metricsOf, setMetric, setMargin,
