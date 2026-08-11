@@ -16,8 +16,12 @@ window.HQ = window.HQ || {};
 HQ.pdf = (() => {
   'use strict';
 
-  const ORDER_TPL = 'forms/SportPharm-Order-Form.pdf';
-  const INVOICE_TPL = 'forms/SportPharm-Invoice.pdf';
+  /* Against this script's URL, not the page's — the standalone order form is
+     served from /order/ and would otherwise look for /order/forms/. */
+  const BASE = document.currentScript
+    ? new URL('.', document.currentScript.src).href : './';
+  const ORDER_TPL = BASE + 'forms/SportPharm-Order-Form.pdf';
+  const INVOICE_TPL = BASE + 'forms/SportPharm-Invoice.pdf';
   const ORDER_LINES = 5;      /* section B of the paper form */
   const ORDER_FREE = 2;       /* section C */
   const INVOICE_LINES = 12;

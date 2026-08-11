@@ -21,7 +21,12 @@ window.HQ = window.HQ || {};
 HQ.orderImport = (() => {
   'use strict';
 
-  const LIB = 'vendor/pdf-lib.min.js';
+  /* Resolved against this script's own URL, not the page's. The standalone
+     order form lives at /order/, and a plain relative path would send it
+     looking for /order/vendor/pdf-lib.min.js. */
+  const BASE = document.currentScript
+    ? new URL('.', document.currentScript.src).href : './';
+  const LIB = BASE + 'vendor/pdf-lib.min.js';
   const LINE_ROWS = 5;      /* section B */
   const FREE_ROWS = 2;      /* section C */
 

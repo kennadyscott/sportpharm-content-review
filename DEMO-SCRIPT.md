@@ -1,139 +1,134 @@
-# SportPharm HQ — demo script
+# SportPharm HQ — 3-minute demo
 
-Twelve minutes, five moves. It opens on the mess Brandon already knows about,
-and only widens once he has seen it fixed.
-
-**Before you start**
-
-1. Open HQ, sign in.
-2. **Settings → Demo data → Load it.** Two orders, a task mid-handoff, some
-   messages and four weeks of KPI figures.
-3. Check the amber **Demo data** chip is showing top-right. It stays there the
-   whole time — the numbers are illustrative and the chip says so, which
-   matters the moment somebody photographs the screen.
-4. **Settings → Demo data → Clear it** when you are done.
-
-One thing to know: the KPI figures are invented and round. If Brandon asks
-what revenue was last week, say so. Everything else on screen — the Oklahoma
-State order, its contents, its total — is real, from Julia's own email.
+Three beats. One story: **Julia's order email, fixed — and Enovachem in the
+same record.** Everything else is cut. If it does not serve that sentence it
+is not in here.
 
 ---
 
-## 1 · Open on the problem (2 min) — *Orders*
+## Before the clock starts
 
-Go to **Orders**. Open **SP-0001**.
+Do all of this before anyone is watching:
 
-> "This is the Oklahoma State order Julia sent last month. Same order, same
-> details — but it was written from scratch in an email, which is why the
-> warehouse, invoicing and Enova each read it slightly differently."
+1. Sign in.
+2. **Settings → Demo data → Load it.**
+3. Go to **Orders → SP-0001** and leave it open on screen.
+4. Check the amber **Demo data** chip is showing. The KPI numbers are invented
+   — the chip says so, which matters if anyone photographs the screen.
 
-Scroll the form. Point at three things and nothing else:
+Afterwards: **Settings → Demo data → Clear it.**
 
-- **Free of charge** — 2 × Super Hot, approved by Brandon. *"On the email
-  these were a sentence. Nobody could tell later whether they were free or
-  just unbilled."*
-- **The total** — $279.95. *"Matches her email to the cent."*
-- **Where it is** — Acknowledged. *"Not a status somebody typed. It moved
-  because Enova acknowledged it."*
+---
 
-## 2 · The thing they will ask for (1 min) — *Print / PDF*
+## 0:00 — The order (55 sec)
 
-Hit **Print / PDF**.
+You are already on SP-0001. Do not scroll yet.
 
-> "Same record, as a purchase order. This is what goes in the file and what
-> the warehouse picks from."
+> "This is the Oklahoma State order Julia sent last month. Same order — but she
+> wrote it from scratch in an email, which is why the warehouse, invoicing and
+> Enova each read it slightly differently."
 
-Close the dialog. Do not linger — the point is that it exists.
+Scroll once, slowly. Point at two things only:
 
-## 3 · Send it (1 min) — *Open in Outlook*
+- **Free of charge** — 2 × Super Hot, approved by Brandon.
+  > "On the email these were a sentence in the middle. Nobody could tell later
+  > whether they were free or just never billed."
+- **$279.95 total.**
+  > "Matches her email to the cent. She didn't add it up — the form did."
 
-Hit **Open in Outlook**.
+## 0:55 — Send it (35 sec)
 
-> "The message is written from the form, so it reads identically every time.
-> Julia is not composing anything."
+Click **Open in Outlook**. Let it open. Close it without sending.
 
-Then close the compose window without sending, and say the honest part:
+> "The message is written from the form, so it reads the same every time.
+> Julia isn't composing anything — she's pressing send."
 
-> "Right now it hands the finished message to Outlook and Julia presses send.
-> When this is on Azure it sends straight from orders@sportpharm.com, with a
-> copy in that mailbox — so 'did that go out?' has an answer that isn't
-> someone's laptop."
+Do not explain the Azure part. If asked: *"Later it sends straight from
+orders@sportpharm.com with a copy in that mailbox. Today it hands it to
+Outlook."*
 
-## 4 · The move that lands (3 min) — *View as → Dana R · EN*
+## 1:30 — Enovachem (60 sec)
 
-Bottom of the rail, **View as → Dana R · EN**. Let the screen change before
-you say anything.
+Bottom of the rail: **View as → Dana R · EN**. Say nothing until the screen
+has changed.
 
-> "That is the same HQ, seen by Enovachem."
+> "Same HQ. This is Enovachem."
 
-Point out what is *not* there: no Marketing, no projects, no KPIs. One
-section, one page.
+Point at what is missing — no marketing, no projects, no numbers. One section.
 
-Open **SP-0001** and scroll to **Talk to Enovachem**. Type a reply as Dana —
-*"40 units on hand, picking today"* — and post it.
+Open **SP-0001**, scroll to **Talk to Enovachem**, type as Dana:
 
-Switch **View as** back to yourself. The reply is there.
+> `40 units on hand, picking today`
+
+Post it. Switch **View as** back to yourself. The reply is there.
 
 > "One order record. Both companies. Not two systems and an email chain
 > between them."
 
-Worth saying plainly, because it is the obvious question: Enovachem are not
-on Microsoft. They sign in with whatever address they already use and Entra
-emails them a code. Nothing to install on their side.
+## 2:30 — The number he doesn't have (25 sec)
 
-## 5 · The question he cannot answer today (2 min) — *Analytics → Orders*
+**Analytics → Orders**, go straight to **Given away**.
 
-Go to **Analytics → Orders**. Go straight to **Given away**.
-
-> "Freebies and SWAG have no price on an order, so they never show up in any
+> "Freebies and SWAG have no price on an order, so they never appear in any
 > total. This is the only place that counts them — and it flags any giveaway
-> with nobody named as having approved it."
+> nobody is recorded as approving."
 
-Then **How long each step takes**.
+## 2:55 — Stop
 
-> "Average days from raised to each handoff. Only counts orders that actually
-> reached the step, so a stalled one doesn't make the process look faster."
+> "That's the piece that pays for itself. There's a lot more behind it when
+> you want to see it."
 
-## 6 · Close on the day-to-day (2 min) — *Today*
-
-Back to **Today**.
-
-- **Assigned to you** — the handoff, with the note attached. *"Not just a name
-  on a task. The reason travels with it."*
-- **Messages** — pick a person, send.
-- **The week** — drag an item out of the running log onto Thursday.
-
-> "That is the whole thing. Orders is the piece that pays for itself on day
-> one; the rest is where the work actually gets tracked."
+Then stop talking.
 
 ---
 
-## What to say when asked
+## If asked
 
-**"Is this live?"** It runs today, and everyone has their own copy in their
-own browser — good for showing, not for two people working together. Shared
-data is a day's work on Supabase, free, or it comes with the Azure move.
+**"Is it live?"** Runs today; everyone has their own copy. Shared data is a
+day's work, or it comes with the Azure move.
 
-**"What does it cost?"** Nothing to run as it stands. Azure Static Web Apps
-Standard is roughly $9/month, and they already pay for Microsoft 365.
+**"Cost?"** Nothing as it stands. About $9/month on Azure, and they already
+pay for Microsoft 365.
 
-**"Can Enovachem see our numbers?"** No — they see the orders addressed to
-them and nothing else, not even drafts. *(Be straight if pushed: that is
-enforced in the interface today. Before a real Enovachem account exists it has
-to be enforced on the server too, and that is part of the Azure work.)*
+**"Can Enovachem see our numbers?"** They see the orders addressed to them and
+nothing else, not even drafts. *(If pushed: enforced in the interface today,
+enforced on the server as part of the Azure work.)*
 
-**"How long?"** Half a day for private hosting and real logins. Another day
-for sending as SportPharm, mostly waiting on admin consent.
+**"How long?"** Half a day for private hosting and real logins. A day more for
+sending as SportPharm.
 
-**"Who has to do something?"** One person with Entra admin rights, for about
-half an hour, to register the app. Nothing else touches IT.
+**"Who has to do something?"** One person with Entra admin rights, half an
+hour, to register the app.
 
 ---
 
-## Do not demo
+## Cut on purpose — do not open these
 
-- **KPIs** unless asked — the numbers are invented, and the real report has
-  customer names in it, which is exactly why it is not loaded.
-- **The WooCommerce pull** — not built, and it needs the server first.
-- Anything from **Marketing** unless Jessie is in the room. It is a different
-  pitch and it dilutes this one.
+Today, the week, handoffs, messages, KPIs, Inventory, Money, Raise an order,
+the PDF export, Marketing, Project Planning.
+
+They are all built. In three minutes each one costs you the thread, and the
+order story is the one that sells. Keep them for the second meeting — that is
+what the long version below is for.
+
+---
+
+<details>
+<summary><strong>The 12-minute version</strong> — for the follow-up, when they have asked to see more</summary>
+
+Same opening, then add, in this order:
+
+1. **Print / PDF** on the order — the purchase order that goes in the file.
+2. **Analytics → Orders → How long each step takes** — average days to each
+   handoff, counting only orders that reached it, so a stall does not make the
+   process look faster.
+3. **Today** — *Assigned to you* with the handoff note attached ("the reason
+   travels with the task"), *Messages*, then drag an item from the running log
+   onto Thursday.
+4. **Project Planning** — one project, its board, its own pages.
+
+Beyond that: Inventory, Money, Raise an order and the PDF export were built in
+a parallel session and are not scripted here. Drive them yourself once before
+you show them to anyone.
+
+</details>
