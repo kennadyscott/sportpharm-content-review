@@ -345,8 +345,7 @@
               <h3>Running task log</h3>
               <span class="wk-count">${logDone}/${log.length}</span>
             </div>
-            ${wkShut.has('__log') ? '' : `<p class="wk-note">Things you have given yourself to do, with no day yet.
-              Drag one onto a day to plan it — or drag it back here to unplan it.</p>
+            ${wkShut.has('__log') ? '' : `<p class="wk-note">Drag one onto a day to plan it.</p>
             <div class="wk-table">
               ${wkHead}
               ${log.length ? log.map(todoRow).join('') : '<p class="wk-empty">Nothing waiting.</p>'}
