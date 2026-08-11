@@ -2658,3 +2658,14 @@ button.pl-st:hover { filter: brightness(.94); }
   .rail-pages { left: 56px; width: 196px; }
   .app.rail-open .rail-icons, .app.rail-open .rail-pages { transform: translateX(0); }
 }
+
+/* An edit affordance on the project card, so renaming does not require
+   opening a sheet first. */
+.proj-card { position: relative; cursor: pointer; text-align: left; }
+.proj-edit { position: absolute; top: .7rem; right: .7rem; opacity: 0;
+  color: var(--ink-faint); display: grid; place-items: center; padding: .25rem;
+  border-radius: 7px; background: none; border: none; cursor: pointer; }
+.proj-card:hover .proj-edit, .proj-edit:focus { opacity: 1; }
+.proj-edit:hover { color: var(--red); background: var(--bg); }
+.proj-edit svg { width: 14px; height: 14px; }
+.proj-add-goal { color: var(--ink-faint); font-style: italic; }

@@ -753,17 +753,20 @@
         const s = projectStats(p);
         const d = dueLabel(p.due);
         const owners = [...new Set(p.tasks.map(t => t.owner).filter(Boolean))];
-        return `<button class="proj-card t-${p.tone}" data-go="#/projects/${p.id}">
+        const ed = Store.can('edit');
+        return `<div class="proj-card t-${p.tone}" data-go="#/projects/${p.id}" tabindex="0" role="button">
           <span class="tag">${esc(areaOf(p.area).label)}</span>
-          <h3>${esc(p.name)}</h3>
-          <p>${esc(p.goal)}</p>
+          ${ed ? `<button class="proj-edit" data-editproj="${p.id}"
+              title="Edit this project" aria-label="Edit ${esc(p.name)}">${svg('pen')}</button>` : ''}
+          <h3 ${ed ? `data-ipname="${p.id}"` : ''}>${esc(p.name)}</h3>
+          <p ${ed ? `data-ipgoal="${p.id}"` : ''}>${esc(p.goal) || (ed ? '<span class="proj-add-goal">Add a goal…</span>' : '')}</p>
           <div class="progbar"><i style="width:${s.pct}%"></i></div>
           <div class="proj-foot">
             <span class="mini-prog">${s.done}/${s.total} done</span>
             ${d ? `<span class="due ${d.tone}">${esc(d.txt)}</span>` : ''}
             <span class="stackav">${owners.map(o => avatar(Store.user(o), 'sm')).join('')}</span>
           </div>
-        </button>`;
+        </div>`;
       }).join('')}
     </div>`;
   }
@@ -1131,7 +1134,7 @@
           </div>
           <div class="sheet-body">
             <textarea class="sheet-title" id="pj-name" rows="2" ${editable ? '' : 'readonly'}>${esc(p.name)}</textarea>
-            <div class="field"><label for="pj-goal">The goal — what this month is for</label>
+            <div class="field"><label for="pj-goal">The goal — what this project is for</label>
               <textarea id="pj-goal" ${editable ? '' : 'readonly'}>${esc(p.goal || '')}</textarea></div>
             <div class="meta-grid">
               <div class="field"><label>Area</label>
@@ -1143,7 +1146,7 @@
             </div>
             ${editable ? `<div class="sheet-danger">
               <span style="font-size:.78rem;color:var(--ink-faint)">${p.tasks.length} task${p.tasks.length === 1 ? '' : 's'} inside</span>
-              <button class="link-danger" id="pj-del">Remove this month</button>
+              <button class="link-danger" id="pj-del">Remove this project</button>
             </div>` : ''}
           </div>`,
         wire(sheet) {
@@ -1151,7 +1154,7 @@
           const n = sheet.querySelector('#pj-name');
           const auto = () => { n.style.height = 'auto'; n.style.height = n.scrollHeight + 'px'; };
           auto(); n.addEventListener('input', auto);
-          n.addEventListener('change', () => { Store.updateProject(p.id, { name: n.value.trim() || 'Untitled month' }); HQ.render(); });
+          n.addEventListener('change', () => { Store.updateProject(p.id, { name: n.value.trim() || 'Untitled project' }); HQ.render(); });
           sheet.querySelector('#pj-goal').addEventListener('change', e => { Store.updateProject(p.id, { goal: e.target.value }); HQ.render(); });
           sheet.querySelector('#pj-area').addEventListener('change', e => {
             Store.updateProject(p.id, { area: e.target.value, tone: areaOf(e.target.value).tone });
@@ -1233,6 +1236,19 @@
           const proj = Store.createProject({ name: 'New project' });
           go('#/projects/' + proj.id);
           setTimeout(() => openProjectSheet(proj.id), 60);
+        });
+
+        /* Rename and re-goal a project from the card itself. The sheet is
+           where you go for area and dates — it is not a toll gate you have to
+           pass through to fix a typo. */
+        HQ.stopRow(root, '[data-editproj], [data-ipname], [data-ipgoal]');
+        root.querySelectorAll('[data-editproj]').forEach(b =>
+          b.addEventListener('click', () => openProjectSheet(b.dataset.editproj)));
+        HQ.inlineText(root, '[data-ipname]', (el, v) => {
+          Store.updateProject(el.dataset.ipname, { name: v }); HQ.render();
+        });
+        HQ.inlineText(root, '[data-ipgoal]', (el, v) => {
+          Store.updateProject(el.dataset.ipgoal, { goal: v }); HQ.render();
         });
       }
     }
