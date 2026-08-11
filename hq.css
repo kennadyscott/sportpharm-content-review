@@ -2475,3 +2475,10 @@ button.pl-st:hover { filter: brightness(.94); }
   color: var(--ink-faint); margin-bottom: .35rem; }
 .asg-row.slim { cursor: pointer; }
 .asg-row.slim:hover { background: var(--bg); border-radius: 8px; }
+
+/* In the third-width column the title, the note and a dropdown will not sit
+   on one line. Let the row wrap and drop the day picker underneath, and pin
+   the dot to the first line instead of floating to the middle of a wrap. */
+.asg-row { flex-wrap: wrap; align-items: flex-start; }
+.asg-row .wk-dot { margin-top: .42rem; }
+.asg-row .asg-plan { max-width: none; width: 100%; margin-top: .35rem; }
