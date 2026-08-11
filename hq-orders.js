@@ -17,6 +17,17 @@
   const { esc, svg, avatar, ago, toast, copy, go } = HQ;
 
   const stOf = o => ORDER_STATES[o.status] || ORDER_STATES.draft;
+
+  /* Graph wants the attachment as base64. Chunked because spreading a
+     100KB Uint8Array into String.fromCharCode blows the argument limit. */
+  function b64(bytes) {
+    let out = '';
+    const CH = 0x8000;
+    for (let i = 0; i < bytes.length; i += CH) {
+      out += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+    }
+    return btoa(out);
+  }
   const money = n => '$' + (Number(n) || 0).toFixed(2);
   const fmt = d => d ? new Date(d.length > 10 ? d : d + 'T12:00:00')
     .toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '—';
@@ -1015,6 +1026,19 @@
            No confirm on this path either: opening a draft is not sending, so
            there is nothing to confirm, and the dialog was another thing
            between the click and the navigation. */
+        /* The order form goes with the message. With a server it is a real
+           attachment; without one the browser downloads it and Julia attaches
+           it in Outlook — a URL cannot carry a file, and pretending otherwise
+           would put "attached" in a mail with nothing on it. */
+        let pdf = null;
+        if (HQ.pdf && HQ.pdf.orderForm) {
+          try {
+            pdf = await HQ.pdf.orderForm(o, { save: !HQ.mailer.ready() });
+          } catch (e) {
+            toast('Could not build the order form PDF — sending the message without it.');
+          }
+        }
+
         if (!HQ.mailer.ready()) {
           /* Outlook on the web, not mailto:. A page cannot choose which mail
              app the OS opens, and on a Mac mailto: lands in Mail.app. This
@@ -1030,7 +1054,9 @@
           document.body.appendChild(a);
           a.click();
           a.remove();
-          toast('Opening Outlook. Nothing is sent until you send it there.');
+          toast(pdf
+            ? 'Outlook is opening. The order form is in your Downloads — attach it before sending.'
+            : 'Outlook is opening. Nothing is sent until you send it there.');
           return;
         }
 
@@ -1038,7 +1064,14 @@
 
         snd.disabled = true;
         snd.textContent = 'Sending…';
-        const res = await HQ.mailer.send({ to, cc, ref: o.ref, subject, body });
+        const res = await HQ.mailer.send({
+          to, cc, ref: o.ref, subject, body,
+          attachment: pdf && pdf.bytes ? {
+            name: pdf.filename || (o.ref + '.pdf'),
+            contentType: 'application/pdf',
+            contentBytes: b64(pdf.bytes)
+          } : null
+        });
 
         if (!res.ok) {
           /* Say what went wrong and leave the order where it was. Marking it

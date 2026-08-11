@@ -57,7 +57,7 @@ module.exports = async function (context, req) {
     return fail(401, 'Not signed in. This endpoint is not reachable anonymously.');
   }
 
-  const { to, cc, subject, body, ref } = req.body || {};
+  const { to, cc, subject, body, ref, attachment } = req.body || {};
   if (!subject || !body) return fail(400, 'A subject and a body are required.');
 
   const list = v => (Array.isArray(v) ? v : String(v || '').split(','))
@@ -91,7 +91,17 @@ module.exports = async function (context, req) {
           ccRecipients: ccList.map(rec),
           /* So a reply goes to the person who raised it, not the shared
              mailbox where it will sit unread. */
-          replyTo: [rec(who.userDetails)]
+          replyTo: [rec(who.userDetails)],
+          /* The order form itself, so the vendor gets the document and not
+             just the summary in the body. Inline attachments are capped at
+             about 3MB by Graph; an order form is tens of KB, so the simple
+             path is the right one here. */
+          attachments: attachment && attachment.contentBytes ? [{
+            '@odata.type': '#microsoft.graph.fileAttachment',
+            name: attachment.name || `${ref || 'order'}.pdf`,
+            contentType: attachment.contentType || 'application/pdf',
+            contentBytes: attachment.contentBytes
+          }] : []
         },
         saveToSentItems: true
       })

@@ -1937,47 +1937,58 @@ const Store = (() => {
   function orderMessage(o) {
     const money = n => '$' + (Number(n) || 0).toFixed(2);
     const L = [];
+    const line = (label, value) => L.push(label + ': ' + value);
+
     L.push('Good morning Team,');
     L.push('');
     L.push('Could we please get this order processed as soon as possible?');
     if (o.pay === 'Invoice') L.push('Invoicing team — they would like to be invoiced for this order, please.');
     L.push('');
-    L.push('ORDER  ' + o.ref);
+
+    /* Written to read in a proportional font. The old version padded columns
+       with spaces so the numbers lined up, which only works in monospace —
+       in Outlook it arrived ragged. Labels and colons instead: nothing here
+       depends on the font, and it survives being quoted in a reply. */
+    L.push('ORDER ' + o.ref);
+    L.push('');
     (o.lines || []).forEach(l => {
-      L.push('  ' + l.qty + ' × ' + l.name + '   ' + money((Number(l.price) || 0) * (Number(l.qty) || 0)));
-      if (l.note) L.push('      ' + l.note);
+      L.push('• ' + l.qty + ' × ' + l.name + ' — ' + money((Number(l.price) || 0) * (Number(l.qty) || 0)));
+      if (l.note) L.push('  (' + l.note + ')');
     });
     if ((o.freebies || []).length) {
       L.push('');
-      L.push('NO CHARGE' + (o.approvedBy ? ' (approved by ' + o.approvedBy + ')' : ''));
-      o.freebies.forEach(f => L.push('  ' + f.qty + ' × ' + f.name));
+      L.push('No charge' + (o.approvedBy ? ' — approved by ' + o.approvedBy : ''));
+      o.freebies.forEach(f => L.push('• ' + f.qty + ' × ' + f.name));
     }
     if ((o.swag || []).length) {
       L.push('');
-      L.push('SWAG');
-      o.swag.forEach(x => L.push('  ' + x));
+      L.push('SWAG to include');
+      o.swag.forEach(x => L.push('• ' + x));
     }
+
     L.push('');
-    L.push('PRICING');
-    L.push('  Items    ' + money(orderTotal(o) - (Number(o.shipCost) || 0)));
-    L.push('  Shipping ' + money(o.shipCost));
-    L.push('  Total    ' + money(orderTotal(o)));
+    line('Items', money(orderTotal(o) - (Number(o.shipCost) || 0)));
+    line('Shipping', money(o.shipCost));
+    line('Total', money(orderTotal(o)));
     L.push('');
-    L.push('PAYMENT   ' + o.pay + (o.poNumber ? '  ·  PO ' + o.poNumber : ''));
-    L.push('SHIPPING  ' + o.ship + (o.needBy ? '  ·  needed by ' + o.needBy : ''));
+    line('Payment', o.pay + (o.poNumber ? ' (PO ' + o.poNumber + ')' : ''));
+    line('Shipping method', o.ship + (o.needBy ? ' — needed by ' + o.needBy : ''));
+
     L.push('');
-    L.push('SHIP TO');
-    L.push('  ' + (o.contactName || ''));
-    if (o.org) L.push('  ' + o.org);
-    (o.shipTo || '').split('\n').filter(Boolean).forEach(x => L.push('  ' + x.trim()));
+    L.push('Ship to');
+    if (o.org) L.push(o.org);
+    if (o.contactName) L.push(o.contactName);
+    (o.shipTo || '').split('\n').map(x => x.trim()).filter(Boolean).forEach(x => L.push(x));
+    const contact = [o.contactEmail, o.contactPhone].filter(Boolean).join(' · ');
+    if (contact) L.push(contact);
+
+    if (o.notes) { L.push(''); L.push('Notes'); L.push(o.notes); }
+
     L.push('');
-    L.push('CONTACT');
-    L.push('  ' + (o.contactName || '') + (o.contactEmail ? '  ·  ' + o.contactEmail : '') +
-           (o.contactPhone ? '  ·  ' + o.contactPhone : ''));
-    if (o.notes) { L.push(''); L.push('NOTES'); L.push('  ' + o.notes); }
-    const me = currentUser();
+    L.push('The order form is attached.');
     L.push('');
     L.push('Thank you all for your help — any questions, let me know.');
+    const me = currentUser();
     if (me) L.push(me.name + ' · SportPharm');
     return L.join('\n');
   }

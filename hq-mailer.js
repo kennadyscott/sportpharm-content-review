@@ -46,12 +46,18 @@ HQ.mailer = (() => {
   function outlookUrl({ to, cc, subject, body }) {
     const list = v => (Array.isArray(v) ? v : [v]).filter(Boolean).join(';');
     const host = cfg().outlookHost || 'https://outlook.office.com/mail/deeplink/compose';
-    const q = new URLSearchParams();
-    q.set('to', list(to));
-    if (cc && list(cc)) q.set('cc', list(cc));
-    q.set('subject', subject || '');
-    q.set('body', body || '');
-    return host + '?' + q.toString();
+    /* encodeURIComponent, NOT URLSearchParams. URLSearchParams writes
+       application/x-www-form-urlencoded, which encodes every space as "+".
+       That is correct for a form POST body and wrong in a URL query that a
+       mail client reads literally — the message arrived with a + between
+       every single word. */
+    const q = [
+      'to=' + encodeURIComponent(list(to)),
+      cc && list(cc) ? 'cc=' + encodeURIComponent(list(cc)) : '',
+      'subject=' + encodeURIComponent(subject || ''),
+      'body=' + encodeURIComponent(body || '')
+    ].filter(Boolean);
+    return host + '?' + q.join('&');
   }
 
   const from = () => cfg().from || 'orders@sportpharm.com';
@@ -60,7 +66,7 @@ HQ.mailer = (() => {
      something a person can act on — sign in again, deploy the function, ask
      for an address to be allowlisted. Swallowing that turns a fixable problem
      into "it doesn't work". */
-  async function send({ to, cc, subject, body, ref }) {
+  async function send({ to, cc, subject, body, ref, attachment }) {
     if (!ready()) {
       /* No server to send from — but the message is already written, so hand
          it to whatever mail client they have. Outlook opens with the
@@ -85,7 +91,10 @@ HQ.mailer = (() => {
         headers: { 'Content-Type': 'application/json' },
         /* The Static Web Apps session cookie is what authenticates this. */
         credentials: 'include',
-        body: JSON.stringify({ to, cc, subject, body, ref })
+        /* The order form travels with the message when there is a server to
+           send it. base64 over JSON — Graph wants contentBytes that way, and
+           an order form is tens of KB, nowhere near the 3MB inline limit. */
+        body: JSON.stringify({ to, cc, subject, body, ref, attachment })
       });
       const data = await r.json().catch(() => ({}));
       if (!r.ok || !data.ok) {
