@@ -692,9 +692,9 @@
         <div class="ed-side">
           <div class="side-card">
             <h4>What it comes to</h4>
-            <div class="os-row"><span>Goods</span><b>${money(t.goods)}</b></div>
-            <div class="os-row"><span>Shipping</span><b>${money(t.ship)}</b></div>
-            <div class="os-row big"><span>Total</span><b>${money(t.total)}</b></div>
+            <div class="os-row"><span>Goods</span><b id="t-goods">${money(t.goods)}</b></div>
+            <div class="os-row"><span>Shipping</span><b id="t-ship">${money(t.ship)}</b></div>
+            <div class="os-row big"><span>Total</span><b id="t-all">${money(t.total)}</b></div>
             ${freeCount ? `<p class="side-sub">Plus ${freeCount} item${freeCount === 1 ? '' : 's'}
                free of charge${nu.swag.length ? ' and ' + nu.swag.length + ' SWAG' : ''}, which carry
                no price but do come off the shelf.</p>` : ''}
@@ -731,15 +731,27 @@
         nu.swag = nu.swag.includes(x) ? nu.swag.filter(s => s !== x) : nu.swag.concat([x]);
         HQ.render();
       }));
-    /* `input` rather than `change` on the plain fields would re-render on
-       every keystroke and lose the caret. These only need to be current when
-       Create is pressed, so they are read straight off the DOM there. */
+    /* Re-rendering on every keystroke would lose the caret, and re-rendering
+       on blur would steal focus from whatever you just tabbed into. So the
+       plain fields are read straight off the DOM when Create is pressed, and
+       the one field that changes something visible — shipping, which moves
+       the total — updates the total in place instead. Typing a shipping cost
+       and watching the total not move is the kind of small wrongness that
+       makes someone stop trusting the number. */
     root.querySelectorAll('[data-nf]').forEach(el =>
       el.addEventListener('change', () => {
         nu[el.dataset.nf] = el.value;
-        /* only the pickers change what is on screen */
-        if (el.dataset.nf === 'pay') HQ.render();
+        if (el.dataset.nf === 'pay') HQ.render();   /* changes which fields exist */
       }));
+
+    const shipIn = root.querySelector('#n-shipCost');
+    if (shipIn) shipIn.addEventListener('input', () => {
+      nu.shipCost = shipIn.value;
+      const t = newTotals();
+      const put = (id, v) => { const el = root.querySelector(id); if (el) el.textContent = money(v); };
+      put('#t-ship', t.ship);
+      put('#t-all', t.total);
+    });
 
     const clear = root.querySelector('#n-clear');
     if (clear) clear.addEventListener('click', () => { nu = blankNew(); HQ.render(); });

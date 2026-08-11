@@ -881,25 +881,75 @@ const ORDER_FLOW = ['draft', 'submitted', 'ack', 'invoiced', 'shipped', 'complet
 const PAY_METHODS = ['Invoice', 'Credit card', 'Purchase order', 'Prepaid', 'No charge'];
 const SHIP_METHODS = ['Ground', '2-day', 'Overnight', 'Freight', 'Customer pickup'];
 
-/* Catalogue for the line-item picker — real prices from the live store. */
+/* Catalogue for the line-item picker — real prices from the live store.
+
+   `of` is what a bundle is made of, and it is what makes inventory mean
+   anything: shipping one Team Trifecta takes nine units off the shelf, not
+   one. Only Trifecta's contents are actually known — they are printed on the
+   order Julia sent. The rest are left empty on purpose rather than guessed,
+   and Inventory says "contents not set" against them instead of quietly
+   counting a bundle as one unit of itself. Set them in Inventory when someone
+   who knows confirms them.
+
+   `unit` items are the things that physically come off a shelf. SWAG is in
+   the same list because a hat going out for free is still a hat gone, which
+   is exactly what nobody could see before. */
 const ORDER_CATALOG = [
-  { sku: 'BUNDLE-TRIFECTA', name: 'Team Trifecta Bundle', price: 269.95,
-    note: '3 WasabiRub · 3 Super Hot · 3 IcetraRub' },
-  { sku: 'BUNDLE-WASABI-TEAM', name: 'WasabiRub Team Bundle', price: 240.95, note: '' },
-  { sku: 'BUNDLE-FIREICE', name: 'Fire & Ice Bundle', price: 64.99, note: '' },
-  { sku: 'BUNDLE-OGHEAT', name: 'OG Heat Bundle', price: 59.99, note: '' },
-  { sku: 'BUNDLE-RECOVERY', name: 'Recovery Bundle', price: 64.99, note: '' },
-  { sku: 'WASABIRUB', name: 'WasabiRub', price: 29.95, note: '' },
-  { sku: 'ICETRARUB', name: 'IcetraRub', price: 39.95, note: '' },
-  { sku: 'SUPERHOT', name: 'WasabiRub Super Hot', price: 39.95, note: '' }
+  { sku: 'BUNDLE-TRIFECTA', name: 'Team Trifecta Bundle', price: 269.95, kind: 'bundle',
+    note: '3 WasabiRub · 3 Super Hot · 3 IcetraRub',
+    of: [['WASABIRUB', 3], ['SUPERHOT', 3], ['ICETRARUB', 3]] },
+  { sku: 'BUNDLE-WASABI-TEAM', name: 'WasabiRub Team Bundle', price: 240.95, kind: 'bundle', note: '', of: [] },
+  { sku: 'BUNDLE-FIREICE', name: 'Fire & Ice Bundle', price: 64.99, kind: 'bundle', note: '', of: [] },
+  { sku: 'BUNDLE-OGHEAT', name: 'OG Heat Bundle', price: 59.99, kind: 'bundle', note: '', of: [] },
+  { sku: 'BUNDLE-RECOVERY', name: 'Recovery Bundle', price: 64.99, kind: 'bundle', note: '', of: [] },
+  { sku: 'WASABIRUB', name: 'WasabiRub', price: 29.95, kind: 'unit', note: '' },
+  { sku: 'ICETRARUB', name: 'IcetraRub', price: 39.95, kind: 'unit', note: '' },
+  { sku: 'SUPERHOT', name: 'WasabiRub Super Hot', price: 39.95, kind: 'unit', note: '' },
+  { sku: 'SWAG-HAT', name: 'SportPharm hat', price: 0, kind: 'swag', note: '' },
+  { sku: 'SWAG-TEE', name: 'SportPharm tee', price: 0, kind: 'swag', note: '' },
+  { sku: 'SWAG-STICKERS', name: 'Stickers', price: 0, kind: 'swag', note: '' },
+  { sku: 'SWAG-BOTTLE', name: 'Water bottle', price: 0, kind: 'swag', note: '' },
+  { sku: 'SWAG-TOWEL', name: 'Towel', price: 0, kind: 'swag', note: '' },
+  { sku: 'SWAG-SAMPLES', name: 'Sample pack', price: 0, kind: 'swag', note: '' }
 ];
-const SWAG_ITEMS = ['SportPharm hat', 'SportPharm tee', 'Stickers', 'Water bottle', 'Towel', 'Sample pack'];
+const SWAG_ITEMS = ORDER_CATALOG.filter(c => c.kind === 'swag').map(c => c.name);
 
 /* Who the form goes to. Kept here so nobody has to remember the distribution. */
 const ORDER_RECIPIENTS = [
   { to: 'orders@sportpharm.com', role: 'Enova — pick & pack' },
   { to: 'AdminUnit@sportpharm.com', role: 'Admin, cc' }
 ];
+
+/* ---------------------------------------------------------------------------
+   MONEY
+
+   Deliberately separate from the order's own status. An order can be shipped
+   and unpaid, or paid and not yet shipped, and collapsing the two into one
+   pipeline is how a delivered order stops being chased. `none` is the honest
+   default: most orders have no invoice yet and pretending otherwise would put
+   money in the outstanding column that nobody has asked for.
+--------------------------------------------------------------------------- */
+const MONEY_STATES = {
+  none:    { label: 'Not invoiced', tone: 'muted', hint: 'No invoice raised yet.' },
+  raised:  { label: 'Invoice raised', tone: 'blue', hint: 'Raised, not sent.' },
+  sent:    { label: 'Invoice sent',  tone: 'amber', hint: 'With the customer, awaiting payment.' },
+  part:    { label: 'Part paid',     tone: 'amber', hint: 'Something in, a balance still out.' },
+  paid:    { label: 'Paid',          tone: 'green', hint: 'Settled in full.' },
+  writeoff:{ label: 'Written off',   tone: 'red',   hint: 'Not going to be collected.' }
+};
+
+/* Where the money is sent from. Shown on the invoice, editable in Settings. */
+const REMIT_TO = {
+  name: 'SportPharm',
+  lines: ['Accounts Receivable', 'accounts@sportpharm.com'],
+  terms: 'Net 30'
+};
+
+/* Opening stock. Zero on purpose — nobody has counted a shelf yet, and a
+   made-up number would read as a real one. Inventory shows what has gone out
+   regardless; on-hand only starts meaning something once someone enters a
+   count, which the Inventory page asks for. */
+const SEED_STOCK = {};
 
 const SEED_ORDERS = [];
 

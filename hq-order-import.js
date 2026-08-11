@@ -194,6 +194,15 @@ HQ.orderImport = (() => {
     if (rec.poNumber && rec.pay !== 'Purchase order') {
       w.push('There is a PO number but the payment method is "' + rec.pay + '".');
     }
+    /* Written in the free list and ticked as SWAG is one item entered twice.
+       Nothing can tell which was meant, and left alone it takes double the
+       stock off the shelf. */
+    const swag = rec.swag.map(s => s.trim().toLowerCase());
+    const twice = rec.freebies.filter(f => swag.includes(f.name.trim().toLowerCase()));
+    twice.forEach(f => w.push(
+      f.name + ' is both a free item and a ticked SWAG box. If that is one ' +
+      f.name.toLowerCase() + ' rather than two, take it off one of them — ' +
+      'as it stands the inventory count sees two.'));
     return w;
   }
 
