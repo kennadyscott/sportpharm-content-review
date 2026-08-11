@@ -1475,7 +1475,9 @@
             return `<div class="team-row">
               ${avatar(u)}
               <div class="who"><b>${esc(u.name)}${u.id === me.id ? ' · you' : ''}</b>
-                <span>${esc(u.email)}${u.title ? ' · ' + esc(u.title) : ''} · ${load} open</span></div>
+                <span>${u.email ? esc(u.email)
+                  : '<em class="u-noinvite">no address yet — needs an invite</em>'}${
+                  u.title ? ' · ' + esc(u.title) : ''} · ${load} open</span></div>
               <div class="right">
                 ${u.pending ? '<span class="badge-pending">Invited</span>' : ''}
                 ${canManage && u.id !== me.id

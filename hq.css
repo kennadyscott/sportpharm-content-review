@@ -2302,4 +2302,25 @@ button.pl-st:hover { filter: brightness(.94); }
   .rail, .topbar, .page-actions, .ed-side, .crumb { display: none !important; }
   .app, .frame, .view { display: block !important; }
   .card-pad { break-inside: avoid; border: 1px solid #999; }
+
+  /* An order on paper is the record Enova and the warehouse work from, so it
+     has to read as a filled-in form rather than a screenshot of a web app:
+     no input boxes, no buttons, nothing that only does something on a click.
+     The generated message prints with it — that is the wording the vendor
+     receives, and it should be on the same sheet as the numbers. */
+  .ord-add, .ord-swag:not(.on), #ord-next, #ord-back, #ord-del, #ord-copy,
+  #ord-print, .ord-del, [data-freedel], [data-linedel], .link-danger { display: none !important; }
+  .ord-in, .field input, .field textarea, .field select,
+  .meta-grid input, .meta-grid select {
+    border: none !important; background: none !important; padding: 0 !important;
+    color: #000 !important; resize: none; -webkit-appearance: none; appearance: none; }
+  .ord-in { width: auto !important; }
+  .ord-msg { white-space: pre-wrap; border: 1px solid #999; padding: .5rem; }
+  .ord-flow { break-inside: avoid; }
+  .panel { break-inside: avoid; box-shadow: none !important; border: 1px solid #ccc; }
+  @page { margin: 14mm; }
 }
+
+/* A seat that exists so it can be messaged and assigned to, but that nobody
+   has an address for yet. Says so rather than showing an empty gap. */
+.u-noinvite { color: var(--amber); font-style: normal; font-size: .78rem; }
