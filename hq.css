@@ -2769,3 +2769,44 @@ button.pl-st:hover { filter: brightness(.94); }
   gap: .5rem; font-size: .72rem; color: var(--ink-soft); }
 .inv-recipe-rows input { width: 3.4rem; padding: .18rem .3rem; font: inherit; font-size: .72rem;
   text-align: right; border: 1px solid var(--line); border-radius: 5px; }
+
+/* The side rail sits in a fixed 297px column, but a grid item defaults to
+   min-width:auto and so refuses to shrink below its widest content. The
+   generated vendor message is a <pre> full of long lines, which made every
+   card in the rail 437px wide and pushed the whole column off the right of
+   the screen. Let them shrink, and let the long lines break. */
+/* min-width:0 alone is not enough: .ed-side is a grid whose implicit column
+   is `auto`, which sizes to max-content and happily grows past its parent.
+   The column has to be told it may shrink. */
+.ed-side, .ed-side > .side-card, .ed-main > .card-pad {
+  grid-template-columns: minmax(0, 1fr);
+}
+.ed-side, .ed-side > .side-card, .ed-main, .ed-main > * { min-width: 0; }
+.ord-msg { overflow-wrap: anywhere; }
+.a-table-wrap { overflow-x: auto; }
+
+/* =====================================================================
+   OVERFLOW — grid tracks that refuse to shrink
+
+   `.ed-side` was `display:grid` with no explicit column, so its implicit
+   track is `auto`, which means max-content. It sized itself to its widest
+   child (437px) and ignored the 297px column it was placed in, pushing the
+   whole page into a horizontal scroll. `min-width:0` on the children cannot
+   fix that — the TRACK is what has to be allowed to shrink.
+
+   Same reasoning on `.app`: `1fr` is `minmax(auto, 1fr)`, and `auto` will
+   not go below min-content. Spelling out minmax(0, 1fr) lets it.
+   ===================================================================== */
+.ed-side { grid-template-columns: minmax(0, 1fr); }
+.app { grid-template-columns: 56px 196px minmax(0, 1fr); }
+.editor-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 297px); }
+
+/* The generated message is a <pre>, so long lines do not wrap and its
+   min-content is the longest line. Let it scroll inside its own box rather
+   than setting the width of everything around it. */
+.ord-msg { overflow-x: auto; white-space: pre; }
+
+/* Below this the side rail stops being a column and sits under the form. */
+@media (max-width: 1080px) {
+  .editor-grid { grid-template-columns: minmax(0, 1fr); }
+}
