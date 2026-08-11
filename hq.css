@@ -2556,3 +2556,17 @@ button.pl-st:hover { filter: brightness(.94); }
 /* Messages: same card language as everything beside it. */
 .mgs { padding: 1rem 1.1rem; }
 .mg-who-row.on { background: var(--bg); }
+
+/* Zeroing the hero's padding pulled it a couple of pixels past the wrap edge
+   and the display face's negative tracking clipped the first letter. */
+.today-hero { padding: 0 0 0 2px; }
+
+/* Align the day picker to the title's first line rather than the middle of a
+   wrapped block, and hold the handoff note to two lines — the full text is
+   on the task, and the row only has to say enough to recognise it. */
+.asg-row { align-items: flex-start; }
+.asg-row .asg-plan { margin-top: .1rem; }
+.asg-pass {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
