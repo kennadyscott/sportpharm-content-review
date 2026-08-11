@@ -826,41 +826,21 @@
     }).join('');
   }
 
+  /* Project Planning is projects, and only projects. The Tasks / Campaign /
+     Content Plan toggle that used to live here is gone: Campaigns and Content
+     Plan are their own sections under Marketing now, and leaving stale copies
+     behind a toggle meant two places to edit the same thing. */
   function projectsIndex() {
-    const blurb = {
-      tasks: 'Every task on one board, a month at a time. Drag between columns; the months are up top.',
-      project: 'The work itself — every project SportPharm has going.',
-      campaign: 'The same tasks, read as "what does this campaign still need before it can run".'
-    }[projView];
-
-    const cur = Store.campaign(CURRENT_CAMPAIGN);
-    const otherCount = Store.campaigns().length - 1;
-
     return `<div class="wrap">
       <div class="page-head">
-        <div><h1>Project Planning</h1><p>${esc(blurb)}</p></div>
+        <div><h1>Project Planning</h1>
+          <p>Every project SportPharm has going. Open one for its board and its pages.</p></div>
         <div class="page-actions">
-          ${Store.can('edit') && projView === 'project'
+          ${Store.can('edit')
             ? `<button class="btn btn-dark" id="new-project">${svg('plus')}Add a project</button>` : ''}
         </div>
       </div>
-
-      ${projToggle(projView)}
-
-      ${projView === 'campaign' ? `
-        <div class="camp-scope">
-          <span class="camp-scope-now">${svg('mega')}<b>${esc(cur ? cur.title : 'Current campaign')}</b>
-            <i>in flight</i></span>
-          <button class="btn btn-outline btn-sm" id="camp-scope-toggle">
-            ${showAllCampaigns ? 'Just the current campaign' : 'See all campaigns (' + otherCount + ' more)'}
-          </button>
-          <button class="btn btn-ghost btn-sm" data-go="#/campaigns">Open the Studio${svg('arrow')}</button>
-        </div>` : ''}
-
-      ${projView === 'project' ? projectCards()
-        : projView === 'tasks' ? taskBoard()
-        : projView === 'campaign' && !showAllCampaigns ? campaignCockpit()
-        : groupedView(projView)}
+      ${projectCards()}
     </div>`;
   }
 

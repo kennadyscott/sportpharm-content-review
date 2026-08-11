@@ -2603,3 +2603,58 @@ button.pl-st:hover { filter: brightness(.94); }
 }
 /* "The week" across: five plain columns rather than five cards. */
 .wk-grid.across .wk-days { gap: 1rem; }
+
+/* =====================================================================
+   THE DOUBLE RAIL
+
+   A narrow strip of section icons, then a panel listing that section's
+   pages. What was here before was one rail with expanding groups — an
+   accordion. This is the real thing: the strip says where you are in the
+   product, the panel says where you are inside it.
+   ===================================================================== */
+.app { grid-template-columns: 56px 196px 1fr; }
+.rail { display: contents; }        /* the two rails are the grid cells */
+
+.rail-icons {
+  grid-column: 1; background: var(--navy-deep); color: #D7E1EF;
+  display: flex; flex-direction: column; align-items: center; gap: .3rem;
+  padding: .85rem .5rem 1rem; position: sticky; top: 0; height: 100vh;
+}
+.rail-mark { display: block; margin-bottom: .9rem; }
+.rail-mark .mark { width: 30px; height: 30px; }
+.rail-secs { display: flex; flex-direction: column; gap: .25rem; width: 100%; align-items: center; }
+.rail-sec {
+  position: relative; width: 38px; height: 38px; border-radius: 11px;
+  display: grid; place-items: center; color: rgba(215,225,239,.62);
+  transition: background .14s ease, color .14s ease;
+}
+.rail-sec svg { width: 19px; height: 19px; }
+.rail-sec:hover { background: rgba(255,255,255,.08); color: #fff; }
+.rail-sec.on { background: rgba(255,255,255,.13); color: #fff; }
+/* A dot rather than a number: at 38px a count is unreadable, and all the
+   strip has to say is "there is something in here". */
+.rail-pip { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--blue); }
+.rail-pip.alert { background: var(--red); }
+
+.rail-pages {
+  grid-column: 2; background: var(--navy); color: #D7E1EF;
+  display: flex; flex-direction: column; gap: .25rem;
+  padding: .9rem .6rem 1rem; position: sticky; top: 0; height: 100vh;
+}
+.rail-head { padding: .1rem .6rem 1rem; }
+.rail-head b { display: block; font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.2; }
+.rail-head span { display: block; font-size: .62rem; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; color: rgba(215,225,239,.45); margin-top: .18rem; }
+.rail-pages .rail-link { padding: .5rem .6rem; gap: .55rem; }
+.rail-pages .rail-link.sub { padding-left: .6rem; }
+
+@media (max-width: 900px) {
+  /* Off-canvas: both rails slide in together as one panel. */
+  .app { grid-template-columns: 1fr; }
+  .rail-icons, .rail-pages { position: fixed; top: 0; height: 100vh; z-index: 60;
+    transform: translateX(-100%); transition: transform .18s ease; }
+  .rail-icons { left: 0; width: 56px; }
+  .rail-pages { left: 56px; width: 196px; }
+  .app.rail-open .rail-icons, .app.rail-open .rail-pages { transform: translateX(0); }
+}

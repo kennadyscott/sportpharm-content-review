@@ -303,51 +303,52 @@ const HQ = (() => {
      rail is the project list — open one and its own tabs sit under it. That
      means NAV cannot be a constant: it is rebuilt on each rail render so a
      project created a second ago is already in the rail. */
-  function navTree() {
-    const kids = [{ id: 'projects', label: 'All projects', icon: 'board' }]
-      .concat(Store.projects().map(p => ({
-        id: 'projects', pid: p.id, label: p.name, icon: 'dot', tone: p.tone
-      })));
+  /* Sections for the narrow rail. Each one owns a set of pages, which the
+     second rail lists. This is a real two-rail nav rather than a single rail
+     with expanding groups — the strip is where you are in the product, the
+     panel is where you are inside that. */
+  function sections() {
     return [
-      { id: 'today',    label: 'Today',            icon: 'today' },
-      { parent: 'Project Planning', icon: 'board', children: kids },
-      { parent: 'Marketing', icon: 'doc',  children: MARKETING_KIDS },
-      { id: 'orders',   label: 'Orders',           icon: 'box' },
-      { parent: 'Analytics', icon: 'chart', children: ANALYTICS_KIDS },
-      { id: 'team',     label: 'Team',     icon: 'team' },
-      { id: 'settings', label: 'Settings', icon: 'gear' }
+      { id: 'today', icon: 'today', label: 'Today',
+        pages: [{ id: 'today', label: 'My week' }] },
+      { id: 'projects', icon: 'board', label: 'Project Planning',
+        pages: [{ id: 'projects', label: 'All projects' }]
+          .concat(Store.projects().map(p => ({
+            id: 'projects', pid: p.id, label: p.name, tone: p.tone }))) },
+      { id: 'marketing', icon: 'doc', label: 'Marketing', pages: MARKETING_KIDS },
+      { id: 'orders', icon: 'box', label: 'Orders',
+        pages: [{ id: 'orders', label: 'All orders' },
+                { id: 'ordstats', label: 'Analytics' }] },
+      { id: 'analytics', icon: 'chart', label: 'Analytics', pages: ANALYTICS_KIDS },
+      { id: 'team', icon: 'team', label: 'Team',
+        pages: [{ id: 'team', label: 'People' }] },
+      { id: 'settings', icon: 'gear', label: 'Settings',
+        pages: [{ id: 'settings', label: 'Settings' }] }
     ];
   }
-  /* flat list for the palette and anything that wants every route. Built from
-     the static sections only — a project is reached through its own id, and
-     listing each one here would put five near-identical rows in the palette. */
-  const NAV = [
-    { id: 'today',    label: 'Today',            icon: 'today' },
-    { id: 'projects', label: 'Project Planning', icon: 'board' },
-    { parent: 'Marketing', icon: 'doc',  children: MARKETING_KIDS },
-    { id: 'orders',   label: 'Orders',           icon: 'box' },
-    { parent: 'Analytics', icon: 'chart', children: ANALYTICS_KIDS },
-    { id: 'team',     label: 'Team',     icon: 'team' },
-    { id: 'settings', label: 'Settings', icon: 'gear' }
-  ];
-  const NAV_FLAT = NAV.flatMap(n => n.children ? n.children : [n]);
 
-  /* Groups start OPEN. They used to default to "open only if you are already
-     inside one", which meant that on Today — the page everyone lands on —
-     all three collapsed and the rail looked flat. The second rail you cannot
-     see is not a second rail.
+  /* Which section owns the page you are on. Orders appears under both Orders
+     and Analytics, so the first match wins and Orders keeps it — a page can
+     only light up one icon. */
+  function sectionFor(view) {
+    const all = sections();
+    return all.find(sec => sec.pages.some(pg => pg.id === view)) || all[0];
+  }
 
-     Folding is remembered per person in localStorage rather than in the
-     store: it is how someone likes to look at the page, not a fact about the
-     work, and it should not sync to everyone else. */
-  const GKEY = 'sphq-railgroups';
-  const groupOpen = (() => {
-    try { return JSON.parse(localStorage.getItem(GKEY)) || {}; } catch (e) { return {}; }
-  })();
-  const saveGroups = () => {
-    try { localStorage.setItem(GKEY, JSON.stringify(groupOpen)); } catch (e) {}
-  };
-  const isOpen = parent => groupOpen[parent] === undefined ? true : groupOpen[parent];
+  /* Every destination, flat, for the command palette. Derived from the same
+     sections the rail draws so the two cannot drift apart. Projects are left
+     out: they are reachable by name through the palette's own search, and
+     listing each one here would put a row per project in front of every
+     query. */
+  function navFlat() {
+    const seen = new Set(), out = [];
+    sections().forEach(sec => sec.pages.forEach(pg => {
+      if (pg.pid || seen.has(pg.id)) return;
+      seen.add(pg.id);
+      out.push({ id: pg.id, label: pg.label, icon: sec.icon });
+    }));
+    return out;
+  }
 
   const views = {};
   function view(id, def) { views[id] = def; }
@@ -378,55 +379,52 @@ const HQ = (() => {
     const { view: v, id: rid } = route();
     const me = Store.currentUser();
     const c = counts();
-    const TREE = navTree();
+    const SECS = sections();
+    const active = sectionFor(v);
     const badge = { projects: c.open, content: c.content, ideas: c.ideas, plan: c.planning,
                     orders: c.orders, today: c.unread };
-    /* the Content parent rolls up only its own children, not Content Plan */
+
+    /* Roll each section's page badges up onto its icon, so a collapsed rail
+       still tells you something is waiting in a section you cannot see. */
+    const secBadge = sec => sec.pages.reduce((t, pg) => t + (pg.pid ? 0 : (badge[pg.id] || 0)), 0);
+
+    /* ---- rail one: the section strip ---- */
+    $('#rail-secs').innerHTML = SECS.map(sec => {
+      const n = secBadge(sec);
+      return `<a class="rail-sec ${sec.id === active.id ? 'on' : ''}" href="#/${sec.pages[0].id}"
+         title="${esc(sec.label)}" aria-label="${esc(sec.label)}"
+         ${sec.id === active.id ? 'aria-current="page"' : ''}>
+        ${svg(sec.icon)}
+        ${n ? `<i class="rail-pip ${sec.id === 'today' ? 'alert' : ''}"></i>` : ''}
+      </a>`;
+    }).join('');
+
+    /* ---- rail two: the pages inside it ---- */
+    $('#rail-head').innerHTML =
+      `<b>${esc(active.label)}</b><span>SportPharm</span>`;
+
     /* A project row carries its own id in the href, and is only "on" when
        that project is the one open — otherwise every project would light up
        whenever any of them was. "All projects" is the inverse: on only when
        no project is open. */
-    const link = (n, sub) => {
-      const href = n.pid ? `#/${n.id}/${n.pid}` : `#/${n.id}`;
-      const on = n.id !== v ? false
-        : n.pid ? rid === n.pid
-        : n.id === 'projects' ? !rid : true;
-      return `
-      <a class="rail-link ${sub ? 'sub' : ''} ${n.pid ? 'rail-proj' : ''} ${on ? 'on' : ''}" href="${href}">
-        ${n.pid ? `<i class="rail-dot t-${n.tone || 'navy'}"></i>` : svg(n.icon)}<span>${n.label}</span>
-        ${!n.pid && badge[n.id] ? `<span class="rail-count ${n.id === 'today' ? 'alert' : ''}">${badge[n.id]}</span>` : ''}
+    $('#rail-nav').innerHTML = active.pages.map(pg => {
+      const href = pg.pid ? `#/${pg.id}/${pg.pid}` : `#/${pg.id}`;
+      const on = pg.id !== v ? false
+        : pg.pid ? rid === pg.pid
+        : pg.id === 'projects' ? !rid : true;
+      return `<a class="rail-link ${pg.pid ? 'rail-proj' : ''} ${on ? 'on' : ''}" href="${href}">
+        ${pg.pid ? `<i class="rail-dot t-${pg.tone || 'navy'}"></i>` : ''}
+        <span>${esc(pg.label)}</span>
+        ${!pg.pid && badge[pg.id] ? `<span class="rail-count ${pg.id === 'today' ? 'alert' : ''}">${badge[pg.id]}</span>` : ''}
       </a>`;
-    };
+    }).join('');
+
     /* The tab title carries it too, so an unread message is visible from a
        different tab. This is the whole of the notification for now — until
-       Supabase is connected there is no server to push from, so a message
-       only reaches someone else when their browser next loads the state. */
+       there is a server, a message only reaches someone else when their
+       browser next loads the state. */
     document.title = (c.unread ? `(${c.unread}) ` : '') + 'SportPharm HQ';
-    $('#rail-nav').innerHTML = TREE.map(n => {
-      if (!n.children) return link(n, false);
-      const activeChild = n.children.some(k => k.id === v);
-      const open = isOpen(n.parent);
-      /* Project rows have no badge of their own, so the parent rolls up once
-         rather than once per project. */
-      const kidBadge = n.children.reduce((t, k) => t + (k.pid ? 0 : (badge[k.id] || 0)), 0);
-      return `
-        <button class="rail-link rail-parent ${activeChild && !open ? 'on' : ''}" data-navtoggle="${esc(n.parent)}" aria-expanded="${open}">
-          ${svg(n.icon)}<span>${n.parent}</span>
-          ${!open && kidBadge ? `<span class="rail-count">${kidBadge}</span>` : ''}
-          <span class="rail-caret ${open ? 'open' : ''}">${svg('down')}</span>
-        </button>
-        ${open ? n.children.map(k => link(k, true)).join('') : ''}`;
-    }).join('');
-    /* Every group, not just the first — and each remembers its own state, so
-       opening Marketing does not fold Analytics away underneath you. */
-    $('#rail-nav').querySelectorAll('[data-navtoggle]').forEach(tg =>
-      tg.addEventListener('click', () => {
-        const parent = tg.dataset.navtoggle;
-        if (!TREE.some(x => x.parent === parent)) return;
-        groupOpen[parent] = !isOpen(parent);
-        saveGroups();
-        renderRail();
-      }));
+
     $('#rail-me').innerHTML = me ? `${avatar(me)}
       <span><b>${esc(me.name)}</b><span>${esc(ROLES[me.role].label)} · Sign out</span></span>` : '';
     $('#tb-right').innerHTML =
@@ -487,7 +485,7 @@ const HQ = (() => {
   function palFilter(q) {
     q = q.trim().toLowerCase();
     const out = [];
-    NAV_FLAT.filter(n => !q || n.label.toLowerCase().includes(q))
+    navFlat().filter(n => !q || n.label.toLowerCase().includes(q))
       .forEach(n => out.push({ group: 'Go to', icon: n.icon, label: n.label, run: () => go('#/' + n.id) }));
 
     Store.articles()
@@ -548,7 +546,9 @@ const HQ = (() => {
   function start() {
     $('#scrim').addEventListener('click', closeSheet);
     $('#tb-search').addEventListener('click', palOpen);
-    $('#tb-menu').addEventListener('click', () => $('#rail').classList.toggle('open'));
+    /* The rail is now two grid cells (display:contents), so the class that
+       slides them in has to live on the app, not on .rail. */
+    $('#tb-menu').addEventListener('click', () => $('#app').classList.toggle('rail-open'));
     $('#rail').addEventListener('click', e => {
       const l = e.target.closest('.rail-link');
       if (l && !l.matches('.rail-parent')) $('#rail').classList.remove('open');

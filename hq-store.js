@@ -66,6 +66,48 @@ const Store = (() => {
     };
   }
 
+  /* ---------------------------- migrations ------------------------------
+     A seed only ever applies to a brand-new store, so changing SEED_PROJECTS
+     did nothing for anyone who had already opened HQ — they kept the four
+     original projects and wondered why the reset never arrived.
+
+     Each migration runs once, recorded in `flags`. The rule for all of them:
+     only touch data that is still recognisably the seed. If somebody has
+     renamed a project or added a task to it, that is their work and it stays,
+     migration or not. Better to leave one stale row than delete real work.
+  --------------------------------------------------------------------- */
+  const MIGRATIONS = {
+    /* The four launch-era projects were replaced by a single Website
+       Redesign. Drop them only where they are untouched. */
+    'projects-2026-08': (s, base) => {
+      const OLD = ['CMS & publishing', 'Direct-to-site sales',
+                   'Website build-out', 'Professional channel'];
+      if (!Array.isArray(s.projects)) return;
+      const untouched = p => OLD.includes(p.name) &&
+        (p.tasks || []).every(t => !t.notes && !(t.handoffs || []).length && t.status !== 'shipped');
+      const kept = s.projects.filter(p => !untouched(p));
+      /* Only if every one of them was untouched — a partial clear would be
+         more confusing than leaving them all. */
+      if (kept.length !== s.projects.length) s.projects = kept;
+      if (!s.projects.some(p => p.id === 'p-web')) {
+        const seedWeb = base.projects.find(p => p.id === 'p-web');
+        if (seedWeb) s.projects.unshift(seedWeb);
+      }
+    }
+  };
+
+  function runMigrations(s, base) {
+    if (!s.flags) s.flags = {};
+    let ran = false;
+    Object.keys(MIGRATIONS).forEach(k => {
+      if (s.flags['mig:' + k]) return;
+      try { MIGRATIONS[k](s, base); } catch (e) { /* never block a load */ }
+      s.flags['mig:' + k] = { done: true, at: now() };
+      ran = true;
+    });
+    return ran;
+  }
+
   function load() {
     if (state) return state;
     try {
@@ -93,6 +135,7 @@ const Store = (() => {
           if (!state.users.some(x => x.id === u.id)) state.users.push(u);
         });
       }
+      runMigrations(state, base);
     } catch (e) { state = seed(); }
     if (runSchedule()) save();
     return state;
