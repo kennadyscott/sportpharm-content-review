@@ -212,13 +212,21 @@
 
           <div class="side-card">
             <h4>The message</h4>
-            <p class="side-sub">Written from the form, so it reads the same every time. Copy it into
-               the email to ${ORDER_RECIPIENTS.map(r => r.to).join(' and ')}.</p>
+            <p class="side-sub">Written from the form, so it reads the same every time. It goes to
+               ${ORDER_RECIPIENTS.map(r => r.to).join(' and ')}.</p>
             <pre class="ord-msg" id="ord-msg">${esc(Store.orderMessage(o))}</pre>
+            ${o.sentAt ? `<p class="ord-sent">${svg('check')} Sent ${esc(ago(o.sentAt))}${
+              o.sentBy ? ' by ' + esc(o.sentBy) : ''}</p>` : ''}
             <div class="img-acts">
+              ${ed ? `<button class="btn btn-dark btn-sm" id="ord-send"
+                ${ready.ok ? '' : 'disabled title="' + esc(ready.error) + '"'}>${svg('arrow')}Send${
+                o.sentAt ? ' again' : ' to Enova'}</button>` : ''}
               <button class="btn btn-outline btn-sm" id="ord-copy">${svg('copy')}Copy</button>
               <button class="btn btn-ghost btn-sm" id="ord-print">Print / PDF</button>
             </div>
+            <p class="side-sub" id="ord-send-note">${HQ.mailer && HQ.mailer.ready()
+              ? 'Sends from ' + esc(HQ.mailer.from()) + ' — a real message, with a copy in that mailbox.'
+              : 'Sending is not connected yet, so Send will explain what is missing rather than pretend. Copy still works.'}</p>
           </div>
 
           ${(o.history || []).length ? `<div class="side-card">
@@ -407,8 +415,8 @@
               <div><b>${pc(s.freeOrders)}%</b><span>of orders carry something free</span></div>
             </div>
             ${s.unapproved ? `<p class="os-warn">${s.unapproved} order${s.unapproved === 1 ? '' : 's'}
-              give something away with nobody named as having approved it. That is the line
-              that gets queried later.</p>`
+              give${s.unapproved === 1 ? 's' : ''} something away with nobody named as having
+              approved it. That is the line that gets queried later.</p>`
               : '<p class="wk-note">Every giveaway has an approver named.</p>'}
           </section>
 
@@ -548,6 +556,35 @@
       });
       const bk = root.querySelector('#ord-back');
       if (bk) bk.addEventListener('click', () => { Store.setOrderStatus(o.id, ORDER_FLOW[i - 1]); HQ.render(); });
+
+      const snd = root.querySelector('#ord-send');
+      if (snd) snd.addEventListener('click', async () => {
+        const gate = Store.orderReady(o);
+        if (!gate.ok) return toast(gate.error);
+        const to = ORDER_RECIPIENTS.filter(r => !/cc/i.test(r.role)).map(r => r.to);
+        const cc = ORDER_RECIPIENTS.filter(r => /cc/i.test(r.role)).map(r => r.to);
+        if (!confirm(`Send ${o.ref} to ${to.join(', ')}?\n\nThis sends a real email.`)) return;
+
+        snd.disabled = true;
+        snd.textContent = 'Sending…';
+        const res = await HQ.mailer.send({
+          to, cc, ref: o.ref,
+          subject: `SportPharm order ${o.ref} — ${o.org || 'new order'}`,
+          body: Store.orderMessage(o)
+        });
+
+        if (!res.ok) {
+          /* Say what went wrong and leave the order where it was. Marking it
+             sent on a failure is the one outcome nobody could recover from. */
+          alert(res.error);
+          HQ.render();
+          return;
+        }
+        Store.markOrderSent(o.id, res.sentBy);
+        if (o.status === 'draft') Store.setOrderStatus(o.id, 'submitted');
+        toast(`${o.ref} sent to ${res.to.join(', ')}.`);
+        HQ.render();
+      });
 
       const cp = root.querySelector('#ord-copy');
       if (cp) cp.addEventListener('click', () => copy(Store.orderMessage(o)));

@@ -1321,6 +1321,18 @@ const Store = (() => {
     };
   }
 
+  /* Recorded only after the send endpoint confirms it. "Sent" has to mean the
+     mail server accepted it, not that someone pressed a button — the whole
+     point of the status is that people downstream can trust it. */
+  function markOrderSent(id, by) {
+    const o = order(id);
+    if (!o) return null;
+    o.sentAt = now();
+    o.sentBy = by || ((currentUser() || {}).name || null);
+    save();
+    return o;
+  }
+
   /* The note to Enova, written from the record. */
   function orderMessage(o) {
     const money = n => '$' + (Number(n) || 0).toFixed(2);
@@ -1512,7 +1524,7 @@ const Store = (() => {
     messages, threads, threadMessages, sendMessage, toggleMessageDone,
     lastReadAt, markThreadRead, unreadIn, unreadTotal, lastInThread,
     orders, order, addOrder, updateOrder, removeOrder, setOrderStatus,
-    orderReady, orderTotal, orderMessage, orderStats,
+    orderReady, orderTotal, orderMessage, orderStats, markOrderSent,
     metricsOf, setMetric, setMargin,
     briefs, brief, reviewState, setReviewState, reviewThread,
     addReviewNote, removeReviewNote, campaignProgress, campaignNoteCount,

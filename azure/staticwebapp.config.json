@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json.schemastore.org/staticwebapp.config.json",
+
+  "comment_auth": "Entra ID only, and only this tenant. The default AAD provider on Static Web Apps is multi-tenant; the openIdIssuer below pins it to SportPharm's directory so a Microsoft account from any other organisation cannot sign in. Everything is behind it — there is no anonymous route at all, which is what makes this a private data path rather than a public page with a login form drawn on top.",
+
+  "auth": {
+    "identityProviders": {
+      "azureActiveDirectory": {
+        "registration": {
+          "openIdIssuer": "https://login.microsoftonline.com/<TENANT_ID>/v2.0",
+          "clientIdSettingName": "AAD_CLIENT_ID",
+          "clientSecretSettingName": "AAD_CLIENT_SECRET"
+        }
+      }
+    }
+  },
+
+  "routes": [
+    { "route": "/api/sendOrder", "methods": ["POST"], "allowedRoles": ["authenticated"] },
+    { "route": "/api/woo",       "methods": ["GET"],  "allowedRoles": ["authenticated"] },
+    { "route": "/.auth/login/github", "statusCode": 404 },
+    { "route": "/*", "allowedRoles": ["authenticated"] }
+  ],
+
+  "responseOverrides": {
+    "401": { "redirect": "/.auth/login/aad", "statusCode": 302 }
+  },
+
+  "globalHeaders": {
+    "X-Frame-Options": "SAMEORIGIN",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "same-origin",
+    "Strict-Transport-Security": "max-age=63072000; includeSubDomains"
+  },
+
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/vendor/*", "*.css", "*.js", "*.png", "*.svg"]
+  }
+}

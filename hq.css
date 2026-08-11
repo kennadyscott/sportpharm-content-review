@@ -2433,3 +2433,8 @@ button.pl-st:hover { filter: brightness(.94); }
   letter-spacing: -.03em; color: var(--navy); line-height: 1.1; }
 .os-pair span { font-size: .72rem; color: var(--ink-faint); max-width: 9rem; line-height: 1.35; }
 .os-warn { font-size: .8rem; color: var(--amber); line-height: 1.5; }
+
+/* An order that has actually been sent says so, with when and by whom. */
+.ord-sent { display: flex; align-items: center; gap: .35rem; font-size: .78rem;
+  font-weight: 600; color: var(--green); margin: .5rem 0 .1rem; }
+.ord-sent svg { width: 13px; height: 13px; }
