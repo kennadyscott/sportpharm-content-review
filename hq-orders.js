@@ -287,9 +287,13 @@
 
       <div class="doc-parties">
         <section>
-          <h2>Vendor</h2>
-          <p><b>Enovachem Pharmaceuticals</b><br>
-             ${ORDER_RECIPIENTS.map(r => esc(r.to)).join('<br>')}</p>
+          <!-- These are SportPharm-hosted aliases that route to Enova, not
+               Enovachem's own domain. Calling the block "Vendor" and putting
+               an @sportpharm.com address under Enovachem's name reads as
+               their address, which it is not. Say where it goes instead. -->
+          <h2>Sent to</h2>
+          <p>${ORDER_RECIPIENTS.map(r =>
+            `<b>${esc(r.to)}</b><span class="doc-note">${esc(r.role)}</span>`).join('')}</p>
         </section>
         <section>
           <h2>Ship to</h2>
@@ -350,6 +354,103 @@
       </footer>
     </div>`;
   }
+
+  /* ---------------------------- order analytics ---------------------------
+     Computed from the order records, so it needs nothing entered and holds
+     nothing private. The giveaway panel is the point of the page: freebies
+     and SWAG carry no price on an order, so they never show up in a total,
+     and the only way anyone sees the size of it is to count it. */
+  HQ.view('ordstats', {
+    render() {
+      const s = Store.orderStats();
+      const pc = n => s.count ? Math.round((n / s.count) * 100) : 0;
+
+      const bar = (label, n, of, tone) => `<div class="os-bar">
+        <span class="os-bar-l">${esc(label)}</span>
+        <span class="os-bar-t"><i class="t-${tone}" style="width:${of ? (n / of) * 100 : 0}%"></i></span>
+        <span class="os-bar-n">${n}</span>
+      </div>`;
+
+      return `<div class="wrap">
+        <div class="page-head">
+          <div><h1>Order analytics</h1>
+            <p>Worked out from the orders themselves — nothing to enter, and no customer
+               data in it. What has been raised, what it is worth, how long each handoff
+               takes, and what is going out for free.</p></div>
+        </div>
+
+        ${!s.count ? `<section class="panel"><p class="wk-empty">No orders raised yet.
+          Everything here fills in as they go through.</p></section>` : `
+
+        <div class="metric-grid" style="margin-bottom:1.2rem">
+          <div class="metric-card big"><h3>${money(s.total)}</h3><p>Raised, all time</p></div>
+          <div class="metric-card big"><h3>${money(s.openValue)}</h3><p>Open — not yet complete</p></div>
+          <div class="metric-card big"><h3>${money(s.avg)}</h3><p>Average order</p></div>
+          <div class="metric-card big"><h3>${s.count}</h3><p>Orders${
+            s.openCount ? ` · ${s.openCount} open` : ''}</p></div>
+        </div>
+
+        <div class="os-grid">
+          <section class="panel">
+            <div class="panel-head"><h2>Where they are</h2>
+              <span class="note">${s.doneCount} of ${s.count} complete</span></div>
+            ${ORDER_FLOW.map(k => bar(ORDER_STATES[k].label, s.byStatus[k], s.count,
+              ORDER_STATES[k].tone)).join('')}
+          </section>
+
+          <section class="panel ${s.unapproved ? 't-amber' : ''}">
+            <div class="panel-head"><h2>Given away</h2>
+              <span class="note">no price on the order, so it never shows in a total</span></div>
+            <div class="os-pair">
+              <div><b>${s.freeUnits}</b><span>free units</span></div>
+              <div><b>${s.swagUnits}</b><span>SWAG items</span></div>
+              <div><b>${pc(s.freeOrders)}%</b><span>of orders carry something free</span></div>
+            </div>
+            ${s.unapproved ? `<p class="os-warn">${s.unapproved} order${s.unapproved === 1 ? '' : 's'}
+              give something away with nobody named as having approved it. That is the line
+              that gets queried later.</p>`
+              : '<p class="wk-note">Every giveaway has an approver named.</p>'}
+          </section>
+
+          <section class="panel">
+            <div class="panel-head"><h2>How long each step takes</h2>
+              <span class="note">average days from raised</span></div>
+            ${ORDER_FLOW.slice(1).map(k => {
+              const d = s.stepDays[k];
+              return `<div class="os-row">
+                <span>${esc(ORDER_STATES[k].label)}</span>
+                <b>${d ? d.days.toFixed(1) + ' days' : '—'}</b>
+                <span class="os-n">${d ? 'from ' + d.n : 'not reached yet'}</span>
+              </div>`;
+            }).join('')}
+          </section>
+
+          <section class="panel">
+            <div class="panel-head"><h2>Who orders</h2></div>
+            ${s.orgs.slice(0, 8).map(o => `<div class="os-row">
+              <span>${esc(o.org)}</span><b>${money(o.value)}</b>
+              <span class="os-n">${o.n} order${o.n === 1 ? '' : 's'}</span>
+            </div>`).join('')}
+          </section>
+
+          <section class="panel">
+            <div class="panel-head"><h2>What they order</h2></div>
+            ${s.skus.length ? s.skus.slice(0, 8).map(x => `<div class="os-row">
+              <span>${esc(x.name)}</span><b>${money(x.value)}</b>
+              <span class="os-n">${x.qty} unit${x.qty === 1 ? '' : 's'}</span>
+            </div>`).join('') : '<p class="wk-empty">No priced lines yet.</p>'}
+          </section>
+
+          <section class="panel">
+            <div class="panel-head"><h2>How they pay</h2>
+              <span class="note">${money(s.shipping)} shipping billed</span></div>
+            ${s.pay.length ? s.pay.map(p => bar(p.k, p.n, s.count, 'blue')).join('')
+              : '<p class="wk-empty">Nothing recorded yet.</p>'}
+          </section>
+        </div>`}
+      </div>`;
+    }
+  });
 
   /* ------------------------------- wiring -------------------------------- */
   HQ.view('orders', {

@@ -1247,6 +1247,80 @@ const Store = (() => {
   const orderTotal = o => (o.lines || []).reduce((n, l) =>
     n + (Number(l.price) || 0) * (Number(l.qty) || 0), 0) + (Number(o.shipCost) || 0);
 
+  /* ---------------------------- order analytics ----------------------------
+     What the orders themselves say, computed from the records rather than
+     entered. Everything here is internal — order values, what is being given
+     away, and how long each handoff takes — so unlike the KPI grid there is
+     no customer data in it and nothing to keep private.
+
+     `giveaway` is the one worth watching: freebies and SWAG have no price on
+     the order, so their cost is invisible in the total. Counting them is the
+     only way anyone sees how much is going out the door for nothing. */
+  function orderStats() {
+    const all = orders();
+    const done = all.filter(o => o.status === 'complete');
+    const open = all.filter(o => o.status !== 'complete');
+    const value = o => orderTotal(o);
+    const sum = list => list.reduce((n, o) => n + value(o), 0);
+
+    const byStatus = {};
+    ORDER_FLOW.forEach(k => { byStatus[k] = all.filter(o => o.status === k).length; });
+
+    /* Average days between raising an order and each step. Only orders that
+       actually reached the step count — averaging in the ones still waiting
+       would make the handoff look faster the longer it stalls. */
+    const stepDays = {};
+    ORDER_FLOW.slice(1).forEach(step => {
+      const spans = [];
+      all.forEach(o => {
+        const h = (o.history || []).find(x => x.to === step);
+        if (h && o.createdAt) {
+          spans.push((new Date(h.at) - new Date(o.createdAt)) / 86400000);
+        }
+      });
+      stepDays[step] = spans.length
+        ? { days: spans.reduce((a, b) => a + b, 0) / spans.length, n: spans.length }
+        : null;
+    });
+
+    const freeUnits = all.reduce((n, o) =>
+      n + (o.freebies || []).reduce((m, f) => m + (Number(f.qty) || 0), 0), 0);
+    const swagUnits = all.reduce((n, o) => n + (o.swag || []).length, 0);
+
+    /* Who it goes to, biggest first. */
+    const orgs = {};
+    all.forEach(o => {
+      const k = (o.org || '').trim() || 'Unnamed';
+      if (!orgs[k]) orgs[k] = { org: k, n: 0, value: 0 };
+      orgs[k].n++; orgs[k].value += value(o);
+    });
+
+    /* What is actually being ordered, by line. */
+    const skus = {};
+    all.forEach(o => (o.lines || []).forEach(l => {
+      if (!l.name) return;
+      const k = l.sku || l.name;
+      if (!skus[k]) skus[k] = { name: l.name, qty: 0, value: 0 };
+      skus[k].qty += Number(l.qty) || 0;
+      skus[k].value += (Number(l.price) || 0) * (Number(l.qty) || 0);
+    }));
+
+    return {
+      count: all.length, openCount: open.length, doneCount: done.length,
+      total: sum(all), openValue: sum(open), doneValue: sum(done),
+      avg: all.length ? sum(all) / all.length : 0,
+      shipping: all.reduce((n, o) => n + (Number(o.shipCost) || 0), 0),
+      freeUnits, swagUnits,
+      freeOrders: all.filter(o => (o.freebies || []).length || (o.swag || []).length).length,
+      unapproved: all.filter(o => (o.freebies || []).length && !o.approvedBy).length,
+      byStatus, stepDays,
+      orgs: Object.values(orgs).sort((a, b) => b.value - a.value),
+      skus: Object.values(skus).sort((a, b) => b.value - a.value),
+      pay: PAY_METHODS.map(p => ({ k: p, n: all.filter(o => o.pay === p).length }))
+        .filter(x => x.n)
+    };
+  }
+
   /* The note to Enova, written from the record. */
   function orderMessage(o) {
     const money = n => '$' + (Number(n) || 0).toFixed(2);
@@ -1438,7 +1512,7 @@ const Store = (() => {
     messages, threads, threadMessages, sendMessage, toggleMessageDone,
     lastReadAt, markThreadRead, unreadIn, unreadTotal, lastInThread,
     orders, order, addOrder, updateOrder, removeOrder, setOrderStatus,
-    orderReady, orderTotal, orderMessage,
+    orderReady, orderTotal, orderMessage, orderStats,
     metricsOf, setMetric, setMargin,
     briefs, brief, reviewState, setReviewState, reviewThread,
     addReviewNote, removeReviewNote, campaignProgress, campaignNoteCount,

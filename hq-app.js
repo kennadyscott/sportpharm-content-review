@@ -292,9 +292,10 @@ const HQ = (() => {
     { id: 'strategy',  label: 'Branding',     icon: 'quote' }
   ];
   const ANALYTICS_KIDS = [
-    { id: 'analytics', label: 'Overview',  icon: 'chart' },
-    { id: 'kpis',      label: 'KPIs',      icon: 'today' },
-    { id: 'platforms', label: 'Platforms', icon: 'coin' }
+    { id: 'analytics',  label: 'Overview',  icon: 'chart' },
+    { id: 'kpis',       label: 'KPIs',      icon: 'today' },
+    { id: 'ordstats',   label: 'Orders',    icon: 'box' },
+    { id: 'platforms',  label: 'Platforms', icon: 'coin' }
   ];
   const GROUPS = { Marketing: MARKETING_KIDS, Analytics: ANALYTICS_KIDS };
 
