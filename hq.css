@@ -1382,8 +1382,10 @@ kbd {
   content: 'That image didn’t load'; font-size: .76rem; color: var(--ink-faint);
 }
 .imgprev-none { font-size: .76rem; color: var(--ink-faint); }
-.img-acts { display: flex; gap: .4rem; }
-.img-acts .btn { flex: 1; }
+/* Wraps because the order card now carries four of these (send, copy, PDF,
+   print) and a non-wrapping row pushed the last one off the side rail. */
+.img-acts { display: flex; gap: .4rem; flex-wrap: wrap; }
+.img-acts .btn { flex: 1 1 auto; min-width: 0; }
 
 .pick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: .6rem; }
 .pick {
