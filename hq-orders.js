@@ -116,7 +116,10 @@
         <input id="o-${key}" type="${type || 'text'}" value="${esc(o[key] == null ? '' : o[key])}"
                placeholder="${esc(ph || '')}" data-of="${key}" ${dis}></div>`;
 
-    return `<div class="wrap">
+    /* `ord-sheet` marks this page as an order record, so the print rules can
+       keep the side rail — the status and the message to Enova belong on the
+       printed sheet, unlike every other editor where the side is UI. */
+    return `<div class="wrap ord-sheet">
       <button class="crumb" data-go="#/orders">${svg('left')} All orders</button>
       <div class="page-head">
         <div>
