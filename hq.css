@@ -2682,3 +2682,32 @@ button.pl-st:hover { filter: brightness(.94); }
   font-size: .82rem; border: 1.5px solid var(--line); border-radius: 999px; background: var(--paper); }
 .ord-talk-form input:focus { outline: none; border-color: var(--red); }
 .team-row .right select[data-usercompany] { max-width: 8.5rem; }
+
+/* ====================== IMPORTING A FILLED FORM ======================
+   Sits above the pipeline on Orders. It has to read as a place to put
+   something, not as another button, because the whole point is that the
+   PDF the vendor was emailed is also the thing that feeds HQ. */
+.ord-drop { border: 1.5px dashed var(--line); border-radius: 12px;
+  background: var(--bg); padding: .95rem 1.1rem; margin-bottom: 1rem;
+  transition: border-color .12s, background .12s; }
+.ord-drop.drop-on { border-color: var(--red); background: #fdf3f3; }
+.ord-drop-in { display: flex; align-items: center; gap: .55rem 1rem; flex-wrap: wrap; }
+.ord-drop-in b { font-size: .84rem; letter-spacing: -.01em; }
+.ord-drop-in span { flex: 1 1 22rem; min-width: 0; font-size: .72rem;
+  line-height: 1.45; color: var(--ink-faint); }
+.ord-drop-in .btn { flex: none; }
+.ord-drop-msg { display: grid; gap: .22rem; margin-top: .8rem;
+  padding: .6rem .75rem; border-radius: 9px; background: var(--paper);
+  border-left: 3px solid var(--tone, var(--navy)); }
+.ord-drop-msg b { font-size: .78rem; color: var(--tone, var(--navy)); }
+.ord-drop-msg span { font-size: .72rem; line-height: 1.5; color: var(--ink-soft); }
+
+/* "View as" — the demo switcher in the rail footer. */
+.rail-viewas { margin-top: auto; padding: .55rem .6rem .35rem; }
+.rail-viewas label { display: block; font-size: .58rem; font-weight: 800; letter-spacing: .14em;
+  text-transform: uppercase; color: rgba(215,225,239,.45); margin-bottom: .25rem; }
+.rail-viewas select { width: 100%; padding: .35rem .45rem; font: inherit; font-size: .78rem;
+  color: #D7E1EF; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.13);
+  border-radius: 8px; }
+.rail-viewas select:focus { outline: none; border-color: var(--red); }
+.rail-viewas + .rail-me { margin-top: .2rem; }

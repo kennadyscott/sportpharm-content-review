@@ -22,6 +22,19 @@ HQ.mailer = (() => {
   const cfg = () => window.SPHQ_MAIL || {};
 
   const ready = () => !!cfg().endpoint;
+
+  /* A mailto: with the whole message in it. Long bodies are fine in every
+     desktop client; the encoding is what matters, so the line breaks survive
+     rather than collapsing into one paragraph. */
+  function mailtoUrl({ to, cc, subject, body }) {
+    const list = v => (Array.isArray(v) ? v : [v]).filter(Boolean).join(',');
+    const q = [];
+    if (cc && list(cc)) q.push('cc=' + encodeURIComponent(list(cc)));
+    q.push('subject=' + encodeURIComponent(subject || ''));
+    q.push('body=' + encodeURIComponent(body || ''));
+    return 'mailto:' + encodeURIComponent(list(to)).replace(/%40/g, '@').replace(/%2C/g, ',')
+      + '?' + q.join('&');
+  }
   const from = () => cfg().from || 'orders@sportpharm.com';
 
   /* Why the caller gets a reason and not just false: every failure here is
@@ -30,13 +43,21 @@ HQ.mailer = (() => {
      into "it doesn't work". */
   async function send({ to, cc, subject, body, ref }) {
     if (!ready()) {
+      /* No server to send from — but the message is already written, so hand
+         it to whatever mail client they have. Outlook opens with the
+         recipients, subject and body filled in and Julia presses send.
+
+         Deliberately NOT reported as ok:true. Nothing has been sent yet, and
+         marking the order sent because a compose window opened is exactly the
+         lie this whole feature exists to stop. The caller shows the draft and
+         leaves the status alone. */
       return {
         ok: false,
-        reason: 'not-configured',
-        error: 'Sending is not connected yet. HQ is served as a static site, which cannot ' +
-               'hold a mail credential — it needs the Azure Function in azure/api/sendOrder ' +
-               'deployed to the SportPharm tenant first. Until then, use Copy and paste it ' +
-               'into Outlook; the wording is identical.'
+        reason: 'handoff-to-client',
+        mailto: mailtoUrl({ to, cc, subject, body }),
+        error: 'Opened this in your mail app instead — HQ has no server to send from yet, ' +
+               'so it cannot send on its own. Everything is filled in; press send there. ' +
+               'The order stays as it is until you mark it sent.'
       };
     }
     try {
@@ -62,5 +83,5 @@ HQ.mailer = (() => {
     }
   }
 
-  return { ready, from, send, recipients: () => (window.ORDER_RECIPIENTS || []) };
+  return { ready, from, send, mailtoUrl, recipients: () => (window.ORDER_RECIPIENTS || []) };
 })();

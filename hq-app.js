@@ -446,6 +446,34 @@ const HQ = (() => {
 
     $('#rail-me').innerHTML = me ? `${avatar(me)}
       <span><b>${esc(me.name)}</b><span>${esc(ROLES[me.role].label)} · Sign out</span></span>` : '';
+
+    /* "View as" — the demo tool. Owners only, and only after a real sign-in,
+       so it adds no way in that the passcode did not already allow. Being
+       able to stand in front of Brandon and flip from Julia's view to
+       Enovachem's view in one click demonstrates the company boundary better
+       than any amount of explaining, and it needs no server at all. */
+    const seatBox = $('#rail-viewas');
+    if (seatBox) {
+      const canSwitch = me && me.role === 'owner';
+      seatBox.hidden = !canSwitch;
+      if (canSwitch) {
+        seatBox.innerHTML = `
+          <label for="viewas-sel">View as</label>
+          <select id="viewas-sel">
+            ${Store.users().filter(u => !u.seed).map(u => {
+              const co = Store.company(u.company);
+              return `<option value="${u.id}" ${u.id === me.id ? 'selected' : ''}
+                >${esc(u.name)}${co ? ' · ' + esc(co.short) : ''}</option>`;
+            }).join('')}
+          </select>`;
+        $('#viewas-sel').addEventListener('change', e => {
+          Store.signInSeat(e.target.value);
+          /* Land somewhere that seat is actually allowed to be. */
+          go('#/' + sections()[0].pages[0].id);
+          render();
+        });
+      }
+    }
     $('#tb-right').innerHTML =
       `<span class="tb-date">${new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</span>`;
   }

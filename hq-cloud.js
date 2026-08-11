@@ -16,8 +16,14 @@ const Cloud = (() => {
   const cfg = window.SPHQ_CLOUD || {};
   const enabled = !!(cfg.url && cfg.anonKey && window.supabase);
 
+  /* Every top-level key the store owns. Keep this in step with seed() in
+     hq-store.js — a key missing here does not sync, silently. `orders`,
+     `messages`, `todos` and `kpis` were added to the store long after this
+     list and were not in it, so turning live mode on would have shared the
+     CMS and left every order and message stranded in one browser. */
   const KEYS = ['users', 'projects', 'articles', 'media', 'ideas', 'platforms',
-                'plan', 'planRules', 'reminders', 'metrics', 'flags', 'invites', 'activity'];
+                'plan', 'planRules', 'reminders', 'metrics', 'flags', 'invites', 'activity',
+                'orders', 'messages', 'todos', 'kpis', 'campReview'];
 
   let client = null;
   let sess = null;

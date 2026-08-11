@@ -41,6 +41,18 @@
         </div>
       </div>
 
+      ${Store.can('edit') && Store.isOwn() ? `<div class="ord-drop" id="ord-drop">
+        <div class="ord-drop-in">
+          <b>Drop a filled order form here</b>
+          <span>The PDF Julia or Marissa emailed to orders@ — HQ reads it and raises the order,
+                so nobody types it a second time. It is read in this browser; the file is not
+                uploaded anywhere.</span>
+          <button class="btn btn-outline btn-sm" id="ord-pick-file">Choose a PDF…</button>
+          <input type="file" id="ord-file" accept="application/pdf,.pdf" hidden>
+        </div>
+        <div class="ord-drop-msg" id="ord-drop-msg" hidden></div>
+      </div>` : ''}
+
       <div class="pipeline">
         ${ORDER_FLOW.map((k, i) => `
           <button class="pipe ${filter === k ? 'on' : ''}" data-ofilter="${k}">
@@ -236,7 +248,7 @@
             </div>
             <p class="side-sub" id="ord-send-note">${HQ.mailer && HQ.mailer.ready()
               ? 'Sends from ' + esc(HQ.mailer.from()) + ' — a real message, with a copy in that mailbox.'
-              : 'Sending is not connected yet, so Send will explain what is missing rather than pretend. Copy still works.'}</p>
+              : 'No server to send from yet, so Send opens this in your mail app with everything filled in. Mark it sent once it has gone.'}</p>
           </div>` : ''}
 
           <div class="side-card">
@@ -492,6 +504,100 @@
     }
   });
 
+  /* --------------------------- importing a form ---------------------------
+     Drop the emailed PDF, get the order. The one rule here is that nothing is
+     written until the person doing it has seen what came out — a silent import
+     of a half-filled form is worse than no import, because the record then
+     looks authoritative. */
+  function wireImport(root) {
+    const zone = root.querySelector('#ord-drop');
+    if (!zone || !HQ.orderImport) return;
+    const input = root.querySelector('#ord-file');
+    const msg = root.querySelector('#ord-drop-msg');
+    const pick = root.querySelector('#ord-pick-file');
+
+    const say = (tone, title, lines) => {
+      msg.hidden = false;
+      msg.className = 'ord-drop-msg t-' + tone;
+      msg.innerHTML = `<b>${esc(title)}</b>${
+        (lines || []).map(l => `<span>${esc(l)}</span>`).join('')}`;
+    };
+
+    async function take(file) {
+      if (!file) return;
+      if (!/pdf$/i.test(file.name) && file.type !== 'application/pdf') {
+        return say('red', 'That is not a PDF.', [file.name]);
+      }
+      say('navy', 'Reading ' + file.name + '…', []);
+      let read;
+      try {
+        read = await HQ.orderImport.inspect(file);
+      } catch (e) {
+        return say('red', 'Could not read that form.', [e.message]);
+      }
+
+      const rec = read.record;
+      const what = rec.org || rec.contactName || 'this order';
+      const lines = rec.lines.length + ' line' + (rec.lines.length === 1 ? '' : 's') +
+        (rec.freebies.length ? ', ' + rec.freebies.length + ' free' : '') +
+        (rec.swag.length ? ', SWAG' : '');
+
+      if (read.duplicate) {
+        if (!confirm(`${read.duplicate.ref} already looks like this order — same ` +
+                     `organisation, same lines, same total.\n\nRaise a second one anyway?`)) {
+          return say('amber', 'Not imported.',
+            ['It matches ' + read.duplicate.ref + ', which is already on the list.']);
+        }
+      }
+
+      if (!confirm(`Raise an order for ${what}?\n\n${lines}` +
+                   (read.warnings.length ? `\n\n${read.warnings.length} thing` +
+                     `${read.warnings.length === 1 ? '' : 's'} to check first — ` +
+                     `they will be listed after you confirm.` : ''))) {
+        return say('amber', 'Not imported.', []);
+      }
+
+      const made = Store.addOrder(rec);
+      if (read.warnings.length) {
+        /* Parked on the record as well as shown, because the person who reads
+           this next is usually not the person who dropped the file. */
+        Store.updateOrder(made.id, {
+          notes: [rec.notes, '', 'ON IMPORT, HQ FLAGGED:',
+            ...read.warnings.map(w => '· ' + w)].filter(x => x !== undefined).join('\n').trim()
+        });
+        say('amber', made.ref + ' raised — ' + read.warnings.length + ' to check.',
+            read.warnings);
+        toast(made.ref + ' raised, with notes to check.');
+      } else {
+        say('green', made.ref + ' raised from ' + file.name + '.', [what + ' · ' + lines]);
+        toast(made.ref + ' raised.');
+      }
+      setTimeout(() => go('#/orders/' + made.id), 700);
+    }
+
+    if (pick) pick.addEventListener('click', () => input.click());
+    if (input) input.addEventListener('change', () => {
+      take(input.files && input.files[0]);
+      input.value = '';                 /* so the same file can be dropped twice */
+    });
+
+    /* dragleave fires when the pointer crosses onto a child, so the highlight
+       only clears once it has actually left the zone. */
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      zone.classList.add('drop-on');
+    });
+    zone.addEventListener('dragleave', e => {
+      if (!zone.contains(e.relatedTarget)) zone.classList.remove('drop-on');
+    });
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drop-on');
+      take(e.dataTransfer.files && e.dataTransfer.files[0]);
+    });
+  }
+
   /* ------------------------------- wiring -------------------------------- */
   HQ.view('orders', {
     render(r) {
@@ -511,6 +617,7 @@
           const b = root.querySelector(sel);
           if (b) b.addEventListener('click', mk);
         });
+        wireImport(root);
         return;
       }
 
@@ -617,7 +724,12 @@
         if (!res.ok) {
           /* Say what went wrong and leave the order where it was. Marking it
              sent on a failure is the one outcome nobody could recover from. */
-          alert(res.error);
+          if (res.reason === 'handoff-to-client' && res.mailto) {
+            toast('Opening your mail app — press send there.');
+            window.location.href = res.mailto;
+          } else {
+            alert(res.error);
+          }
           HQ.render();
           return;
         }
