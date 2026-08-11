@@ -1797,6 +1797,17 @@
       </div>`;
     },
     wire(root) {
+      const dm = root.querySelector('#set-demo');
+      if (dm) dm.addEventListener('click', () => {
+        if (Store.isDemoOn()) {
+          if (!confirm('Clear the demo data? Anything you added yourself stays.')) return;
+          Store.clearDemo(); toast('Demo data cleared.');
+        } else {
+          Store.loadDemo(); toast('Demo data loaded.');
+        }
+        HQ.render();
+      });
+
       root.querySelector('#set-out').addEventListener('click', () => { Store.signOut(); location.reload(); });
       root.querySelector('#set-pass').addEventListener('click', () => {
         const code = prompt('New passcode for this seat:');
