@@ -366,7 +366,10 @@ const HQ = (() => {
       content: s.review + s.changes,
       ideas: Store.ideas().filter(d => d.state === 'open').length,
       orders: Store.orders().filter(o => o.status !== 'complete').length,
-      unread: Store.unreadTotal(),
+      /* One badge on Today for "something is waiting on you", covering both
+         unread messages and tasks handed over and not yet opened. Two
+         separate counts in the same place would just be noise. */
+      unread: Store.unreadTotal() + Store.handoffInbox().length,
       planning: Store.pieces().filter(p => p.status === 'drafting' || p.status === 'review').length
     };
   }

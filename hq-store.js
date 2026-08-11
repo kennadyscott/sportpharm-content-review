@@ -1016,10 +1016,127 @@ const Store = (() => {
 
   /* Work somebody handed you. The question isn't which day — it's whether you
      know about it — so it stands on its own until you plan it. */
+  /* Everything sitting with me: work I own, plus anything just handed to me.
+     A handoff shows here even if it already has a date, because someone
+     passing you a task with a note is news — the date does not make it less
+     so, and the old `!t.due` filter would have hidden exactly the handoffs
+     this list exists to surface. */
   function assignedToMe() {
     const me = currentUser();
     if (!me) return [];
-    return allTasks().filter(t => t.owner === me.id && t.status !== 'shipped' && !t.due);
+    return allTasks().filter(t => {
+      if (t.owner !== me.id || t.status === 'shipped') return false;
+      const h = lastHandoff(t);
+      const handedToMe = h && h.to === me.id && h.by !== me.id;
+      return handedToMe || !t.due;
+    }).sort((a, b) => {
+      /* Unopened handoffs first — they are the ones someone is waiting on. */
+      const un = t => { const h = lastHandoff(t); return h && !h.seen && h.by !== me.id ? 0 : 1; };
+      return un(a) - un(b);
+    });
+  }
+
+  /* =========================================================================
+     HANDOFFS
+
+     Passing the same piece of work back and forth is most of what a shared
+     workspace is: "I've done my bit — over to you." The reason has to travel
+     with the task, because the other person reads it in a different browser
+     hours later, and "why is this mine now?" is otherwise unanswerable.
+
+     Each pass appends to the task's own thread and re-owns it, so there is
+     one history rather than a task and a separate conversation about it.
+  ========================================================================= */
+  function handOff(projectId, taskId, toUserId, note, status) {
+    const t = taskRef(projectId, taskId);
+    if (!t) return null;
+    const me = currentUser();
+    t.handoffs = t.handoffs || [];
+    t.handoffs.push({
+      id: uid('h'),
+      by: me ? me.id : null,
+      to: toUserId || null,
+      note: (note || '').trim(),
+      at: now(),
+      seen: false
+    });
+    /* A long-lived task should not grow forever; the recent trail is the
+       useful part. */
+    if (t.handoffs.length > 40) t.handoffs.splice(0, t.handoffs.length - 40);
+    t.owner = toUserId || null;
+    if (status && status !== t.status) moveTask(projectId, taskId, status, null);
+    t.updatedAt = now();
+    const who = user(toUserId);
+    log('passed “' + t.title + '” to ' + (who ? who.name.split(' ')[0] : 'no one'), '');
+    save();
+    return t;
+  }
+
+  /* Opening the task is the acknowledgement — no separate "mark read" chore. */
+  function seeHandoffs(projectId, taskId) {
+    const t = taskRef(projectId, taskId);
+    const me = currentUser();
+    if (!t || !me || !t.handoffs) return;
+    let changed = false;
+    t.handoffs.forEach(h => { if (h.to === me.id && !h.seen) { h.seen = true; changed = true; } });
+    if (changed) save();
+  }
+
+  /* One running conversation: entries with a `to` are passes, entries without
+     are someone thinking out loud. Same array either way, so the thread reads
+     in order instead of splitting into two histories. */
+  function taskLog(t) { return (t && t.handoffs) || []; }
+
+  function addTaskNote(projectId, taskId, text) {
+    const body = (text || '').trim();
+    if (!body) return null;
+    const t = taskRef(projectId, taskId);
+    if (!t) return null;
+    const me = currentUser();
+    t.handoffs = t.handoffs || [];
+    t.handoffs.push({ id: uid('h'), by: me ? me.id : null, to: null, note: body, at: now(), seen: true });
+    if (t.handoffs.length > 60) t.handoffs.splice(0, t.handoffs.length - 60);
+    t.updatedAt = now();
+    save();
+    return t;
+  }
+
+  /* The last actual pass, and only while it still describes the current
+     owner. Once the task is reassigned by other means the note is stale, not
+     news. Plain notes are skipped — they hand nothing to anyone. */
+  function lastHandoff(t) {
+    const passes = taskLog(t).filter(h => h.to);
+    if (!passes.length) return null;
+    const h = passes[passes.length - 1];
+    return h.to === t.owner ? h : null;
+  }
+  /* Newest thing anyone said, whatever kind — what a row should surface. */
+  function lastNote(t) {
+    const said = taskLog(t).filter(h => h.note);
+    return said.length ? said[said.length - 1] : null;
+  }
+
+  /* Handed to me and not yet opened — this is the notification. */
+  function handoffInbox() {
+    const me = currentUser();
+    if (!me) return [];
+    return allTasks()
+      .filter(t => t.status !== 'shipped')
+      .map(t => ({ t, h: lastHandoff(t) }))
+      .filter(x => x.h && x.h.to === me.id && !x.h.seen && x.h.by !== me.id)
+      .sort((a, b) => b.h.at.localeCompare(a.h.at));
+  }
+
+  /* What I have passed on and not had back — the other half of "who is doing
+     what", and the thing that stops work quietly stalling with someone. */
+  function handoffOutbox() {
+    const me = currentUser();
+    if (!me) return [];
+    return allTasks()
+      .filter(t => t.status !== 'shipped' && t.owner !== me.id)
+      .map(t => ({ t, h: lastHandoff(t) }))
+      .filter(x => x.h && x.h.by === me.id && x.h.to)
+      .sort((a, b) => a.h.at.localeCompare(b.h.at));
   }
 
   /* =========================================================================
@@ -1520,6 +1637,8 @@ const Store = (() => {
     media, mediaItem, addMedia, updateMedia, removeMedia, mediaUsedBy,
     todos, todo, addTodo, updateTodo, toggleTodo, removeTodo,
     mondayOf, addDays, weekDays, dayItems, runningLog, assignedToMe,
+    handOff, seeHandoffs, taskLog, addTaskNote, lastHandoff, lastNote,
+    handoffInbox, handoffOutbox,
     kpiMap, setKpi, kpiRow, kpiPeriods,
     messages, threads, threadMessages, sendMessage, toggleMessageDone,
     lastReadAt, markThreadRead, unreadIn, unreadTotal, lastInThread,

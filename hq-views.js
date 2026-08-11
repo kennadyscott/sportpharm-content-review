@@ -250,6 +250,7 @@
       const days = Store.weekDays(start);
       const log = Store.runningLog();
       const assigned = Store.assignedToMe();
+      const waiting = Store.handoffOutbox();
       const logDone = log.filter(t => t.done).length;
 
       const LV = ['blocker', 'important', 'note'];
@@ -280,19 +281,43 @@
             <div class="panel-head"><h2>Assigned to you</h2>
               ${assigned.length ? `<span class="asg-n">${assigned.length}</span>` : ''}</div>
             ${assigned.length ? `<p class="wk-note">From a project — someone is waiting on these.</p>
-            ${assigned.map(t => `<div class="asg-row">
+            ${assigned.map(t => {
+              /* If it was handed over, the note is the whole point of the row:
+                 it is what the other person said when they passed it. */
+              const h = Store.lastHandoff(t);
+              const fresh = h && !h.seen && h.by !== (me && me.id);
+              const by = h && Store.user(h.by);
+              return `<div class="asg-row ${fresh ? 'fresh' : ''}">
               <span class="wk-dot t-${areaOf(t.project.area).tone}"></span>
               <span class="asg-body" data-task="${t.project.id}:${t.id}" tabindex="0" role="button">
                 <span class="asg-title">${esc(t.title)}</span>
-                <span class="asg-from">${esc(t.project.name)}</span>
+                ${h ? `<span class="asg-pass">
+                  ${fresh ? '<i class="asg-new"></i>' : ''}
+                  <b>${esc(by ? by.name.split(' ')[0] : 'Someone')}</b> passed this to you${
+                    h.note ? ' — “' + esc(h.note) + '”' : ''}</span>`
+                : `<span class="asg-from">${esc(t.project.name)}</span>`}
               </span>
               ${Store.can('edit') ? `<select class="asg-plan" data-planday="${t.project.id}:${t.id}"
                   aria-label="Plan ${esc(t.title)} into a day">
                 <option value="">Plan…</option>
                 ${days.map(d => `<option value="${d}">${esc(longDay(d))}</option>`).join('')}
               </select>` : ''}
-            </div>`).join('')}`
+            </div>`; }).join('')}`
             : '<p class="wk-empty">Nothing is waiting on you.</p>'}
+
+            ${waiting.length ? `<div class="asg-out">
+              <h3>Waiting on someone else</h3>
+              ${waiting.map(x => {
+                const to = Store.user(x.h.to);
+                return `<div class="asg-row slim" data-task="${x.t.project.id}:${x.t.id}"
+                  tabindex="0" role="button">
+                  <span class="asg-body">
+                    <span class="asg-title">${esc(x.t.title)}</span>
+                    <span class="asg-from">with ${esc(to ? to.name.split(' ')[0] : 'someone')} · ${esc(ago(x.h.at))}</span>
+                  </span>
+                </div>`;
+              }).join('')}
+            </div>` : ''}
           </section>
           ${msgPanel(me)}
         </div>
@@ -967,6 +992,51 @@
       b.addEventListener('click', e => { e.stopPropagation(); Store.shiftTask(p.id, b.dataset.shift, Number(b.dataset.dir)); HQ.render(); }));
   }
 
+  /* ---------------------------- handing it over ----------------------------
+     One thread per task, holding both the passes and the plain notes, so the
+     history reads in order. Passing re-owns the task and carries the reason
+     with it — the other person reads it hours later in another browser, and
+     "why is this mine now?" has to be answerable from the task itself. */
+  function handoffPanel(p, t, editable) {
+    const log = Store.taskLog(t);
+    const me = Store.currentUser();
+
+    const entries = log.slice(-25).map(h => {
+      const by = Store.user(h.by), to = Store.user(h.to);
+      return `<div class="ho-entry ${h.to ? 'pass' : ''}">
+        <span class="ho-who">
+          <b>${esc(by ? by.name.split(' ')[0] : 'Someone')}</b>
+          ${h.to ? `${svg('arrow')}<b>${esc(to ? to.name.split(' ')[0] : 'no one')}</b>` : ''}
+          <span class="ho-at">${esc(ago(h.at))}</span>
+        </span>
+        ${h.note ? `<p>${esc(h.note)}</p>` : '<p class="ho-silent">passed it over without a note</p>'}
+      </div>`;
+    }).join('');
+
+    return `<section class="ho">
+      <h4 class="ho-h">Hand it over</h4>
+      ${log.length ? `<div class="ho-thread">${entries}</div>`
+        : '<p class="ho-none">Nothing passed back and forth yet.</p>'}
+      ${editable ? `
+        <div class="ho-form">
+          <select id="ho-to" aria-label="Pass it to">
+            <option value="">Pass it to…</option>
+            ${Store.users().filter(u => !u.seed && u.id !== (me && me.id))
+              .map(u => `<option value="${u.id}">${esc(u.name)}</option>`).join('')}
+          </select>
+          <select id="ho-status" aria-label="And set the status to">
+            <option value="">Leave the status</option>
+            ${STATUSES.map(s => `<option value="${s.id}">Mark ${esc(s.label.toLowerCase())}</option>`).join('')}
+          </select>
+        </div>
+        <textarea id="ho-note" rows="2" placeholder="What do they need to know? — this is what they read when it lands with them"></textarea>
+        <div class="ho-acts">
+          <button class="btn btn-dark btn-sm" id="ho-send">${svg('arrow')}Pass it on</button>
+          <button class="btn btn-ghost btn-sm" id="ho-note-only">Just add a note</button>
+        </div>` : ''}
+    </section>`;
+  }
+
   function openTaskSheet(projectId, taskId) {
     HQ.openSheet(() => {
       const p = Store.project(projectId);
@@ -1006,6 +1076,9 @@
             </div>
             <div class="field"><label for="f-notes">Notes</label>
               <textarea id="f-notes" ${editable ? '' : 'readonly'}>${esc(t.notes || '')}</textarea></div>
+
+            ${handoffPanel(p, t, editable)}
+
             ${editable ? `<div class="sheet-danger">
               <span style="font-size:.78rem;color:var(--ink-faint)">Added ${ago(t.createdAt)}</span>
               <button class="link-danger" id="del-task">Remove this task</button>
@@ -1015,7 +1088,33 @@
           const ta = sheet.querySelector('#f-title');
           const autosize = () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; };
           autosize();
+
+          /* Opening it is the acknowledgement — there is no separate "mark as
+             read" chore, and the badge clears because you actually looked. */
+          Store.seeHandoffs(p.id, t.id);
+          const th = sheet.querySelector('.ho-thread');
+          if (th) th.scrollTop = th.scrollHeight;
+
           if (!editable) return;
+
+          const hoSend = sheet.querySelector('#ho-send');
+          if (hoSend) hoSend.addEventListener('click', () => {
+            const to = sheet.querySelector('#ho-to').value;
+            const note = sheet.querySelector('#ho-note').value;
+            const status = sheet.querySelector('#ho-status').value;
+            if (!to) return toast('Pick who it goes to first.');
+            Store.handOff(p.id, t.id, to, note, status);
+            const who = Store.user(to);
+            toast(`Passed to ${who ? who.name.split(' ')[0] : 'them'}.`);
+            HQ.render(); HQ.refreshSheet();
+          });
+          const hoNote = sheet.querySelector('#ho-note-only');
+          if (hoNote) hoNote.addEventListener('click', () => {
+            const note = sheet.querySelector('#ho-note').value;
+            if (!note.trim()) return toast('Nothing to add.');
+            Store.addTaskNote(p.id, t.id, note);
+            HQ.render(); HQ.refreshSheet();
+          });
           ta.addEventListener('input', autosize);
           ta.addEventListener('change', () => { Store.updateTask(p.id, t.id, { title: ta.value.trim() || 'Untitled task' }); HQ.render(); });
           sheet.querySelector('#f-status').addEventListener('change', e => { Store.moveTask(p.id, t.id, e.target.value, null); HQ.render(); HQ.refreshSheet(); });

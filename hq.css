@@ -2438,3 +2438,40 @@ button.pl-st:hover { filter: brightness(.94); }
 .ord-sent { display: flex; align-items: center; gap: .35rem; font-size: .78rem;
   font-weight: 600; color: var(--green); margin: .5rem 0 .1rem; }
 .ord-sent svg { width: 13px; height: 13px; }
+
+/* ============================ HANDOFFS ============================ */
+.ho { margin-top: 1.2rem; padding-top: .9rem; border-top: 1px solid var(--line); }
+.ho-h { font-size: .7rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: .6rem; }
+.ho-none { font-size: .8rem; color: var(--ink-faint); font-style: italic; margin-bottom: .6rem; }
+.ho-thread { max-height: 15rem; overflow-y: auto; margin-bottom: .7rem;
+  display: flex; flex-direction: column; gap: .5rem; }
+.ho-entry { padding: .45rem .6rem; border-radius: 8px; background: var(--bg); }
+.ho-entry.pass { background: var(--bg-2); border-left: 2.5px solid var(--red); }
+.ho-who { display: flex; align-items: center; gap: .28rem; font-size: .74rem; color: var(--ink-soft); }
+.ho-who b { color: var(--navy); font-weight: 700; }
+.ho-who svg { width: 11px; height: 11px; color: var(--red); }
+.ho-at { margin-left: auto; color: var(--ink-faint); font-size: .68rem; }
+.ho-entry p { font-size: .84rem; line-height: 1.5; color: var(--ink); margin-top: .2rem; }
+.ho-silent { font-style: italic; color: var(--ink-faint) !important; }
+.ho-form { display: flex; gap: .4rem; margin-bottom: .4rem; }
+.ho-form select { flex: 1; min-width: 0; padding: .35rem .5rem; border: 1.5px solid var(--line);
+  border-radius: 8px; background: var(--paper); font: inherit; font-size: .8rem; }
+.ho-form select:focus { outline: none; border-color: var(--red); }
+.ho textarea { width: 100%; padding: .45rem .6rem; border: 1.5px solid var(--line);
+  border-radius: 8px; font: inherit; font-size: .84rem; resize: vertical; background: var(--paper); }
+.ho textarea:focus { outline: none; border-color: var(--red); }
+.ho-acts { display: flex; gap: .4rem; margin-top: .5rem; }
+
+/* A handoff in Assigned-to-you: the note is the row, not a detail behind it. */
+.asg-pass { display: block; font-size: .74rem; color: var(--ink-soft); line-height: 1.45; margin-top: .1rem; }
+.asg-pass b { color: var(--navy); }
+.asg-new { display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--red); margin-right: .3rem; vertical-align: middle; }
+.asg-row.fresh { background: rgba(214, 32, 42, .045); border-radius: 8px;
+  margin: 0 -.4rem; padding-left: .4rem; padding-right: .4rem; }
+.asg-out { margin-top: .9rem; padding-top: .7rem; border-top: 1px solid var(--line); }
+.asg-out h3 { font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: .35rem; }
+.asg-row.slim { cursor: pointer; }
+.asg-row.slim:hover { background: var(--bg); border-radius: 8px; }
