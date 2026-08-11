@@ -246,9 +246,18 @@
               <button class="btn btn-outline btn-sm" id="ord-copy">${svg('copy')}Copy</button>
               <button class="btn btn-ghost btn-sm" id="ord-print">Print / PDF</button>
             </div>
-            <p class="side-sub" id="ord-send-note">${HQ.mailer && HQ.mailer.ready()
-              ? 'Sends from ' + esc(HQ.mailer.from()) + ' — a real message, with a copy in that mailbox.'
-              : 'No server to send from yet, so Send opens this in your mail app with everything filled in. Mark it sent once it has gone.'}</p>
+            ${HQ.mailer && HQ.mailer.ready()
+              ? `<p class="side-sub">Sends from ${esc(HQ.mailer.from())} — a real message, with a copy in that mailbox.</p>`
+              : `<p class="side-sub">No server to send from yet, so Send opens this in your mail app
+                   with everything filled in. Mark it sent once it has gone.</p>
+                 <p class="side-sub">Nothing happened? <a class="linky" href="${esc(HQ.mailer.mailtoUrl({
+                     to: ORDER_RECIPIENTS.filter(r => !/cc/i.test(r.role)).map(r => r.to),
+                     cc: ORDER_RECIPIENTS.filter(r => /cc/i.test(r.role)).map(r => r.to),
+                     subject: `SportPharm order ${o.ref} — ${o.org || 'new order'}`,
+                     body: Store.orderMessage(o)
+                   }))}">open it as a link instead</a> — or use Copy and paste it into Outlook.
+                   Some machines have no mail app registered with the browser, and then only
+                   Copy can work.</p>`}
           </div>` : ''}
 
           <div class="side-card">
@@ -711,25 +720,39 @@
         if (!gate.ok) return toast(gate.error);
         const to = ORDER_RECIPIENTS.filter(r => !/cc/i.test(r.role)).map(r => r.to);
         const cc = ORDER_RECIPIENTS.filter(r => /cc/i.test(r.role)).map(r => r.to);
+        const subject = `SportPharm order ${o.ref} — ${o.org || 'new order'}`;
+        const body = Store.orderMessage(o);
+
+        /* No server: hand it straight to the mail client, and do it
+           SYNCHRONOUSLY. This was broken — the old code awaited the mailer
+           first, and a mailto: navigation that is not inside the click's own
+           user activation gets blocked, so nothing happened at all. The
+           confirm() and the re-render immediately after made it worse.
+
+           No confirm on this path either: opening a draft is not sending, so
+           there is nothing to confirm, and the dialog was another thing
+           between the click and the navigation. */
+        if (!HQ.mailer.ready()) {
+          const a = document.createElement('a');
+          a.href = HQ.mailer.mailtoUrl({ to, cc, subject, body });
+          a.rel = 'noopener';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          toast('Opening your mail app. Nothing is sent until you send it there.');
+          return;
+        }
+
         if (!confirm(`Send ${o.ref} to ${to.join(', ')}?\n\nThis sends a real email.`)) return;
 
         snd.disabled = true;
         snd.textContent = 'Sending…';
-        const res = await HQ.mailer.send({
-          to, cc, ref: o.ref,
-          subject: `SportPharm order ${o.ref} — ${o.org || 'new order'}`,
-          body: Store.orderMessage(o)
-        });
+        const res = await HQ.mailer.send({ to, cc, ref: o.ref, subject, body });
 
         if (!res.ok) {
           /* Say what went wrong and leave the order where it was. Marking it
              sent on a failure is the one outcome nobody could recover from. */
-          if (res.reason === 'handoff-to-client' && res.mailto) {
-            toast('Opening your mail app — press send there.');
-            window.location.href = res.mailto;
-          } else {
-            alert(res.error);
-          }
+          alert(res.error);
           HQ.render();
           return;
         }
