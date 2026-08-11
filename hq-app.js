@@ -331,7 +331,23 @@ const HQ = (() => {
     { id: 'settings', label: 'Settings', icon: 'gear' }
   ];
   const NAV_FLAT = NAV.flatMap(n => n.children ? n.children : [n]);
-  const groupOpen = {};   /* per group: undefined = follow the route */
+
+  /* Groups start OPEN. They used to default to "open only if you are already
+     inside one", which meant that on Today — the page everyone lands on —
+     all three collapsed and the rail looked flat. The second rail you cannot
+     see is not a second rail.
+
+     Folding is remembered per person in localStorage rather than in the
+     store: it is how someone likes to look at the page, not a fact about the
+     work, and it should not sync to everyone else. */
+  const GKEY = 'sphq-railgroups';
+  const groupOpen = (() => {
+    try { return JSON.parse(localStorage.getItem(GKEY)) || {}; } catch (e) { return {}; }
+  })();
+  const saveGroups = () => {
+    try { localStorage.setItem(GKEY, JSON.stringify(groupOpen)); } catch (e) {}
+  };
+  const isOpen = parent => groupOpen[parent] === undefined ? true : groupOpen[parent];
 
   const views = {};
   function view(id, def) { views[id] = def; }
@@ -386,7 +402,7 @@ const HQ = (() => {
     $('#rail-nav').innerHTML = TREE.map(n => {
       if (!n.children) return link(n, false);
       const activeChild = n.children.some(k => k.id === v);
-      const open = groupOpen[n.parent] === undefined ? activeChild : groupOpen[n.parent];
+      const open = isOpen(n.parent);
       /* Project rows have no badge of their own, so the parent rolls up once
          rather than once per project. */
       const kidBadge = n.children.reduce((t, k) => t + (k.pid ? 0 : (badge[k.id] || 0)), 0);
@@ -403,11 +419,9 @@ const HQ = (() => {
     $('#rail-nav').querySelectorAll('[data-navtoggle]').forEach(tg =>
       tg.addEventListener('click', () => {
         const parent = tg.dataset.navtoggle;
-        const grp = TREE.find(x => x.parent === parent);
-        if (!grp) return;
-        const activeChild = grp.children.some(k => k.id === route().view);
-        const open = groupOpen[parent] === undefined ? activeChild : groupOpen[parent];
-        groupOpen[parent] = !open;
+        if (!TREE.some(x => x.parent === parent)) return;
+        groupOpen[parent] = !isOpen(parent);
+        saveGroups();
         renderRail();
       }));
     $('#rail-me').innerHTML = me ? `${avatar(me)}
