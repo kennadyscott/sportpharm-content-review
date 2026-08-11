@@ -1386,6 +1386,20 @@ const Store = (() => {
     const me = currentUser();
     const mk = n => DEMO_TAG + n;
 
+    /* The Enovachem contact. Without her there is nobody to switch to, and
+       the whole cross-company half of the demo cannot be shown — the script
+       assumed she existed because she kept getting created by hand while
+       this was being built. Tagged like everything else so clearDemo takes
+       her out again. */
+    if (!s.users.some(u => u.id === mk('u-dana'))) {
+      s.users.push({
+        id: mk('u-dana'), company: 'enovachem', name: 'Dana R',
+        email: 'dana@enovachem.com', role: 'editor', tone: 'blue',
+        title: 'Fulfilment', seed: false, invite: false,
+        pass: hash('summit-anchor-40'), createdAt: now(), order: s.users.length
+      });
+    }
+
     /* Julia's real Oklahoma State order — the one from her own email — plus a
        second so the pipeline is not a single row. */
     s.orders.unshift({
@@ -1458,6 +1472,14 @@ const Store = (() => {
     const tagged = x => String(x && x.id || '').startsWith(DEMO_TAG);
     s.orders = s.orders.filter(o => !tagged(o));
     s.messages = (s.messages || []).filter(m => !tagged(m));
+    /* If the demo seat is the one signed in, step back to a real one first —
+       clearing it underneath yourself would leave nobody logged in. */
+    const meNow = currentUser();
+    if (meNow && tagged(meNow)) {
+      const real = s.users.find(u => !tagged(u) && u.role === 'owner');
+      if (real) localStorage.setItem(SESSION, real.id);
+    }
+    s.users = s.users.filter(u => !tagged(u));
     (s.projects || []).forEach(p => (p.tasks || []).forEach(t => {
       if (Array.isArray(t.handoffs)) {
         t.handoffs = t.handoffs.filter(h => !tagged(h));
