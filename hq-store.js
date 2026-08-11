@@ -54,6 +54,8 @@ const Store = (() => {
       planRules: { ...DEFAULT_PLAN_RULES },
       reminders: SEED_REMINDERS.map((r, i) => ({ resolved: false, ...r, order: i, createdAt: now(), updatedAt: now() })),
       orders: SEED_ORDERS.map((o, i) => ({ order: i, ...o })),
+      stock: { ...SEED_STOCK },   /* sku -> counted on hand */
+      recipe: {},                 /* sku -> [[sku, qty]] — bundle contents, once known */
       todos: SEED_TODOS.map((t, i) => ({ done: false, repeats: null, tag: '', detail: '',
         day: null, order: i, createdAt: now(), ...t })),
       metrics: {},    /* rowKey -> { col: value }, plus .margin — HQ-level rollup */
@@ -104,6 +106,19 @@ const Store = (() => {
         if (!o.fromCompany) o.fromCompany = OWN_COMPANY;
         if (!o.toCompany) o.toCompany = 'enovachem';
         if (!Array.isArray(o.thread)) o.thread = [];
+      });
+    },
+    /* Inventory and money arrived after orders existed. Nothing is inferred
+       about an old order's payment: an order that shipped months ago may well
+       have been paid, but this cannot know that, and marking it paid would be
+       inventing a receipt. They start at `none` and someone says otherwise. */
+    'stock-money-2026-08': s => {
+      if (!s.stock) s.stock = {};
+      if (!s.recipe) s.recipe = {};
+      (s.orders || []).forEach(o => {
+        if (!o.money) o.money = { state: 'none', invoiceNo: '', raisedAt: null,
+          sentAt: null, paidAt: null, amountPaid: 0, terms: REMIT_TO.terms, note: '' };
+        if (!Array.isArray(o.moves)) o.moves = [];
       });
     }
   };
@@ -1351,6 +1366,117 @@ const Store = (() => {
   }
 
   /* =========================================================================
+     DEMO DATA
+
+     A demo of an empty app shows nothing. This fills it with enough to walk
+     someone through in five minutes, and takes it all out again afterwards.
+
+     Two rules it follows. It is flagged, so a banner says the numbers on
+     screen are illustrative — the failure mode here is somebody screenshotting
+     a KPI and quoting it in a meeting. And it only ever adds; `clearDemo`
+     removes exactly what it added, by id, so it can be run on a store that
+     already has real work in it without eating any of it.
+  ========================================================================= */
+  const DEMO_TAG = 'demo:';
+  const isDemoOn = () => !!(load().flags || {}).demoData;
+
+  function loadDemo() {
+    const s = load();
+    if (isDemoOn()) return false;
+    const me = currentUser();
+    const mk = n => DEMO_TAG + n;
+
+    /* Julia's real Oklahoma State order — the one from her own email — plus a
+       second so the pipeline is not a single row. */
+    s.orders.unshift({
+      id: mk('o1'), ref: 'SP-0001', status: 'ack', raisedBy: 'u-julia',
+      fromCompany: 'sportpharm', toCompany: 'enovachem',
+      org: 'Oklahoma State Athletics', contactName: 'Kevin Blaske',
+      contactEmail: 'blaske@okstate.edu', contactPhone: '',
+      shipTo: '170 Athletic Center\nStillwater, OK 74078',
+      lines: [{ sku: 'BUNDLE-TRIFECTA', name: 'Team Trifecta Bundle', qty: 1, price: 269.95,
+                note: '3 WasabiRub · 3 Super Hot · 3 IcetraRub' }],
+      freebies: [{ qty: 2, name: 'Super Hot' }], approvedBy: 'Brandon',
+      swag: ['SportPharm hat'], pay: 'Invoice', po: '', ship: 'Ground', shipCost: 10,
+      needBy: '', notes: '', tracking: '',
+      thread: [
+        { id: mk('t1'), by: 'u-julia', company: 'sportpharm', at: now(),
+          text: 'Can you confirm stock on Super Hot before this ships?' }
+      ],
+      history: [{ at: now(), by: 'u-julia', from: 'draft', to: 'submitted' },
+                { at: now(), by: 'u-julia', from: 'submitted', to: 'ack' }],
+      createdAt: now(), updatedAt: now(), order: -1
+    });
+    s.orders.unshift({
+      id: mk('o2'), ref: 'SP-0002', status: 'draft', raisedBy: 'u-marissa',
+      fromCompany: 'sportpharm', toCompany: 'enovachem',
+      org: 'Midwest Sports Medicine', contactName: 'R. Alvarez',
+      contactEmail: 'ralvarez@example.org', contactPhone: '',
+      shipTo: '', lines: [{ sku: 'WASABIRUB', name: 'WasabiRub', qty: 12, price: 29.95 }],
+      freebies: [], approvedBy: '', swag: [], pay: 'Invoice', po: '',
+      ship: 'Ground', shipCost: 0, needBy: '', notes: '', tracking: '',
+      thread: [], history: [], createdAt: now(), updatedAt: now(), order: -2
+    });
+
+    /* A task mid-handoff, so "assigned to you" has something in it. */
+    const p = s.projects[0];
+    if (p && p.tasks[0]) {
+      p.tasks[0].owner = 'u-jessie';
+      p.tasks[0].handoffs = [{
+        id: mk('h1'), by: 'u-kennady', to: 'u-jessie',
+        note: 'Page inventory is agreed — over to you for the copy pass.',
+        at: now(), seen: false
+      }];
+    }
+
+    s.messages.push(
+      { id: mk('m1'), by: 'u-brandon', to: 'team', at: now(),
+        text: 'Website redesign kicks off Monday. Shout if that clashes with anything.' },
+      { id: mk('m2'), by: 'u-julia', to: 'team', at: now(),
+        text: 'Oklahoma State is acknowledged — Enova are picking today.' }
+    );
+
+    /* Illustrative only. Round numbers on purpose so nobody mistakes them for
+       the real report, and the banner says so while they are loaded. */
+    const w = kpiPeriods('week', 8);
+    const set = (i, m, v) => { kpiMap()[kpiKey(w[i].key, m)] = v; };
+    [[0, 12400, 48, 2100, 5200, 31, 17], [1, 9800, 41, 2400, 4700, 26, 15],
+     [2, 11200, 45, 2200, 4900, 29, 16], [3, 8600, 36, 2500, 4400, 24, 12]]
+      .forEach(([i, rev, ord, sp, ses, nc, rc]) => {
+        set(i, 'revenue', rev); set(i, 'orders', ord); set(i, 'spend', sp);
+        set(i, 'sessions', ses); set(i, 'newCust', nc); set(i, 'repeatCust', rc);
+      });
+
+    if (!s.flags) s.flags = {};
+    s.flags.demoData = { on: true, at: now(), by: me ? me.id : null };
+    save();
+    return true;
+  }
+
+  function clearDemo() {
+    const s = load();
+    const tagged = x => String(x && x.id || '').startsWith(DEMO_TAG);
+    s.orders = s.orders.filter(o => !tagged(o));
+    s.messages = (s.messages || []).filter(m => !tagged(m));
+    (s.projects || []).forEach(p => (p.tasks || []).forEach(t => {
+      if (Array.isArray(t.handoffs)) {
+        t.handoffs = t.handoffs.filter(h => !tagged(h));
+        if (!t.handoffs.length && t.owner === 'u-jessie') t.owner = null;
+      }
+    }));
+    /* The KPI grid is keyed by period, not by id, so clear the cells the demo
+       wrote rather than trying to match a tag. Anything typed by hand into a
+       different period survives. */
+    const w = kpiPeriods('week', 8);
+    const m = kpiMap();
+    [0, 1, 2, 3].forEach(i => ['revenue', 'orders', 'spend', 'sessions', 'newCust', 'repeatCust']
+      .forEach(k => { delete m[kpiKey(w[i].key, k)]; }));
+    if (s.flags) delete s.flags.demoData;
+    save();
+    return true;
+  }
+
+  /* =========================================================================
      COMPANIES
 
      One HQ, several companies. Who you work for decides what you can see:
@@ -1416,6 +1542,9 @@ const Store = (() => {
       shipTo: '', lines: [], freebies: [], swag: [], approvedBy: '',
       pay: 'Invoice', poNumber: '', ship: 'Ground', shipCost: 0,
       needBy: '', notes: '', tracking: '', history: [],
+      money: { state: 'none', invoiceNo: '', raisedAt: null, sentAt: null,
+               paidAt: null, amountPaid: 0, terms: REMIT_TO.terms, note: '' },
+      moves: [],   /* stock taken off the shelf, written once when it ships */
       createdAt: now(), updatedAt: now(), order: -Date.now() / 1000, ...fields
     };
     load().orders.unshift(o);
@@ -1445,6 +1574,10 @@ const Store = (() => {
       at: now(), by: me ? me.id : null, from: o.status, to: status, note: note || ''
     }]);
     o.status = status;
+    /* Stock follows the order rather than being kept by hand. Crossing into
+       shipped takes the units off; stepping back out puts them back, so a
+       misclick does not leave the shelf permanently wrong. */
+    if (hasShipped(o)) applyMoves(o); else revertMoves(o);
     o.updatedAt = now();
     log('order ' + (ORDER_STATES[status] || {}).label.toLowerCase(), o.ref);
     save();
@@ -1464,6 +1597,229 @@ const Store = (() => {
   }
   const orderTotal = o => (o.lines || []).reduce((n, l) =>
     n + (Number(l.price) || 0) * (Number(l.qty) || 0), 0) + (Number(o.shipCost) || 0);
+
+  /* =========================================================================
+     INVENTORY
+
+     What went out the door, per SKU. The reason this is worth having is the
+     one the order form already made visible: a freebie and a SWAG item carry
+     no price, so they never appear in a total and the only trace they leave
+     is the stock they consume. Counted here they stop being invisible.
+
+     A line is matched to the catalogue by name, because a line can be typed
+     freehand and often is. Anything that matches nothing is still reported —
+     under its own name, marked unknown — rather than dropped, since a line
+     nobody can account for is exactly the thing worth seeing.
+  ========================================================================= */
+  const catalog = () => ORDER_CATALOG;
+  const bySku = sku => ORDER_CATALOG.find(c => c.sku === sku) || null;
+
+  const norm = s => String(s || '').trim().toLowerCase();
+  function skuFor(name) {
+    const n = norm(name);
+    if (!n) return null;
+    const exact = ORDER_CATALOG.find(c => norm(c.name) === n);
+    if (exact) return exact.sku;
+    /* "Team Trifecta Bundle (3 WasabiRub · 3 Super Hot · 3 IcetraRub)" is what
+       comes off the paper form — the catalogue name with its contents spelled
+       out after it. Match on the front of the string before giving up. */
+    const starts = ORDER_CATALOG.find(c => n.startsWith(norm(c.name)));
+    return starts ? starts.sku : null;
+  }
+
+  /* Contents of a bundle: whatever someone has set in Inventory wins over the
+     shipped default, so a correction does not need a new build. */
+  function recipeOf(sku) {
+    const set = (load().recipe || {})[sku];
+    if (Array.isArray(set)) return set;
+    const c = bySku(sku);
+    return (c && Array.isArray(c.of)) ? c.of : [];
+  }
+  function setRecipe(sku, pairs) {
+    load().recipe[sku] = (pairs || []).filter(p => p && p[0] && Number(p[1]) > 0)
+      .map(p => [p[0], Number(p[1])]);
+    save();
+    return load().recipe[sku];
+  }
+
+  /* One order flattened into the units it actually consumes. `why` is kept
+     per unit because "9 WasabiRub" and "9 WasabiRub, 6 of them free" are
+     different facts and only one of them is a problem. */
+  function orderUnits(o) {
+    const out = [];
+    const take = (name, qty, why) => {
+      const q = Number(qty) || 0;
+      if (!q) return;
+      const sku = skuFor(name);
+      if (!sku) return out.push({ sku: null, name: String(name || '').trim(), qty: q, why, unknown: true });
+      const parts = recipeOf(sku);
+      if (parts.length) {
+        parts.forEach(([s, n]) => {
+          const c = bySku(s);
+          out.push({ sku: s, name: c ? c.name : s, qty: q * Number(n), why, via: sku });
+        });
+      } else {
+        out.push({ sku, name: (bySku(sku) || {}).name || name, qty: q, why });
+      }
+    };
+    (o.lines || []).forEach(l => take(l.name, l.qty, 'sold'));
+    (o.freebies || []).forEach(f => take(f.name, f.qty, 'free'));
+    (o.swag || []).forEach(s => take(s, 1, 'swag'));
+    return out;
+  }
+
+  /* Stock leaves when the order ships, not when it is raised — that is when
+     it physically goes. Written onto the order once, so re-entering the state
+     cannot take the same units off twice, and stepping back puts them back. */
+  function applyMoves(o) {
+    if ((o.moves || []).length) return;
+    o.moves = orderUnits(o).filter(u => u.sku).map(u => ({ sku: u.sku, qty: u.qty, why: u.why }));
+    const st = load().stock;
+    o.moves.forEach(m => { st[m.sku] = (Number(st[m.sku]) || 0) - m.qty; });
+  }
+  function revertMoves(o) {
+    if (!(o.moves || []).length) return;
+    const st = load().stock;
+    o.moves.forEach(m => { st[m.sku] = (Number(st[m.sku]) || 0) + m.qty; });
+    o.moves = [];
+  }
+
+  const SHIPPED_FROM = ORDER_FLOW.indexOf('shipped');
+  const hasShipped = o => ORDER_FLOW.indexOf(o.status) >= SHIPPED_FROM;
+
+  function setStock(sku, n) {
+    load().stock[sku] = Number(n) || 0;
+    save();
+    return load().stock[sku];
+  }
+
+  /* The inventory table. `out` is what has physically gone; `committed` is
+     what is promised on orders that have not shipped yet, which is the number
+     that tells you whether you can say yes to the next one. */
+  function inventory() {
+    const all = orders();
+    const rows = {};
+    const row = (sku, name) => (rows[sku] = rows[sku] ||
+      { sku, name, onHand: Number((load().stock || {})[sku]) || 0,
+        sold: 0, free: 0, swag: 0, committed: 0, unknown: false });
+
+    ORDER_CATALOG.forEach(c => { if (c.kind !== 'bundle') row(c.sku, c.name); });
+
+    all.forEach(o => {
+      const shipped = hasShipped(o);
+      orderUnits(o).forEach(u => {
+        const r = u.sku ? row(u.sku, u.name) : row('?' + norm(u.name), u.name);
+        if (!u.sku) r.unknown = true;
+        if (shipped) r[u.why === 'sold' ? 'sold' : u.why === 'free' ? 'free' : 'swag'] += u.qty;
+        else if (o.status !== 'draft') r.committed += u.qty;
+      });
+    });
+
+    return Object.values(rows)
+      .map(r => ({ ...r, out: r.sold + r.free + r.swag, free: r.free, kind: (bySku(r.sku) || {}).kind || 'unit' }))
+      .sort((a, b) => (b.out + b.committed) - (a.out + a.committed) || a.name.localeCompare(b.name));
+  }
+
+  /* Bundles whose contents nobody has confirmed. Surfaced rather than
+     silently counted, because a bundle counted as one unit of itself makes
+     every number under it wrong in a way that looks fine. */
+  const bundlesWithoutContents = () => ORDER_CATALOG
+    .filter(c => c.kind === 'bundle' && !recipeOf(c.sku).length)
+    .map(c => ({ sku: c.sku, name: c.name }));
+
+  /* An item written into the free-of-charge list AND ticked as SWAG is one
+     item, entered twice. Nothing can tell from the record whether two hats
+     were meant or one was double-entered, so this refuses to guess — it
+     reports it and a person decides. Left alone it silently doubles the
+     stock that item consumes, which is the quiet kind of wrong. */
+  function orderDoubles(o) {
+    const swag = (o.swag || []).map(norm);
+    return (o.freebies || [])
+      .filter(f => swag.includes(norm(f.name)))
+      .map(f => f.name);
+  }
+  const allDoubles = () => orders()
+    .map(o => ({ o, items: orderDoubles(o) }))
+    .filter(x => x.items.length);
+
+  /* =========================================================================
+     MONEY
+  ========================================================================= */
+  const moneyOf = o => o.money || { state: 'none', amountPaid: 0 };
+  const outstandingOf = o => {
+    const m = moneyOf(o);
+    if (m.state === 'none' || m.state === 'writeoff') return 0;
+    return Math.max(0, orderTotal(o) - (Number(m.amountPaid) || 0));
+  };
+
+  function setMoney(id, patch) {
+    const o = order(id);
+    if (!o) return null;
+    o.money = { ...moneyOf(o), ...patch };
+    const m = o.money;
+    const total = orderTotal(o);
+    const paid = Number(m.amountPaid) || 0;
+    /* The state follows the numbers rather than being set beside them, so a
+       part payment cannot sit on an order still labelled "sent". */
+    if (m.state !== 'writeoff' && m.state !== 'none') {
+      m.state = paid <= 0 ? (m.sentAt ? 'sent' : 'raised')
+        : paid + 0.005 < total ? 'part' : 'paid';
+      if (m.state === 'paid' && !m.paidAt) m.paidAt = now();
+      if (m.state !== 'paid') m.paidAt = m.state === 'part' ? m.paidAt : null;
+    }
+    o.updatedAt = now();
+    save();
+    return o;
+  }
+
+  /* Raise an invoice against an order. The number is sequential and separate
+     from the order reference — an invoice is its own document with its own
+     numbering, and finance will ask for it that way. */
+  function raiseInvoice(id) {
+    const o = order(id);
+    if (!o) return { ok: false, error: 'Gone.' };
+    if (!(o.lines || []).length) return { ok: false, error: 'Nothing on the order to invoice.' };
+    const m = moneyOf(o);
+    if (m.invoiceNo) return { ok: true, invoiceNo: m.invoiceNo };
+    const used = orders().map(x => String((x.money || {}).invoiceNo || ''))
+      .filter(s => /^INV-\d+$/.test(s)).map(s => Number(s.slice(4)));
+    const next = (used.length ? Math.max(...used) : 0) + 1;
+    const invoiceNo = 'INV-' + String(next).padStart(4, '0');
+    setMoney(id, { state: 'raised', invoiceNo, raisedAt: now() });
+    log('raised invoice ' + invoiceNo, o.ref);
+    return { ok: true, invoiceNo };
+  }
+
+  function moneyStats() {
+    const all = visibleOrders();
+    const withInv = all.filter(o => moneyOf(o).state !== 'none');
+    const sum = (list, f) => list.reduce((n, o) => n + f(o), 0);
+    const paid = sum(withInv, o => Number(moneyOf(o).amountPaid) || 0);
+    const invoiced = sum(withInv.filter(o => moneyOf(o).state !== 'writeoff'), orderTotal);
+    const outstanding = sum(all, outstandingOf);
+
+    /* Age from when the invoice was sent, not raised — the clock a customer
+       is judged against starts when they receive it. */
+    const days = o => {
+      const at = moneyOf(o).sentAt || moneyOf(o).raisedAt;
+      return at ? Math.floor((Date.now() - new Date(at).getTime()) / 86400000) : 0;
+    };
+    const owing = all.filter(o => outstandingOf(o) > 0);
+    const bucket = (lo, hi) => owing.filter(o => days(o) >= lo && (hi == null || days(o) < hi));
+    const band = (label, list) => ({ label, n: list.length, value: sum(list, outstandingOf) });
+
+    return {
+      invoiced, paid, outstanding,
+      writtenOff: sum(withInv.filter(o => moneyOf(o).state === 'writeoff'), orderTotal),
+      notInvoiced: all.filter(o => moneyOf(o).state === 'none' && o.status !== 'draft')
+        .reduce((n, o) => n + orderTotal(o), 0),
+      notInvoicedCount: all.filter(o => moneyOf(o).state === 'none' && o.status !== 'draft').length,
+      ageing: [band('0–30 days', bucket(0, 31)), band('31–60', bucket(31, 61)),
+               band('61–90', bucket(61, 91)), band('Over 90', bucket(91, null))],
+      owing: owing.map(o => ({ o, days: days(o), due: outstandingOf(o) }))
+        .sort((a, b) => b.days - a.days)
+    };
+  }
 
   /* ---------------------------- order analytics ----------------------------
      What the orders themselves say, computed from the records rather than
@@ -1782,7 +2138,11 @@ const Store = (() => {
     lastReadAt, markThreadRead, unreadIn, unreadTotal, lastInThread,
     orders, order, addOrder, updateOrder, removeOrder, setOrderStatus,
     orderReady, orderTotal, orderMessage, orderStats, markOrderSent,
+    catalog, bySku, skuFor, orderUnits, inventory, setStock,
+    recipeOf, setRecipe, bundlesWithoutContents, orderDoubles, allDoubles,
+    moneyOf, outstandingOf, setMoney, raiseInvoice, moneyStats,
     companies, company, myCompany, isOwn, companyForEmail, visibleOrders,
+    loadDemo, clearDemo, isDemoOn,
     addOrderNote, orderThread,
     metricsOf, setMetric, setMargin,
     briefs, brief, reviewState, setReviewState, reviewThread,

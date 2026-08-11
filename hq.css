@@ -2711,3 +2711,61 @@ button.pl-st:hover { filter: brightness(.94); }
   border-radius: 8px; }
 .rail-viewas select:focus { outline: none; border-color: var(--red); }
 .rail-viewas + .rail-me { margin-top: .2rem; }
+
+/* Demo-data banner. Deliberately not subtle. */
+.tb-demo { font-size: .64rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  color: #fff; background: var(--amber); padding: .18rem .5rem; border-radius: 999px;
+  margin-right: .6rem; }
+
+/* ===================== RAISE AN ORDER · the pickers =====================
+   A grid of things you can want, with a counter on each, rather than a
+   dropdown and a price to type. The catalogue already knows the prices;
+   asking someone to retype one is asking for the mistake. */
+.picks { display: grid; gap: .5rem;
+  grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr)); }
+.pick { display: flex; align-items: stretch; gap: .3rem;
+  border: 1.5px solid var(--line); border-radius: 10px; background: var(--paper);
+  overflow: hidden; transition: border-color .12s, background .12s; }
+.pick:hover { border-color: var(--ink-faint); }
+.pick.on { border-color: var(--tone, var(--blue-deep)); background: var(--tone-soft, #E6EDFD); }
+.pick-body { flex: 1; min-width: 0; text-align: left; background: none; border: none;
+  cursor: pointer; padding: .5rem .6rem; display: grid; gap: .1rem; }
+.pick-body b { font-size: .78rem; letter-spacing: -.01em; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick-body span { font-size: .66rem; color: var(--ink-faint);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick-n { flex: none; display: flex; align-items: center; gap: .1rem; padding-right: .35rem; }
+.pick-n em { font-style: normal; font-weight: 800; font-size: .8rem; min-width: 1.1rem;
+  text-align: center; color: var(--ink); }
+.pick-pm { width: 1.4rem; height: 1.4rem; border-radius: 6px; border: 1px solid var(--line);
+  background: #fff; cursor: pointer; font-weight: 700; color: var(--ink-soft); line-height: 1; }
+.pick-pm:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+.pick-pm:disabled { opacity: .35; cursor: default; }
+.os-row.big { border-top: 1.5px solid var(--line); margin-top: .3rem; padding-top: .45rem; }
+.os-row.big b { font-size: 1rem; }
+
+/* ========================= INVENTORY ========================= */
+.inv-table th.n, .inv-table td.n { text-align: right; width: 4.6rem; }
+.inv-in { width: 4.2rem; padding: .22rem .35rem; font: inherit; font-size: .78rem;
+  text-align: right; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
+.inv-in:focus { outline: none; border-color: var(--red); background: #fff; }
+.inv-in.neg { color: var(--red); border-color: #F3C9C7; }
+.t-amber-txt { color: var(--amber); font-weight: 700; }
+.t-red-txt { color: var(--red); font-weight: 700; }
+.inv-bar { display: flex; height: 7px; border-radius: 4px; overflow: hidden;
+  background: var(--bg-2); min-width: 5rem; }
+.inv-bar i { background: var(--tone, var(--navy)); }
+.inv-key { display: flex; align-items: center; gap: .35rem 1rem; flex-wrap: wrap;
+  margin-top: .7rem; font-size: .7rem; color: var(--ink-faint); }
+.inv-key .k { width: .7rem; height: .7rem; border-radius: 3px; background: var(--tone);
+  display: inline-block; margin-right: .25rem; vertical-align: -1px; }
+.inv-recipes { display: grid; gap: .7rem;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); margin-top: .6rem; }
+.inv-recipe { border: 1px solid var(--line); border-radius: 10px; padding: .65rem .75rem;
+  background: var(--paper); }
+.inv-recipe > b { font-size: .8rem; }
+.inv-recipe-rows { display: grid; gap: .25rem; margin: .45rem 0 .55rem; }
+.inv-recipe-rows label { display: flex; align-items: center; justify-content: space-between;
+  gap: .5rem; font-size: .72rem; color: var(--ink-soft); }
+.inv-recipe-rows input { width: 3.4rem; padding: .18rem .3rem; font: inherit; font-size: .72rem;
+  text-align: right; border: 1px solid var(--line); border-radius: 5px; }

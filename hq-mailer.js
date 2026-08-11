@@ -35,6 +35,25 @@ HQ.mailer = (() => {
     return 'mailto:' + encodeURIComponent(list(to)).replace(/%40/g, '@').replace(/%2C/g, ',')
       + '?' + q.join('&');
   }
+  /* Outlook on the web, composing directly. `mailto:` hands off to whatever
+     the OS has registered as the default mail handler and a web page cannot
+     override that — on a Mac that is usually Mail.app, not Outlook. This goes
+     straight to Outlook in the browser instead, signed in as whoever they
+     already are, which is the right answer for a Microsoft 365 tenant.
+
+     office.com is the work/school host; outlook.live.com is the personal one.
+     SportPharm is a tenant, so office.com is the default. */
+  function outlookUrl({ to, cc, subject, body }) {
+    const list = v => (Array.isArray(v) ? v : [v]).filter(Boolean).join(';');
+    const host = cfg().outlookHost || 'https://outlook.office.com/mail/deeplink/compose';
+    const q = new URLSearchParams();
+    q.set('to', list(to));
+    if (cc && list(cc)) q.set('cc', list(cc));
+    q.set('subject', subject || '');
+    q.set('body', body || '');
+    return host + '?' + q.toString();
+  }
+
   const from = () => cfg().from || 'orders@sportpharm.com';
 
   /* Why the caller gets a reason and not just false: every failure here is
@@ -83,5 +102,5 @@ HQ.mailer = (() => {
     }
   }
 
-  return { ready, from, send, mailtoUrl, recipients: () => (window.ORDER_RECIPIENTS || []) };
+  return { ready, from, send, mailtoUrl, outlookUrl, recipients: () => (window.ORDER_RECIPIENTS || []) };
 })();

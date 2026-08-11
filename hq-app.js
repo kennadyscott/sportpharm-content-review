@@ -335,6 +335,9 @@ const HQ = (() => {
       { id: 'marketing', icon: 'doc', label: 'Marketing', pages: MARKETING_KIDS },
       { id: 'orders', icon: 'box', label: 'Orders',
         pages: [{ id: 'orders', label: 'All orders' },
+                { id: 'neworder', label: 'Raise an order' },
+                { id: 'inventory', label: 'Inventory' },
+                { id: 'money', label: 'Money' },
                 { id: 'ordstats', label: 'Analytics' }] },
       { id: 'analytics', icon: 'chart', label: 'Analytics', pages: ANALYTICS_KIDS },
       { id: 'team', icon: 'team', label: 'Team',
@@ -474,8 +477,12 @@ const HQ = (() => {
         });
       }
     }
+    /* If demo data is loaded, say so on every screen. The failure mode is
+       somebody screenshotting an illustrative KPI and quoting it in a
+       meeting, and a banner is cheap insurance against that. */
     $('#tb-right').innerHTML =
-      `<span class="tb-date">${new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</span>`;
+      `${Store.isDemoOn() ? '<span class="tb-demo" title="Illustrative figures — clear it in Settings">Demo data</span>' : ''}
+       <span class="tb-date">${new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</span>`;
   }
 
   function render() {

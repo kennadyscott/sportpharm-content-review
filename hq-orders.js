@@ -118,6 +118,51 @@
     </div>` : ''}`;
   }
 
+  /* ----------------------------- the money side ---------------------------
+     On the order rather than only on the Money page, because the moment
+     somebody wants to raise an invoice is the moment they are looking at the
+     order. The state is never set directly — it follows the numbers, so a
+     part payment cannot sit under a heading that says "sent".
+  ------------------------------------------------------------------------ */
+  function moneyCard(o, ed) {
+    if (!Store.isOwn()) return '';
+    const m = Store.moneyOf(o);
+    const st = MONEY_STATES[m.state] || MONEY_STATES.none;
+    const total = Store.orderTotal(o);
+    const due = Store.outstandingOf(o);
+    const tone = st.tone === 'muted' ? 'navy' : st.tone;
+
+    return `<div class="side-card t-${tone}">
+      <h4>Money</h4>
+      <span class="a-pill t-${tone} ${st.tone === 'muted' ? 'muted' : ''}">${esc(st.label)}</span>
+      <p class="side-sub">${esc(st.hint)}</p>
+
+      ${m.state === 'none' ? `
+        <div class="os-row"><span>Order total</span><b>${money(total)}</b></div>
+        ${ed ? `<button class="btn btn-dark btn-sm" id="ord-raise-inv"
+          ${(o.lines || []).length ? '' : 'disabled title="Nothing on the order to invoice"'}>
+          ${svg('plus')}Raise invoice</button>` : ''}
+      ` : `
+        <div class="os-row"><span>${esc(m.invoiceNo || 'Invoice')}</span><b>${money(total)}</b></div>
+        <div class="os-row"><span>Paid</span><b>${money(m.amountPaid)}</b></div>
+        <div class="os-row big"><span>Still due</span><b>${money(due)}</b></div>
+        ${ed ? `
+          <div class="field"><label for="m-paid">Paid to date</label>
+            <input id="m-paid" type="number" step="0.01" min="0" value="${esc(m.amountPaid || 0)}"
+                   data-money="amountPaid"></div>
+          <div class="field"><label for="m-terms">Terms</label>
+            <input id="m-terms" value="${esc(m.terms || '')}" data-money="terms" placeholder="Net 30"></div>
+          <div class="img-acts">
+            ${!m.sentAt ? `<button class="btn btn-outline btn-sm" id="ord-inv-sent">Mark invoice sent</button>` : ''}
+            <button class="btn btn-dark btn-sm" id="ord-invoice-pdf">${svg('doc')}Invoice PDF</button>
+            ${due > 0 ? `<button class="btn btn-ghost btn-sm" id="ord-paid-full">Settle in full</button>` : ''}
+          </div>
+          ${m.sentAt ? `<p class="side-sub">Sent ${esc(ago(m.sentAt))}.</p>` : ''}
+        ` : ''}
+      `}
+    </div>`;
+  }
+
   function form(o) {
     const ed = Store.can('edit');
     const dis = ed ? '' : 'disabled';
@@ -244,21 +289,25 @@
                 ${ready.ok ? '' : 'disabled title="' + esc(ready.error) + '"'}>${svg('arrow')}Send${
                 o.sentAt ? ' again' : ' to Enova'}</button>` : ''}
               <button class="btn btn-outline btn-sm" id="ord-copy">${svg('copy')}Copy</button>
-              <button class="btn btn-ghost btn-sm" id="ord-print">Print / PDF</button>
+              <button class="btn btn-outline btn-sm" id="ord-pdf">${svg('doc')}Order form PDF</button>
+              <button class="btn btn-ghost btn-sm" id="ord-print">Print</button>
             </div>
+            <p class="side-sub">The PDF is the same one-page form the team fills by hand —
+               filled in from this record, in SportPharm branding, ready to attach.</p>
             ${HQ.mailer && HQ.mailer.ready()
               ? `<p class="side-sub">Sends from ${esc(HQ.mailer.from())} — a real message, with a copy in that mailbox.</p>`
               : `<p class="side-sub">No server to send from yet, so Send opens this in your mail app
                    with everything filled in. Mark it sent once it has gone.</p>
-                 <p class="side-sub">Nothing happened? <a class="linky" href="${esc(HQ.mailer.mailtoUrl({
+                 <p class="side-sub">Prefer your desktop app? <a class="linky" href="${esc(HQ.mailer.mailtoUrl({
                      to: ORDER_RECIPIENTS.filter(r => !/cc/i.test(r.role)).map(r => r.to),
                      cc: ORDER_RECIPIENTS.filter(r => /cc/i.test(r.role)).map(r => r.to),
                      subject: `SportPharm order ${o.ref} — ${o.org || 'new order'}`,
                      body: Store.orderMessage(o)
-                   }))}">open it as a link instead</a> — or use Copy and paste it into Outlook.
-                   Some machines have no mail app registered with the browser, and then only
-                   Copy can work.</p>`}
+                   }))}">open it in whatever mail app this machine defaults to</a>
+                   — that is an OS setting, so it may not be Outlook. Copy always works.</p>`}
           </div>` : ''}
+
+          ${moneyCard(o, ed)}
 
           <div class="side-card">
             <h4>Talk to ${esc((Store.company(o.toCompany) || {}).name || 'them')}</h4>
@@ -513,6 +562,228 @@
     }
   });
 
+  /* ---------------------------- raise an order ----------------------------
+     The simple way in. The order record has thirty-odd fields and the full
+     editor shows all of them, which is right for correcting an order and
+     wrong for raising one — Julia knows four things when she starts: who it
+     is for, what they want, what is free, how they are paying.
+
+     So this asks for those, in that order, on one screen, with the catalogue
+     as buttons rather than a dropdown and a price to type. Everything else
+     takes a sensible default and is editable on the record afterwards, which
+     is the "fill it, then tweak it" the CEO asked for.
+
+     Kept in a draft object rather than a real order, so abandoning it half
+     done does not leave an empty SP-00xx on the list for someone to wonder
+     about later.
+  ------------------------------------------------------------------------ */
+  let nu = null;
+  const blankNew = () => ({
+    org: '', contactName: '', contactEmail: '', shipTo: '',
+    qty: {},        /* sku -> how many, charged */
+    freeQty: {},    /* sku -> how many, free of charge */
+    approvedBy: '', swag: [], pay: 'Invoice', ship: 'Ground',
+    shipCost: '', needBy: '', poNumber: '', invoiceEmail: '', notes: ''
+  });
+
+  const newTotals = () => {
+    const goods = Object.keys(nu.qty).reduce((n, sku) => {
+      const c = Store.bySku(sku);
+      return n + (c ? c.price * nu.qty[sku] : 0);
+    }, 0);
+    const ship = Number(nu.shipCost) || 0;
+    return { goods, ship, total: goods + ship };
+  };
+
+  function newOrder() {
+    if (!nu) nu = blankNew();
+    const t = newTotals();
+    const sellable = Store.catalog().filter(c => c.kind !== 'swag');
+    const swag = Store.catalog().filter(c => c.kind === 'swag');
+    const freeCount = Object.values(nu.freeQty).reduce((n, q) => n + q, 0);
+
+    const fld = (key, label, ph, type) => `
+      <div class="field"><label for="n-${key}">${label}</label>
+        <input id="n-${key}" type="${type || 'text'}" value="${esc(nu[key] || '')}"
+               placeholder="${esc(ph || '')}" data-nf="${key}"></div>`;
+
+    const stepper = (c, bag, tone) => {
+      const n = bag[c.sku] || 0;
+      return `<div class="pick ${n ? 'on ' + tone : ''}">
+        <button class="pick-body" data-add="${esc(c.sku)}:${bag === nu.qty ? 'qty' : 'freeQty'}">
+          <b>${esc(c.name)}</b>
+          <span>${c.price ? money(c.price) : 'no charge'}${c.note ? ' · ' + esc(c.note) : ''}</span>
+        </button>
+        <div class="pick-n">
+          <button class="pick-pm" data-bump="${esc(c.sku)}:${bag === nu.qty ? 'qty' : 'freeQty'}:-1"
+            ${n ? '' : 'disabled'}>−</button>
+          <em>${n}</em>
+          <button class="pick-pm" data-bump="${esc(c.sku)}:${bag === nu.qty ? 'qty' : 'freeQty'}:1">+</button>
+        </div>
+      </div>`;
+    };
+
+    return `<div class="wrap">
+      <div class="page-head">
+        <div><h1>Raise an order</h1>
+          <p>Four things: who it is for, what they want, what is free, how they are paying.
+             Everything else takes a default you can change on the order afterwards.</p></div>
+      </div>
+
+      <div class="editor-grid">
+        <div class="ed-main">
+          <div class="card-pad">
+            <h3 class="ord-h">1 · Who it is for</h3>
+            <div class="meta-grid">
+              ${fld('org', 'Organisation / team', 'Oklahoma State Athletics')}
+              ${fld('contactName', 'Contact name', 'Kevin Blaske')}
+              ${fld('contactEmail', 'Contact email', 'name@school.edu', 'email')}
+              ${fld('needBy', 'Needed by', 'ASAP')}
+            </div>
+            <div class="field"><label for="n-shipTo">Shipping address</label>
+              <textarea id="n-shipTo" rows="3" data-nf="shipTo"
+                placeholder="170 Athletic Center&#10;Stillwater, OK 74078">${esc(nu.shipTo)}</textarea></div>
+          </div>
+
+          <div class="card-pad">
+            <h3 class="ord-h">2 · What they are ordering</h3>
+            <div class="picks">${sellable.map(c => stepper(c, nu.qty, 't-blue')).join('')}</div>
+          </div>
+
+          <div class="card-pad">
+            <h3 class="ord-h">3 · Anything free of charge</h3>
+            <p class="ord-hint">Same catalogue, no price. Say who approved it — that is the
+               line that gets queried later, and it is the number nobody could see before.</p>
+            <div class="picks">${sellable.map(c => stepper(c, nu.freeQty, 't-amber')).join('')}</div>
+            ${freeCount ? `<div class="field" style="margin-top:.7rem">
+              <label for="n-approvedBy">Approved by</label>
+              <input id="n-approvedBy" value="${esc(nu.approvedBy)}" data-nf="approvedBy"
+                     placeholder="Brandon"></div>` : ''}
+          </div>
+
+          <div class="card-pad">
+            <h3 class="ord-h">4 · SWAG in the box</h3>
+            <div class="ord-chips">
+              ${swag.map(c => `<button class="ord-swag ${nu.swag.includes(c.name) ? 'on' : ''}"
+                data-nswag="${esc(c.name)}">${esc(c.name)}</button>`).join('')}
+            </div>
+          </div>
+
+          <div class="card-pad">
+            <h3 class="ord-h">5 · Paying and shipping</h3>
+            <div class="meta-grid">
+              <div class="field"><label for="n-pay">How they are paying</label>
+                <select id="n-pay" data-nf="pay">
+                  ${PAY_METHODS.map(m => `<option ${nu.pay === m ? 'selected' : ''}>${esc(m)}</option>`).join('')}
+                </select></div>
+              <div class="field"><label for="n-ship">How it ships</label>
+                <select id="n-ship" data-nf="ship">
+                  ${SHIP_METHODS.map(m => `<option ${nu.ship === m ? 'selected' : ''}>${esc(m)}</option>`).join('')}
+                </select></div>
+              ${fld('shipCost', 'Shipping charged', '10.00', 'number')}
+              ${nu.pay === 'Purchase order' ? fld('poNumber', 'PO number', '') : ''}
+              ${nu.pay === 'Invoice' ? fld('invoiceEmail', 'Send the invoice to', 'name@company.com', 'email') : ''}
+            </div>
+            <div class="field"><label for="n-notes">Anything else</label>
+              <textarea id="n-notes" rows="2" data-nf="notes">${esc(nu.notes)}</textarea></div>
+          </div>
+        </div>
+
+        <div class="ed-side">
+          <div class="side-card">
+            <h4>What it comes to</h4>
+            <div class="os-row"><span>Goods</span><b>${money(t.goods)}</b></div>
+            <div class="os-row"><span>Shipping</span><b>${money(t.ship)}</b></div>
+            <div class="os-row big"><span>Total</span><b>${money(t.total)}</b></div>
+            ${freeCount ? `<p class="side-sub">Plus ${freeCount} item${freeCount === 1 ? '' : 's'}
+               free of charge${nu.swag.length ? ' and ' + nu.swag.length + ' SWAG' : ''}, which carry
+               no price but do come off the shelf.</p>` : ''}
+            <button class="btn btn-dark" id="n-create">${svg('arrow')}Create the order</button>
+            <button class="btn btn-ghost btn-sm" id="n-clear">Start again</button>
+            <p class="side-sub">It is created as a draft. Nothing is sent to Enova and no stock
+               moves until you say so.</p>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function wireNew(root) {
+    const bump = (sku, bag, by) => {
+      nu[bag][sku] = Math.max(0, (nu[bag][sku] || 0) + by);
+      if (!nu[bag][sku]) delete nu[bag][sku];
+      HQ.render();
+    };
+    root.querySelectorAll('[data-add]').forEach(b =>
+      b.addEventListener('click', () => {
+        const [sku, bag] = b.dataset.add.split(':');
+        bump(sku, bag, 1);
+      }));
+    root.querySelectorAll('[data-bump]').forEach(b =>
+      b.addEventListener('click', e => {
+        e.stopPropagation();
+        const [sku, bag, by] = b.dataset.bump.split(':');
+        bump(sku, bag, Number(by));
+      }));
+    root.querySelectorAll('[data-nswag]').forEach(b =>
+      b.addEventListener('click', () => {
+        const x = b.dataset.nswag;
+        nu.swag = nu.swag.includes(x) ? nu.swag.filter(s => s !== x) : nu.swag.concat([x]);
+        HQ.render();
+      }));
+    /* `input` rather than `change` on the plain fields would re-render on
+       every keystroke and lose the caret. These only need to be current when
+       Create is pressed, so they are read straight off the DOM there. */
+    root.querySelectorAll('[data-nf]').forEach(el =>
+      el.addEventListener('change', () => {
+        nu[el.dataset.nf] = el.value;
+        /* only the pickers change what is on screen */
+        if (el.dataset.nf === 'pay') HQ.render();
+      }));
+
+    const clear = root.querySelector('#n-clear');
+    if (clear) clear.addEventListener('click', () => { nu = blankNew(); HQ.render(); });
+
+    const create = root.querySelector('#n-create');
+    if (create) create.addEventListener('click', () => {
+      root.querySelectorAll('[data-nf]').forEach(el => { nu[el.dataset.nf] = el.value; });
+
+      const lines = Object.keys(nu.qty).map(sku => {
+        const c = Store.bySku(sku);
+        return { name: c.name, qty: nu.qty[sku], price: c.price, note: c.note || '' };
+      });
+      const freebies = Object.keys(nu.freeQty).map(sku => {
+        const c = Store.bySku(sku);
+        return { name: c.name, qty: nu.freeQty[sku], note: '' };
+      });
+
+      if (!lines.length && !freebies.length) return toast('Nothing on the order yet.');
+      if (freebies.length && !nu.approvedBy.trim()) {
+        return toast('Say who approved the free items — that is the line that gets queried.');
+      }
+
+      const o = Store.addOrder({
+        org: nu.org, contactName: nu.contactName, contactEmail: nu.contactEmail,
+        shipTo: nu.shipTo, needBy: nu.needBy, lines, freebies, swag: nu.swag,
+        approvedBy: nu.approvedBy, pay: nu.pay, ship: nu.ship,
+        shipCost: Number(nu.shipCost) || 0, poNumber: nu.poNumber,
+        invoiceEmail: nu.invoiceEmail, notes: nu.notes
+      });
+      nu = blankNew();
+      toast(o.ref + ' raised.');
+      go('#/orders/' + o.id);
+    });
+  }
+
+  HQ.view('neworder', {
+    render() {
+      return Store.can('edit') && Store.isOwn()
+        ? newOrder()
+        : '<div class="wrap"><p class="panel-empty">Only SportPharm staff raise orders.</p></div>';
+    },
+    wire(root) { if (Store.can('edit') && Store.isOwn()) wireNew(root); }
+  });
+
   /* --------------------------- importing a form ---------------------------
      Drop the emailed PDF, get the order. The one rule here is that nothing is
      written until the person doing it has seen what came out — a silent import
@@ -733,13 +1004,21 @@
            there is nothing to confirm, and the dialog was another thing
            between the click and the navigation. */
         if (!HQ.mailer.ready()) {
+          /* Outlook on the web, not mailto:. A page cannot choose which mail
+             app the OS opens, and on a Mac mailto: lands in Mail.app. This
+             goes straight to Outlook, composing as whoever is signed in.
+
+             Still synchronous inside the click — window.open outside a user
+             activation gets popup-blocked, which is the same trap as before
+             wearing a different hat. */
           const a = document.createElement('a');
-          a.href = HQ.mailer.mailtoUrl({ to, cc, subject, body });
+          a.href = HQ.mailer.outlookUrl({ to, cc, subject, body });
+          a.target = '_blank';
           a.rel = 'noopener';
           document.body.appendChild(a);
           a.click();
           a.remove();
-          toast('Opening your mail app. Nothing is sent until you send it there.');
+          toast('Opening Outlook. Nothing is sent until you send it there.');
           return;
         }
 
@@ -766,6 +1045,63 @@
       if (cp) cp.addEventListener('click', () => copy(Store.orderMessage(o)));
       const pr = root.querySelector('#ord-print');
       if (pr) pr.addEventListener('click', () => window.print());
+
+      /* ------------------------------- paper ------------------------------
+         Both documents come out of the same record through hq-pdf.js. The
+         warnings matter: the paper form holds five lines and two free rows,
+         so an order bigger than that would otherwise reach the warehouse
+         quietly missing something. */
+      async function makePdf(btn, fn, what) {
+        if (!HQ.pdf) return toast('The PDF builder did not load.');
+        const label = btn.innerHTML;
+        btn.disabled = true;
+        btn.textContent = 'Building…';
+        try {
+          const res = await fn();
+          if (res.warnings.length) alert(what + ' built, but read this first:\n\n· ' +
+            res.warnings.join('\n· '));
+          else toast(res.filename + ' downloaded.');
+        } catch (e) {
+          alert('Could not build the ' + what.toLowerCase() + '.\n\n' + e.message);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = label;
+        }
+      }
+
+      const pdfBtn = root.querySelector('#ord-pdf');
+      if (pdfBtn) pdfBtn.addEventListener('click', () =>
+        makePdf(pdfBtn, () => HQ.pdf.orderForm(o), 'The order form'));
+
+      const invBtn = root.querySelector('#ord-invoice-pdf');
+      if (invBtn) invBtn.addEventListener('click', () =>
+        makePdf(invBtn, () => HQ.pdf.invoice(Store.order(o.id)), 'The invoice'));
+
+      /* ------------------------------- money ------------------------------ */
+      const raise = root.querySelector('#ord-raise-inv');
+      if (raise) raise.addEventListener('click', () => {
+        const r = Store.raiseInvoice(o.id);
+        if (!r.ok) return toast(r.error);
+        toast(r.invoiceNo + ' raised.');
+        HQ.render();
+      });
+      const sent = root.querySelector('#ord-inv-sent');
+      if (sent) sent.addEventListener('click', () => {
+        Store.setMoney(o.id, { sentAt: new Date().toISOString() });
+        toast('Marked sent — the clock starts today.');
+        HQ.render();
+      });
+      const settle = root.querySelector('#ord-paid-full');
+      if (settle) settle.addEventListener('click', () => {
+        Store.setMoney(o.id, { amountPaid: Store.orderTotal(o) });
+        toast('Settled.');
+        HQ.render();
+      });
+      root.querySelectorAll('[data-money]').forEach(el =>
+        el.addEventListener('change', () => {
+          Store.setMoney(o.id, { [el.dataset.money]: el.value });
+          HQ.render();
+        }));
 
       const del = root.querySelector('#ord-del');
       if (del) del.addEventListener('click', () => {

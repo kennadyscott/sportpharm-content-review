@@ -1744,6 +1744,19 @@
             <button class="btn btn-outline btn-sm" id="set-out">Sign out</button></div>
         </section>
 
+        ${me.role === 'owner' ? `<section class="panel ${Store.isDemoOn() ? 't-amber' : ''}" style="margin-top:1.1rem">
+          <div class="panel-head"><h2>Demo data</h2>
+            <span class="note">for showing HQ to someone</span></div>
+          <div class="set-row"><div class="body">
+            <b>${Store.isDemoOn() ? 'Demo data is loaded' : 'Load demo data'}</b>
+            <span>Fills HQ with two orders, a task mid-handoff, a few messages and four weeks of
+              illustrative KPI figures — enough to walk someone through. The numbers are made up
+              and deliberately round. It only ever adds, and clearing removes exactly what it
+              added, so anything real in here is safe either way.</span></div>
+            <button class="btn ${Store.isDemoOn() ? 'btn-outline' : 'btn-dark'} btn-sm" id="set-demo">
+              ${Store.isDemoOn() ? 'Clear it' : 'Load it'}</button></div>
+        </section>` : ''}
+
         <section class="panel" style="margin-top:1.1rem">
           <div class="panel-head"><h2>How publishing works here</h2></div>
           <div class="set-row"><div class="body"><b>Require review before publishing</b>
