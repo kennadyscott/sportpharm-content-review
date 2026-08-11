@@ -15,11 +15,14 @@ HQ.mailer = (() => {
   'use strict';
 
   /* Set by azure/deploy — see azure/README.md. On GitHub Pages this stays
-     empty, which is the honest state: there is no server here to send from. */
-  const CFG = window.SPHQ_MAIL || {};
+     empty, which is the honest state: there is no server here to send from.
 
-  const ready = () => !!CFG.endpoint;
-  const from = () => CFG.from || 'orders@sportpharm.com';
+     Read on every call rather than captured once, so this does not depend on
+     hq-config.js happening to load before this file. */
+  const cfg = () => window.SPHQ_MAIL || {};
+
+  const ready = () => !!cfg().endpoint;
+  const from = () => cfg().from || 'orders@sportpharm.com';
 
   /* Why the caller gets a reason and not just false: every failure here is
      something a person can act on — sign in again, deploy the function, ask
@@ -37,7 +40,7 @@ HQ.mailer = (() => {
       };
     }
     try {
-      const r = await fetch(CFG.endpoint, {
+      const r = await fetch(cfg().endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         /* The Static Web Apps session cookie is what authenticates this. */
