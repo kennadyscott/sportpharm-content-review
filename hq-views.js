@@ -1234,6 +1234,115 @@
     }
   });
 
+  /* ================================= KPIs =================================
+     Jessie's weekly report as a grid: metrics down, periods across, newest
+     first. Weekly / monthly / quarterly are the same grid over different
+     period keys.
+
+     Derived cells are grey and not editable — they are computed, and a typed
+     AOV that disagrees with revenue ÷ orders is a number nobody trusts. */
+  let kpiKind = 'week';
+
+  function kpiFmt(def, v) {
+    if (v === undefined || v === null || v === '' || !isFinite(v)) return '—';
+    if (def.unit === '$') return '$' + Math.round(v).toLocaleString();
+    if (def.unit === '%') return v.toFixed(1) + '%';
+    if (def.unit === '×') return v.toFixed(2) + '×';
+    return Math.round(v).toLocaleString();
+  }
+  /* Change against the period before it. Only for entered metrics with both
+     sides present — a delta against an empty period is not a delta. */
+  function kpiDelta(def, cur, prev) {
+    if (cur === undefined || prev === undefined || !prev || !isFinite(cur) || !isFinite(prev)) return '';
+    const pc = ((cur - prev) / Math.abs(prev)) * 100;
+    if (!isFinite(pc) || Math.abs(pc) < 0.5) return '';
+    const up = pc > 0;
+    /* Spend and cost-per-order going up is not good news, so the colour
+       follows what the metric means, not which way the arrow points. */
+    const lower = def.k === 'spend' || def.k === 'cpo';
+    const good = lower ? !up : up;
+    return `<span class="kpi-d ${good ? 'up' : 'down'}">${up ? '▲' : '▼'} ${Math.abs(pc).toFixed(0)}%</span>`;
+  }
+
+  HQ.view('kpis', {
+    render() {
+      const spec = KPI_PERIODS.find(p => p.k === kpiKind) || KPI_PERIODS[0];
+      const periods = Store.kpiPeriods(spec.k, spec.n);
+      const rows = periods.map(p => Store.kpiRow(p.key));
+      const ed = Store.can('edit');
+      const anything = rows.some(r => KPI_METRICS.some(d => !d.derive && r[d.k] !== undefined));
+
+      const groups = [];
+      KPI_METRICS.forEach(d => {
+        const g = groups.find(x => x.name === d.group);
+        (g || groups[groups.push({ name: d.group, items: [] }) - 1]).items.push(d);
+      });
+
+      return `<div class="wrap">
+        <div class="page-head">
+          <div><h1>KPIs</h1><p>The weekly report, kept in one place instead of rebuilt every Monday.
+            Same metrics weekly, monthly and quarterly. Grey rows are worked out from the rows
+            above them — enter revenue and orders and the average order value follows.</p></div>
+          <div class="page-actions">
+            <div class="seg">
+              ${KPI_PERIODS.map(p => `<button data-kpikind="${p.k}"
+                class="${p.k === kpiKind ? 'on' : ''}">${esc(p.label)}</button>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        ${!anything ? `<section class="panel t-amber kpi-note">
+          <h3>No numbers in here yet — and none were seeded.</h3>
+          <p>The weekly report this is built from carries customer names, email addresses and
+             order numbers. This dashboard is served publicly from GitHub Pages, so anything
+             written into the bundle can be read by anyone with the link. Real figures go in
+             here in the browser (they stay on this machine) until there is a private
+             connection to put them behind.</p>
+          <p class="kpi-note-2">The WooCommerce pull is the same problem: its REST API needs a
+             key and secret on every request, and a public bundle has nowhere to keep a secret.
+             It needs something server-side in between — a Supabase Edge Function or a
+             Cloudflare Worker holding the credentials. Not built, because that decision is
+             yours to make.</p>
+        </section>` : ''}
+
+        <div class="kpi-wrap">
+          <table class="kpi-table">
+            <thead><tr><th class="kpi-m">${esc(spec.note)}</th>
+              ${periods.map(p => `<th>${esc(p.label)}</th>`).join('')}</tr></thead>
+            ${groups.map(g => `<tbody>
+              <tr class="kpi-grp"><td colspan="${periods.length + 1}">${esc(g.name)}</td></tr>
+              ${g.items.map(d => `<tr class="${d.derive ? 'kpi-derived' : ''}">
+                <td class="kpi-m">${esc(d.label)}</td>
+                ${periods.map((p, i) => {
+                  const v = rows[i][d.k];
+                  if (d.derive || !ed) return `<td class="kpi-v">${kpiFmt(d, v)}
+                    ${d.derive ? '' : kpiDelta(d, v, rows[i + 1] && rows[i + 1][d.k])}</td>`;
+                  return `<td class="kpi-v"><input class="kpi-in" data-kpi="${p.key}:${d.k}"
+                    value="${v === undefined ? '' : v}" placeholder="—"
+                    aria-label="${esc(d.label)}, ${esc(p.label)}"
+                    inputmode="decimal">${kpiDelta(d, v, rows[i + 1] && rows[i + 1][d.k])}</td>`;
+                }).join('')}
+              </tr>`).join('')}
+            </tbody>`).join('')}
+          </table>
+        </div>
+      </div>`;
+    },
+
+    wire(root) {
+      root.querySelectorAll('[data-kpikind]').forEach(b =>
+        b.addEventListener('click', () => { kpiKind = b.dataset.kpikind; HQ.render(); }));
+      /* Save on the way out of the cell, not per keystroke — and re-render so
+         everything derived from it moves at the same time. */
+      root.querySelectorAll('[data-kpi]').forEach(inp =>
+        inp.addEventListener('change', () => {
+          const [period, metric] = inp.dataset.kpi.split(':');
+          Store.setKpi(period, metric, inp.value);
+          HQ.render();
+        }));
+    }
+  });
+
   /* ============================== ANALYTICS ============================== */
   let pasted = null;
 

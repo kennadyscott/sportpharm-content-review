@@ -2141,6 +2141,38 @@ button.pl-st:hover { filter: brightness(.94); }
 }
 .asg-plan:focus { outline: none; border-color: var(--blue-deep); }
 
+/* ================================ KPIs ================================
+   Metrics down, periods across. The metric column is sticky because the
+   quarterly view is wide and a row of numbers with no label is useless. */
+.kpi-note { margin-bottom: 1.2rem; }
+.kpi-note h3 { font-size: 1rem; margin-bottom: .4rem; }
+.kpi-note p { font-size: .85rem; line-height: 1.6; color: var(--ink-soft); }
+.kpi-note-2 { margin-top: .6rem; padding-top: .6rem; border-top: 1px solid var(--line); }
+.kpi-wrap { overflow-x: auto; background: var(--paper); border: 1px solid var(--line);
+  border-radius: 12px; box-shadow: var(--shadow); }
+.kpi-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.kpi-table th { text-align: right; font-size: .68rem; font-weight: 800; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-faint); padding: .7rem .6rem; white-space: nowrap;
+  border-bottom: 1.5px solid var(--line); }
+.kpi-table th.kpi-m, .kpi-table td.kpi-m { text-align: left; position: sticky; left: 0;
+  background: var(--paper); min-width: 13rem; }
+.kpi-table th.kpi-m { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: .74rem; }
+.kpi-table td { padding: .3rem .6rem; border-bottom: 1px solid var(--line-soft); }
+.kpi-table td.kpi-m { font-weight: 500; color: var(--navy); }
+.kpi-v { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.kpi-grp td { background: var(--bg); font-size: .64rem; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-faint); padding: .35rem .6rem; position: sticky; left: 0; }
+.kpi-derived td { color: var(--ink-soft); background: var(--line-soft); }
+.kpi-derived td.kpi-m { background: var(--line-soft); }
+.kpi-in { width: 5.6rem; padding: .18rem .35rem; text-align: right; font: inherit;
+  font-size: .85rem; font-variant-numeric: tabular-nums; border: 1.5px solid transparent;
+  border-radius: 6px; background: none; color: var(--navy); }
+.kpi-in:hover { border-color: var(--line); }
+.kpi-in:focus { outline: none; border-color: var(--red); background: #fff; }
+.kpi-d { display: block; font-size: .62rem; font-weight: 700; }
+.kpi-d.up { color: var(--green); }
+.kpi-d.down { color: var(--red); }
+
 /* =========================== PROJECT PAGES ===========================
    The board is one page of a project, not the whole of it. Everything else
    someone adds sits beside it in the same strip. */

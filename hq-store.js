@@ -57,6 +57,7 @@ const Store = (() => {
       todos: SEED_TODOS.map((t, i) => ({ done: false, repeats: null, tag: '', detail: '',
         day: null, order: i, createdAt: now(), ...t })),
       metrics: {},    /* rowKey -> { col: value }, plus .margin — HQ-level rollup */
+      kpis: {},       /* "<periodKey>:<metric>" -> number. Empty on purpose; see hq-data.js */
       campReview: {}, /* "campId:sec:<key>" | "campId:asset:<id>" -> { status, thread[] } */
       flags: {},      /* one-off markers: migrations, dismissals */
       invites: [],
@@ -1022,6 +1023,79 @@ const Store = (() => {
   }
 
   /* =========================================================================
+     KPIs
+
+     One flat map, `kpis`, keyed "<periodKey>:<metric>" — so a week, a month
+     and a quarter are the same storage with different keys, and nothing has
+     to be recomputed when the period toggle moves.
+
+     Derived metrics are not stored. They are computed on read from whatever
+     the entered ones say, so they cannot drift out of agreement with them.
+  ========================================================================= */
+  function kpiMap() {
+    const s = load();
+    if (!s.kpis) s.kpis = {};
+    return s.kpis;
+  }
+  const kpiKey = (period, metric) => period + ':' + metric;
+  function setKpi(period, metric, value) {
+    const m = kpiMap();
+    const v = String(value == null ? '' : value).replace(/[$,%×\s,]/g, '');
+    if (v === '') delete m[kpiKey(period, metric)];
+    else m[kpiKey(period, metric)] = Number(v);
+    save();
+  }
+  /* Every metric for one period: entered values first, then the derived ones
+     on top of them. Returns null for anything with no basis rather than 0,
+     so an empty week reads as empty and not as a week that sold nothing. */
+  function kpiRow(period) {
+    const m = kpiMap();
+    const v = {};
+    KPI_METRICS.forEach(def => {
+      if (!def.derive) v[def.k] = m[kpiKey(period, def.k)];
+    });
+    const nz = k => (typeof v[k] === 'number' ? v[k] : 0);
+    const basis = { revenue: nz('revenue'), orders: nz('orders'), spend: nz('spend'),
+      sessions: nz('sessions'), newCust: nz('newCust'), repeatCust: nz('repeatCust') };
+    KPI_METRICS.forEach(def => {
+      if (def.derive) { const d = def.derive(basis); v[def.k] = (d == null || !isFinite(d)) ? undefined : d; }
+    });
+    return v;
+  }
+
+  /* Period keys. Weekly is the Monday, so it lines up with the week on Today;
+     monthly is YYYY-MM; quarterly is YYYY-Qn. */
+  function kpiPeriods(kind, n) {
+    const out = [];
+    if (kind === 'week') {
+      let d = mondayOf(today());
+      for (let i = 0; i < n; i++) { out.push({ key: 'w' + d, label: shortRange(d) }); d = addDays(d, -7); }
+    } else if (kind === 'month') {
+      const now0 = new Date(today() + 'T00:00:00');
+      for (let i = 0; i < n; i++) {
+        const d = new Date(now0.getFullYear(), now0.getMonth() - i, 1);
+        const key = 'm' + d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        /* "Aug ’26", not "Aug 26" — the latter reads as the 26th of August. */
+        out.push({ key, label: d.toLocaleDateString(undefined, { month: 'short' })
+          + ' ’' + String(d.getFullYear()).slice(2) });
+      }
+    } else {
+      const now0 = new Date(today() + 'T00:00:00');
+      let y = now0.getFullYear(), q = Math.floor(now0.getMonth() / 3) + 1;
+      for (let i = 0; i < n; i++) {
+        out.push({ key: 'q' + y + '-Q' + q, label: 'Q' + q + ' ’' + String(y).slice(2) });
+        q--; if (q === 0) { q = 4; y--; }
+      }
+    }
+    return out;
+  }
+  function shortRange(monday) {
+    const a = new Date(monday + 'T00:00:00'), b = new Date(addDays(monday, 6) + 'T00:00:00');
+    const f = d => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    return f(a) + '–' + (a.getMonth() === b.getMonth() ? b.getDate() : f(b));
+  }
+
+  /* =========================================================================
      MESSAGES
 
      Threads, not one shared log: you pick who it goes to. A message carries
@@ -1360,6 +1434,7 @@ const Store = (() => {
     media, mediaItem, addMedia, updateMedia, removeMedia, mediaUsedBy,
     todos, todo, addTodo, updateTodo, toggleTodo, removeTodo,
     mondayOf, addDays, weekDays, dayItems, runningLog, assignedToMe,
+    kpiMap, setKpi, kpiRow, kpiPeriods,
     messages, threads, threadMessages, sendMessage, toggleMessageDone,
     lastReadAt, markThreadRead, unreadIn, unreadTotal, lastInThread,
     orders, order, addOrder, updateOrder, removeOrder, setOrderStatus,

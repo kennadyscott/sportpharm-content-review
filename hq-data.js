@@ -57,6 +57,46 @@ const SEED_USERS = [
 const SEED_MESSAGES = [];
 const TEAM_THREAD = 'team';
 
+/* ---------------------------------- KPIs ---------------------------------
+   Jessie's weekly report, as a dashboard rather than a spreadsheet she
+   rebuilds every Monday. Weekly, monthly and quarterly are the same metrics
+   over different periods, so there is one definition and three rollups.
+
+   `derive` metrics are never typed — they are computed from the ones above
+   them, because an entered AOV that disagrees with revenue ÷ orders is the
+   kind of thing nobody notices until a board meeting.
+
+   NOTHING IS SEEDED WITH REAL NUMBERS, deliberately. The report this is
+   modelled on carries customer names, emails and order numbers, and this
+   bundle is served publicly from GitHub Pages — anyone with the URL can read
+   hq-data.js. Numbers get entered in the browser (they stay in localStorage)
+   or arrive over a private connection once one exists. See the note in the
+   KPI view and README.md. */
+const KPI_METRICS = [
+  { k: 'revenue',   label: 'Revenue',            unit: '$',  group: 'Sales' },
+  { k: 'orders',    label: 'Orders',             unit: '',   group: 'Sales' },
+  { k: 'aov',       label: 'Average order value', unit: '$', group: 'Sales',
+    derive: v => v.orders ? v.revenue / v.orders : null },
+  { k: 'newCust',   label: 'New customers',      unit: '',   group: 'Customers' },
+  { k: 'repeatCust', label: 'Returning customers', unit: '', group: 'Customers' },
+  { k: 'repeatRate', label: 'Repeat rate',       unit: '%',  group: 'Customers',
+    derive: v => (v.newCust + v.repeatCust) ? (v.repeatCust / (v.newCust + v.repeatCust)) * 100 : null },
+  { k: 'sessions',  label: 'Sessions',           unit: '',   group: 'Traffic' },
+  { k: 'convRate',  label: 'Conversion rate',    unit: '%',  group: 'Traffic',
+    derive: v => v.sessions ? (v.orders / v.sessions) * 100 : null },
+  { k: 'spend',     label: 'Ad spend',           unit: '$',  group: 'Paid' },
+  { k: 'roas',      label: 'ROAS',               unit: '×',  group: 'Paid',
+    derive: v => v.spend ? v.revenue / v.spend : null },
+  { k: 'cpo',       label: 'Cost per order',     unit: '$',  group: 'Paid',
+    derive: v => v.orders ? v.spend / v.orders : null },
+  { k: 'signups',   label: 'Email / SMS signups', unit: '',  group: 'List' }
+];
+const KPI_PERIODS = [
+  { k: 'week',    label: 'Weekly',    n: 8,  note: 'The last eight weeks, Monday to Sunday.' },
+  { k: 'month',   label: 'Monthly',   n: 6,  note: 'The last six months.' },
+  { k: 'quarter', label: 'Quarterly', n: 4,  note: 'The last four quarters.' }
+];
+
 /* ------------------------------- products -------------------------------- */
 /* Live-store facts. Referenced by the CMS (product tie-ins) and Branding. */
 const PRODUCTS = [
