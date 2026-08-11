@@ -636,6 +636,38 @@ const Store = (() => {
     if (p) { Object.assign(p, patch); save(); }
     return p;
   }
+
+  /* ---------------------------- project tabs ----------------------------
+     Every project opens on its board. Anything else is a page someone added
+     — a spec, a decision log, a list of URLs — and holds free text, because
+     the moment it holds a schema it stops being the place you put the thing
+     that does not fit anywhere. */
+  function projectTabs(id) {
+    const p = project(id);
+    if (!p) return [];
+    return [{ id: 'board', label: 'Board', fixed: true }].concat(p.tabs || []);
+  }
+  function addProjectTab(id, label) {
+    const p = project(id);
+    if (!p) return null;
+    if (!Array.isArray(p.tabs)) p.tabs = [];
+    const t = { id: uid('tab'), label: (label || 'New page').slice(0, 40), notes: '' };
+    p.tabs.push(t);
+    save();
+    return t;
+  }
+  function updateProjectTab(id, tabId, patch) {
+    const p = project(id);
+    const t = p && (p.tabs || []).find(x => x.id === tabId);
+    if (t) { Object.assign(t, patch); save(); }
+    return t || null;
+  }
+  function removeProjectTab(id, tabId) {
+    const p = project(id);
+    if (!p || !Array.isArray(p.tabs)) return;
+    p.tabs = p.tabs.filter(t => t.id !== tabId);
+    save();
+  }
   function removeProject(id) {
     const s = load();
     s.projects = s.projects.filter(p => p.id !== id);
@@ -1316,6 +1348,7 @@ const Store = (() => {
     injectState, applyRemote, findUserByEmail, claimSeat,
     users, user, projects, project, campaigns, campaign, ideas, activity, allTasks,
     createProject, updateProject, removeProject,
+    projectTabs, addProjectTab, updateProjectTab, removeProjectTab,
     createTask, updateTask, removeTask, moveTask, nudgeTask, shiftTask, taskRef,
     articles, article, addArticle, updateArticle, removeArticle, uniqueSlug,
     blocksOf, ensureBlocks, newBlock, addBlock, setBlock, moveBlock, placeBlock,

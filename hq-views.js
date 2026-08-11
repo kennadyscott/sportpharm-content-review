@@ -125,45 +125,45 @@
     let lastDay = null, lastBy = null;
     const thread = all.slice(-80).map(m => {
       const d = day(m.at);
-      const rule = d !== lastDay ? `<div class="msg-day"><span>${d === today ? 'Today' : esc(d)}</span></div>` : '';
+      const rule = d !== lastDay ? `<div class="mg-day"><span>${d === today ? 'Today' : esc(d)}</span></div>` : '';
       const runOn = d === lastDay && m.by === lastBy;
       lastDay = d; lastBy = m.by;
       const who = Store.user(m.by);
       const mine = m.by === (me && me.id);
-      return rule + `<div class="msg ${mine ? 'me' : 'them'} ${runOn ? 'run' : ''} ${m.done ? 'is-done' : ''}">
-        ${runOn ? '' : `<span class="msg-who">${esc(who ? who.name.split(' ')[0] : 'Someone')}</span>`}
-        <span class="msg-line">
-          <button class="msg-tick" data-msgdone="${m.id}" aria-pressed="${!!m.done}"
+      return rule + `<div class="mg ${mine ? 'me' : 'them'} ${runOn ? 'run' : ''} ${m.done ? 'is-done' : ''}">
+        ${runOn ? '' : `<span class="mg-who">${esc(who ? who.name.split(' ')[0] : 'Someone')}</span>`}
+        <span class="mg-line">
+          <button class="mg-tick" data-msgdone="${m.id}" aria-pressed="${!!m.done}"
                   title="${m.done ? 'Mark not done' : 'Mark done'}">${m.done ? '✓' : ''}</button>
-          <span class="msg-bubble">${esc(m.text)}</span>
+          <span class="mg-bubble">${esc(m.text)}</span>
         </span>
-        <span class="msg-at">${clock(m.at)}${m.done ? ' · done' : ''}</span>
+        <span class="mg-at">${clock(m.at)}${m.done ? ' · done' : ''}</span>
       </div>`;
     }).join('');
 
     const who = list.map(t => {
       const n = Store.unreadIn(t.id);
       const last = Store.lastInThread(t.id);
-      return `<button class="msg-who-row ${t.id === to ? 'on' : ''}" data-msgto="${esc(t.id)}">
-        <span class="msg-av t-${t.tone}">${t.isRoom ? svg('team') : esc(t.name.slice(0, 1))}</span>
-        <span class="msg-who-body">
-          <span class="msg-who-name">${esc(t.name)}</span>
-          <span class="msg-who-last">${last ? esc(last.text.slice(0, 44)) : esc(t.title || 'No messages yet')}</span>
+      return `<button class="mg-who-row ${t.id === to ? 'on' : ''}" data-msgto="${esc(t.id)}">
+        <span class="mg-av t-${t.tone}">${t.isRoom ? svg('team') : esc(t.name.slice(0, 1))}</span>
+        <span class="mg-who-body">
+          <span class="mg-who-name">${esc(t.name)}</span>
+          <span class="mg-who-last">${last ? esc(last.text.slice(0, 44)) : esc(t.title || 'No messages yet')}</span>
         </span>
-        ${n ? `<span class="msg-dot">${n}</span>` : ''}
+        ${n ? `<span class="mg-dot">${n}</span>` : ''}
       </button>`;
     }).join('');
 
-    return `<section class="panel msgs">
+    return `<section class="panel mgs">
       <div class="panel-head"><h2>Messages</h2>
         <span class="note" style="margin-left:auto">Pick who it goes to</span></div>
-      <div class="msg-body">
-        <div class="msg-who-list">${who}</div>
-        <div class="msg-main">
-          <div class="msg-thread" id="msg-thread">${all.length ? thread
+      <div class="mg-body">
+        <div class="mg-who-list">${who}</div>
+        <div class="mg-main">
+          <div class="mg-thread" id="mg-thread">${all.length ? thread
             : `<p class="wk-empty">Nothing here yet. Say something to ${esc(open ? open.name : 'the team')}.</p>`}</div>
-          ${Store.can('edit') ? `<form class="msg-form" id="msg-form" autocomplete="off">
-            <input id="msg-input" type="text" maxlength="2000"
+          ${Store.can('edit') ? `<form class="mg-form" id="mg-form" autocomplete="off">
+            <input id="mg-input" type="text" maxlength="2000"
                    placeholder="Message ${esc(open ? open.name.split(' ')[0] : 'the team')}…"
                    aria-label="Write a message">
             <button class="btn btn-dark btn-sm" type="submit">Send</button>
@@ -273,7 +273,7 @@
 
       /* ---- messages ---- */
       const openTo = msgTo || ((Store.threads()[0] || {}).id);
-      const th = root.querySelector('#msg-thread');
+      const th = root.querySelector('#mg-thread');
       /* Open at the newest message, like every chat app. */
       if (th) th.scrollTop = th.scrollHeight;
       if (openTo) Store.markThreadRead(openTo);
@@ -292,20 +292,20 @@
           const keep = th ? th.scrollTop : 0;
           Store.toggleMessageDone(b.dataset.msgdone);
           HQ.render();
-          const again = HQ.$('#msg-thread');
+          const again = HQ.$('#mg-thread');
           if (again) again.scrollTop = keep;
         }));
 
-      const mf = root.querySelector('#msg-form');
+      const mf = root.querySelector('#mg-form');
       if (mf) mf.addEventListener('submit', e => {
         e.preventDefault();
-        const box = root.querySelector('#msg-input');
+        const box = root.querySelector('#mg-input');
         const text = box.value.trim();
         if (!text) return;
         Store.sendMessage(openTo, text);
         Store.markThreadRead(openTo);
         HQ.render();
-        const again = HQ.$('#msg-input');
+        const again = HQ.$('#mg-input');
         if (again) again.focus();
       });
 
@@ -790,27 +790,48 @@
     </div>`;
   }
 
-  function projectDetail(p) {
+  function projectDetail(p, subId) {
     const s = projectStats(p);
     const d = dueLabel(p.due);
+    const ed = Store.can('edit');
+    const tabs = Store.projectTabs(p.id);
+    const cur = tabs.find(t => t.id === subId) || tabs[0];
+    const onBoard = cur.id === 'board';
+
     return `<div class="wrap">
       <button class="crumb" data-go="#/projects">${svg('left')} All projects</button>
       <div class="page-head">
         <div>
           <span class="tag t-${p.tone}">${esc(areaOf(p.area).label)}</span>
-          <h1>${esc(p.name)}</h1>
+          <h1 ${ed ? `data-iproj="${p.id}"` : ''}>${esc(p.name)}</h1>
           <p>${esc(p.goal)}</p>
         </div>
         <div class="page-actions">
           <span class="pill t-green"><b>${s.done}</b>/${s.total} done</span>
           ${d ? `<span class="pill t-red">${esc(d.txt)}</span>` : ''}
-          ${Store.can('edit') ? `<button class="btn btn-outline" id="edit-project">Edit month</button>
-          <button class="btn btn-dark" id="new-task">${svg('plus')}New task</button>` : ''}
+          ${ed ? `<button class="btn btn-outline" id="edit-project">Edit project</button>
+          ${onBoard ? `<button class="btn btn-dark" id="new-task">${svg('plus')}New task</button>` : ''}` : ''}
         </div>
       </div>
-      <p class="board-hint">Drag a card between columns — or use the little arrows on each card to move it
+
+      <div class="ptabs">
+        ${tabs.map(t => `<a class="ptab ${t.id === cur.id ? 'on' : ''}"
+            href="#/projects/${p.id}/${t.id}">${esc(t.label)}</a>`).join('')}
+        ${ed ? `<button class="ptab ptab-add" id="add-tab" title="Add a page to this project">${svg('plus')} Page</button>` : ''}
+      </div>
+
+      ${onBoard ? `<p class="board-hint">Drag a card between columns — or use the little arrows on each card to move it
         left, right, up, or down without a mouse.</p>
-      ${boardHTML(p)}
+      ${boardHTML(p)}`
+      : `<section class="panel ptab-page">
+          <div class="panel-head">
+            <h2 ${ed ? `data-itab="${p.id}:${cur.id}"` : ''}>${esc(cur.label)}</h2>
+            ${ed ? `<button class="btn btn-ghost btn-sm" data-deltab="${p.id}:${cur.id}">Delete page</button>` : ''}
+          </div>
+          ${ed ? `<textarea class="ptab-notes" data-notes="${p.id}:${cur.id}"
+              placeholder="Anything that belongs to this project but not on the board — decisions, specs, links, the reason something was rejected.">${esc(cur.notes || '')}</textarea>`
+            : `<div class="ptab-read">${cur.notes ? esc(cur.notes) : '<span class="wk-empty">Nothing on this page yet.</span>'}</div>`}
+        </section>`}
     </div>`;
   }
 
@@ -988,7 +1009,7 @@
   HQ.view('projects', {
     render(r) {
       const p = r.id ? Store.project(r.id) : null;
-      return p ? projectDetail(p) : projectsIndex();
+      return p ? projectDetail(p, r.sub) : projectsIndex();
     },
     wire(root, r) {
       const p = r.id ? Store.project(r.id) : null;
@@ -1001,6 +1022,35 @@
         });
         const ep = root.querySelector('#edit-project');
         if (ep) ep.addEventListener('click', () => openProjectSheet(p.id));
+
+        /* ---- project pages ---- */
+        const at = root.querySelector('#add-tab');
+        if (at) at.addEventListener('click', () => {
+          const t = Store.addProjectTab(p.id, 'New page');
+          go('#/projects/' + p.id + '/' + t.id);
+        });
+        HQ.inlineText(root, '[data-iproj]', (el, v) => {
+          Store.updateProject(el.dataset.iproj, { name: v }); HQ.render();
+        });
+        HQ.inlineText(root, '[data-itab]', (el, v) => {
+          const [pid, tid] = el.dataset.itab.split(':');
+          Store.updateProjectTab(pid, tid, { label: v }); HQ.render();
+        });
+        /* Notes save as you leave the box, not on every keystroke — a write
+           is a sync, and syncing once per character is not a plan. */
+        const ta = root.querySelector('[data-notes]');
+        if (ta) ta.addEventListener('blur', () => {
+          const [pid, tid] = ta.dataset.notes.split(':');
+          Store.updateProjectTab(pid, tid, { notes: ta.value });
+        });
+        root.querySelectorAll('[data-deltab]').forEach(b =>
+          b.addEventListener('click', () => {
+            const [pid, tid] = b.dataset.deltab.split(':');
+            const t = Store.projectTabs(pid).find(x => x.id === tid);
+            if (!confirm(`Delete the page “${t ? t.label : ''}”? Anything written on it goes with it.`)) return;
+            Store.removeProjectTab(pid, tid);
+            go('#/projects/' + pid);
+          }));
       } else {
         wireProjToggle(root);
         const cs = root.querySelector('#camp-scope-toggle');

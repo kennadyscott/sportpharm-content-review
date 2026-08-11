@@ -298,6 +298,28 @@ const HQ = (() => {
   ];
   const GROUPS = { Marketing: MARKETING_KIDS, Analytics: ANALYTICS_KIDS };
 
+  /* Project Planning's children are the projects themselves, so the second
+     rail is the project list — open one and its own tabs sit under it. That
+     means NAV cannot be a constant: it is rebuilt on each rail render so a
+     project created a second ago is already in the rail. */
+  function navTree() {
+    const kids = [{ id: 'projects', label: 'All projects', icon: 'board' }]
+      .concat(Store.projects().map(p => ({
+        id: 'projects', pid: p.id, label: p.name, icon: 'dot', tone: p.tone
+      })));
+    return [
+      { id: 'today',    label: 'Today',            icon: 'today' },
+      { parent: 'Project Planning', icon: 'board', children: kids },
+      { parent: 'Marketing', icon: 'doc',  children: MARKETING_KIDS },
+      { id: 'orders',   label: 'Orders',           icon: 'box' },
+      { parent: 'Analytics', icon: 'chart', children: ANALYTICS_KIDS },
+      { id: 'team',     label: 'Team',     icon: 'team' },
+      { id: 'settings', label: 'Settings', icon: 'gear' }
+    ];
+  }
+  /* flat list for the palette and anything that wants every route. Built from
+     the static sections only — a project is reached through its own id, and
+     listing each one here would put five near-identical rows in the palette. */
   const NAV = [
     { id: 'today',    label: 'Today',            icon: 'today' },
     { id: 'projects', label: 'Project Planning', icon: 'board' },
@@ -307,7 +329,6 @@ const HQ = (() => {
     { id: 'team',     label: 'Team',     icon: 'team' },
     { id: 'settings', label: 'Settings', icon: 'gear' }
   ];
-  /* flat list for the palette and anything that wants every route */
   const NAV_FLAT = NAV.flatMap(n => n.children ? n.children : [n]);
   const groupOpen = {};   /* per group: undefined = follow the route */
 
@@ -334,27 +355,40 @@ const HQ = (() => {
   }
 
   function renderRail() {
-    const { view: v } = route();
+    const { view: v, id: rid } = route();
     const me = Store.currentUser();
     const c = counts();
+    const TREE = navTree();
     const badge = { projects: c.open, content: c.content, ideas: c.ideas, plan: c.planning,
                     orders: c.orders, today: c.unread };
     /* the Content parent rolls up only its own children, not Content Plan */
-    const link = (n, sub) => `
-      <a class="rail-link ${sub ? 'sub' : ''} ${n.id === v ? 'on' : ''}" href="#/${n.id}">
-        ${svg(n.icon)}<span>${n.label}</span>
-        ${badge[n.id] ? `<span class="rail-count ${n.id === 'today' ? 'alert' : ''}">${badge[n.id]}</span>` : ''}
+    /* A project row carries its own id in the href, and is only "on" when
+       that project is the one open — otherwise every project would light up
+       whenever any of them was. "All projects" is the inverse: on only when
+       no project is open. */
+    const link = (n, sub) => {
+      const href = n.pid ? `#/${n.id}/${n.pid}` : `#/${n.id}`;
+      const on = n.id !== v ? false
+        : n.pid ? rid === n.pid
+        : n.id === 'projects' ? !rid : true;
+      return `
+      <a class="rail-link ${sub ? 'sub' : ''} ${n.pid ? 'rail-proj' : ''} ${on ? 'on' : ''}" href="${href}">
+        ${n.pid ? `<i class="rail-dot t-${n.tone || 'navy'}"></i>` : svg(n.icon)}<span>${n.label}</span>
+        ${!n.pid && badge[n.id] ? `<span class="rail-count ${n.id === 'today' ? 'alert' : ''}">${badge[n.id]}</span>` : ''}
       </a>`;
+    };
     /* The tab title carries it too, so an unread message is visible from a
        different tab. This is the whole of the notification for now — until
        Supabase is connected there is no server to push from, so a message
        only reaches someone else when their browser next loads the state. */
     document.title = (c.unread ? `(${c.unread}) ` : '') + 'SportPharm HQ';
-    $('#rail-nav').innerHTML = NAV.map(n => {
+    $('#rail-nav').innerHTML = TREE.map(n => {
       if (!n.children) return link(n, false);
       const activeChild = n.children.some(k => k.id === v);
       const open = groupOpen[n.parent] === undefined ? activeChild : groupOpen[n.parent];
-      const kidBadge = n.children.reduce((t, k) => t + (badge[k.id] || 0), 0);
+      /* Project rows have no badge of their own, so the parent rolls up once
+         rather than once per project. */
+      const kidBadge = n.children.reduce((t, k) => t + (k.pid ? 0 : (badge[k.id] || 0)), 0);
       return `
         <button class="rail-link rail-parent ${activeChild && !open ? 'on' : ''}" data-navtoggle="${esc(n.parent)}" aria-expanded="${open}">
           ${svg(n.icon)}<span>${n.parent}</span>
@@ -368,7 +402,7 @@ const HQ = (() => {
     $('#rail-nav').querySelectorAll('[data-navtoggle]').forEach(tg =>
       tg.addEventListener('click', () => {
         const parent = tg.dataset.navtoggle;
-        const grp = NAV.find(x => x.parent === parent);
+        const grp = TREE.find(x => x.parent === parent);
         if (!grp) return;
         const activeChild = grp.children.some(k => k.id === route().view);
         const open = groupOpen[parent] === undefined ? activeChild : groupOpen[parent];
