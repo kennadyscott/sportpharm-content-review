@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>SportPharm — Order form</title>
+<link rel="icon" href="../assets/wordmark-dark.png">
+<link rel="stylesheet" href="order.css?v=67">
+</head>
+<body>
+
+<!--
+  The order form on its own.
+
+  Deliberately not part of HQ: Julia and Marissa raise orders, they do not run
+  the back office, and making them sign into a hub full of marketing plans and
+  project boards to type an order is the friction this was supposed to remove.
+  No rail, no passcode, one job.
+
+  It is not a copy, though. It loads the same catalogue and the same store as
+  HQ and writes the same order records, so an order raised here shows up in
+  HQ's Orders, Inventory and Money without anything being synced or re-entered.
+-->
+
+<header class="head">
+  <div class="head-in">
+    <img src="../assets/wordmark-white.png" alt="SportPharm" class="wordmark">
+    <span class="head-tag">Order form</span>
+  </div>
+</header>
+
+<main id="app" class="wrap"><p class="loading">Loading…</p></main>
+
+<footer class="foot">
+  <div class="wrap">
+    Raise it here and it is on record — no email to write, nothing retyped.
+    Questions to <a href="mailto:AdminUnit@sportpharm.com">AdminUnit@sportpharm.com</a>.
+  </div>
+</footer>
+
+<div id="toast" class="toast" hidden></div>
+
+<!-- The same data and the same store HQ uses, so both write one set of records. -->
+<script src="../hq-data.js?v=67"></script>
+<script src="../hq-store.js?v=67"></script>
+<script src="../hq-order-import.js?v=67"></script>
+<script src="../hq-pdf.js?v=67"></script>
+<script src="order.js?v=67"></script>
+</body>
+</html>

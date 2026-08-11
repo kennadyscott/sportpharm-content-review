@@ -9,6 +9,9 @@ cd "$(dirname "$0")"
 CUR=$(grep -o 'hq-data.js?v=[0-9]*' index.html | head -1 | sed 's/.*v=//')
 NEXT=$((CUR + 1))
 sed -i '' "s/?v=$CUR/?v=$NEXT/g" index.html
+# order/index.html loads the SAME shared files, so it has to move too — it
+# shipped pinned at ?v=1, which would have cached those files forever.
+[ -f order/index.html ] && sed -i '' "s/?v=$CUR/?v=$NEXT/g" order/index.html
 sed -i '' "s/window.HQ_BUILD = \"[0-9]*\"/window.HQ_BUILD = \"$NEXT\"/" index.html
 printf '%s\n' "$NEXT" > build.txt
 echo "$CUR -> $NEXT"
