@@ -36,7 +36,8 @@
           <p>One form, filled once. It covers every base the order email used to carry, produces
              the same record every time, and moves through the handoff instead of being retyped.</p></div>
         <div class="page-actions">
-          ${Store.can('edit') ? `<button class="btn btn-dark" id="new-order">${svg('plus')}New order</button>` : ''}
+          ${Store.can('edit') && Store.isOwn()
+            ? `<button class="btn btn-dark" id="new-order">${svg('plus')}New order</button>` : ''}
         </div>
       </div>
 
@@ -55,6 +56,8 @@
         </div>
       </div>
 
+      ${!Store.isOwn() ? `<p class="wk-note">Orders SportPharm has sent you. Open one to see what
+         they need and to reply on it.</p>` : ''}
       ${list.length ? `<div class="a-table-wrap">
         <table class="a-table">
           <thead><tr><th>Order</th><th>For</th><th>Total</th><th>Status</th><th>Raised</th><th></th></tr></thead>
