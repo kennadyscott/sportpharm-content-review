@@ -78,10 +78,46 @@ A read/write key in an app setting is a standing risk for no benefit, and
 `api/woo` deliberately calls the `reports/*` endpoints rather than the orders
 list so customer records never cross the boundary in the first place.
 
-## Once this is live
+## Retiring the public URL
 
-- The public GitHub Pages copy should be taken down or reduced to nothing. It
-  is currently readable by anyone with the link, which is why no real KPI
-  figures were ever seeded into `hq-data.js`.
-- The passcode gate in `hq-app.js` becomes redundant — Entra is the real gate.
-  Leave it or remove it, but do not rely on it; it is a door, not a lock.
+Decided: once Azure is up, the HQ URL goes. Three things have to happen in
+order, and the first one is the one people forget.
+
+**1. Move the Content Studio too, or the takedown breaks it.** `/campaigns/`
+is served from the same repo, and Brandon and Jessie hold links straight to
+it. Pulling the Pages site pulls the Studio with it. Both of them have
+@sportpharm.com accounts, so the Studio can sit behind the same Entra login —
+but it has to move first, not after.
+
+**2. Kennady cannot sign in as things stand.** Her account is
+`kennady.nickell@gmail.com`, and `staticwebapp.config.json` pins sign-in to
+the SportPharm tenant. She needs either a B2B guest invite or a
+@sportpharm.com mailbox. Sort this before cutover, not on the day.
+
+**3. Turning off Pages does not un-publish anything.** The repo is public, so
+every past version of every file stays readable at
+github.com/kennadyscott/sportpharm-content-review — including the internal
+strategy text that was stripped from the live bundle back in July. It is
+still in the history today.
+
+Deleting the Pages deployment closes the website and nothing else. To actually
+close the exposure, **make the repo private** — one setting, takes effect
+immediately, and it covers the history as well as the current files. Rewriting
+history instead is not worth it: forks, clones and caches survive it, and
+nobody can prove they got them all.
+
+Order of operations: Studio moved → Kennady's access sorted → repo set to
+private (which takes Pages down with it).
+
+## Also once this is live
+
+The passcode gate in `hq-app.js` becomes redundant — Entra is the real gate.
+Leave it or remove it, but do not rely on it; it is a door, not a lock.
+
+## The thing Azure does not fix
+
+Each person's HQ still lives in their own browser. A handoff to Julia only
+reaches her when her browser next loads. Multi-user needs a database behind
+the same Entra login — Supabase, or Azure Table Storage via a third Function.
+It changes nothing about the UI and everything about whether handoffs work,
+so it is worth settling before this goes to the team.
