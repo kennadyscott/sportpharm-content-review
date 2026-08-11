@@ -2570,3 +2570,36 @@ button.pl-st:hover { filter: brightness(.94); }
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* =====================================================================
+   THE WEEK — plain lists, not coloured blocks
+
+   ClearK12's planner puts the day's name above a plain bordered table:
+   the heading is not inside a card, there is no tinted panel, and the only
+   colour is the day name itself. Wrapping each day in its own card made
+   five stacked blocks fighting for attention down the page.
+   ===================================================================== */
+.wk-day, .wk-log {
+  background: none; border: none; border-radius: 0; padding: 0; box-shadow: none;
+}
+.wk-days { gap: 1.5rem; }
+.wk-day-head { margin-bottom: .45rem; padding: 0; }
+/* The table is the only thing with an edge. */
+.wk-table {
+  border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+  background: var(--paper);
+}
+.wk-thead { background: var(--bg); border-bottom: 1px solid var(--line);
+  padding-left: .7rem; padding-right: .7rem; }
+.wk-table .wk-row { padding-left: .7rem; padding-right: .7rem; }
+.wk-table .wk-empty { padding-left: .7rem; }
+.wk-add { margin-top: .4rem; padding-left: .1rem; }
+
+/* Dropping onto a day highlights the table, since that is now the only
+   thing with an outline to highlight. */
+.wk-day.drop-on, .wk-log.drop-on { box-shadow: none; border: none; }
+.wk-day.drop-on .wk-table, .wk-log.drop-on .wk-table {
+  border-color: var(--red); box-shadow: 0 0 0 2px rgba(214, 32, 42, .14);
+}
+/* "The week" across: five plain columns rather than five cards. */
+.wk-grid.across .wk-days { gap: 1rem; }
