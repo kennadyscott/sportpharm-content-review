@@ -1,28 +1,34 @@
 /* =============================================================================
    SportPharm HQ — internal dashboard
-   SportPharm brand: red #E0312A on deep navy #0B1E3B, Bebas Neue + Inter.
+   Brand: the WasabiRub masterbrand, read out of wasabirub-home.html rather
+   than approximated — red #D6202A on deep #0F1D33, heavy Arial/Helvetica.
    Same layout and structure as the Kindred HQ build it was ported from; the
    palette, type and voice are SportPharm's.
 ============================================================================= */
 :root {
-  --bg: #F3F6FB;
-  --bg-2: #E9EFF7;
-  --paper: #FFFFFF;
-  --ink: #10233F;
-  --ink-soft: #5A6B84;
-  --ink-faint: #8C99AC;
-  --navy: #0B1E3B;
-  --navy-deep: #061428;
-  --red: #E0312A;
-  --red-deep: #B8241E;
-  --blue: #4E7FD6;
-  --blue-deep: #2563EB;
-  --green: #12925A;
-  --amber: #C07806;
-  --line: #E2E8F0;
-  --line-soft: #EEF3F9;
-  --shadow: 0 1px 2px rgba(11, 30, 59, .06), 0 9px 27px rgba(11, 30, 59, .08);
-  --shadow-lift: 0 16.2px 39.6px rgba(11, 30, 59, .18);
+  --bg: #F4F5F6;        /* masterbrand paper — the page ground */
+  --bg-2: #E9EBED;      /* insets and chips */
+  --paper: #FFFFFF;     /* cards sit above the ground */
+  --ink: #15202B;
+  /* HQ needs a couple of tones the storefront has no use for — softer ink for
+     secondary text, hairlines. Derived from the masterbrand ink, not invented. */
+  --ink-soft: #566371;
+  --ink-faint: #8B96A2;
+  --navy: #0F1D33;      /* masterbrand deep */
+  --navy-deep: #0A1526;
+  --red: #D6202A;       /* masterbrand red / fam-hot */
+  --red-deep: #AF1A22;
+  --blue: #337FA7;
+  --blue-deep: #2B6C8F; /* fam-cold */
+  --green: #27865A;     /* fam-og */
+  --amber: #C85B38;     /* masterbrand orange */
+  --line: #E1E4E7;
+  --line-soft: #EDEFF1;
+  /* Heavy grotesque set tight and negative — the storefront's display voice.
+     Native Arial/Helvetica, so it matches with no webfont to load. */
+  --display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --shadow: 0 1px 2px rgba(15, 29, 51, .06), 0 9px 27px rgba(15, 29, 51, .08);
+  --shadow-lift: 0 16.2px 39.6px rgba(15, 29, 51, .16);
   font-size: 14.4px;
 }
 
@@ -37,11 +43,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 h1, h2, h3 { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; letter-spacing: -.018em; line-height: 1.18; color: var(--navy); }
-/* Bebas Neue is the SportPharm display face — page titles and big numbers only,
-   never small headings (it loses too much at UI sizes). */
+/* The masterbrand display voice: heavy grotesque, tracked negative, set tight.
+   Page titles and big numbers only, never small headings — at UI sizes the
+   negative tracking closes letters up and it stops being readable. */
 .disp, h1, .gate-name, .metric-card h3, .today-hero h1 {
-  font-family: 'Bebas Neue', 'Inter', sans-serif; font-weight: 400;
-  letter-spacing: .012em; line-height: 1.06;
+  font-family: var(--display); font-weight: 900;
+  letter-spacing: -.035em; line-height: 1.02;
+  /* The storefront sets every display line in caps. Bebas only had caps, so
+     this keeps what was on screen and makes it deliberate. */
+  text-transform: uppercase;
 }
 h1 { font-size: 2.5rem; }
 h1 em, .today-hero h1 em { font-style: normal; color: var(--red); }
@@ -107,10 +117,10 @@ ul { list-style: none; }
   background: radial-gradient(circle at 30% 30%, rgba(224,49,42,.42), transparent 68%);
 }
 .gate-brand { display: flex; align-items: center; gap: .8rem; position: relative; z-index: 1; }
-.gate-name { font-family: 'Bebas Neue', 'Inter', sans-serif; letter-spacing: .015em; font-size: 1.5rem; color: var(--bg); line-height: 1; }
+.gate-name { font-family: var(--display); font-weight: 900; letter-spacing: -.03em; font-size: 1.5rem; color: var(--bg); line-height: 1; }
 .gate-tag { font-size: .64rem; letter-spacing: .16em; text-transform: uppercase; color: var(--red); margin-top: .3rem; }
 .gate-line {
-  font-family: 'Bebas Neue', 'Inter', sans-serif; font-weight: 400; letter-spacing: .012em;
+  font-family: var(--display); font-weight: 900; letter-spacing: -.03em;
   font-size: clamp(2rem, 3.6vw, 3.1rem);
   line-height: 1.04; color: #fff; max-width: 12em; position: relative; z-index: 1;
 }
@@ -172,7 +182,7 @@ ul { list-style: none; }
 }
 .rail-brand { display: flex; align-items: center; gap: .6rem; padding: .2rem .5rem 1.2rem; }
 .rail-brand .mark { width: 27px; height: 27px; }
-.rail-brand span { font-family: 'Bebas Neue', 'Inter', sans-serif; letter-spacing: .015em; font-size: 1.2rem; color: var(--bg); }
+.rail-brand span { font-family: var(--display); font-weight: 900; letter-spacing: -.03em; font-size: 1.2rem; color: var(--bg); }
 .rail-nav { display: grid; gap: .18rem; }
 .rail-link {
   display: flex; align-items: center; gap: .7rem; padding: .6rem .7rem;
@@ -481,7 +491,7 @@ kbd {
   padding: .85rem 1.1rem; transition: border-color .14s ease, transform .14s ease, box-shadow .14s ease;
 }
 .msg-line:hover { border-color: var(--blue); transform: translateY(-1px); box-shadow: var(--shadow); }
-.msg-line q { font-family: 'Bebas Neue', 'Inter', sans-serif; letter-spacing: .015em; font-size: 1.02rem; color: var(--navy); quotes: none; flex: 1; line-height: 1.35; }
+.msg-line q { font-family: var(--display); font-weight: 900; letter-spacing: -.03em; font-size: 1.02rem; color: var(--navy); quotes: none; flex: 1; line-height: 1.35; }
 .msg-use { font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; }
 .msg-copy { color: var(--ink-faint); flex: none; }
 .msg-copy svg { width: 14.4px; height: 14.4px; }
@@ -503,7 +513,7 @@ kbd {
 .invite-form { display: grid; grid-template-columns: 1fr 1fr auto auto; gap: .5rem; align-items: end; }
 @media (max-width: 760px) { .invite-form { grid-template-columns: 1fr; } }
 .invite-out { margin-top: .9rem; background: var(--navy); color: var(--bg); border-radius: 12.6px; padding: .9rem 1.1rem; font-size: .86rem; }
-.invite-out code { font-family: 'Bebas Neue', 'Inter', sans-serif; letter-spacing: .015em; font-size: 1.3rem; letter-spacing: .12em; color: var(--amber); display: block; margin-top: .3rem; }
+.invite-out code { font-family: var(--display); font-weight: 900; letter-spacing: -.03em; font-size: 1.3rem; letter-spacing: .12em; color: var(--amber); display: block; margin-top: .3rem; }
 
 /* =============================================================================
    ANALYTICS (next)
@@ -633,7 +643,7 @@ kbd {
 .camp-chips .tag { background: rgba(255,248,239,.12); color: var(--bg); }
 .camp-hero-side { display: grid; gap: .6rem; align-content: start; justify-items: end; position: relative; z-index: 1; }
 .camp-score { font-size: .82rem; color: #D7C9DC; }
-.camp-score b { font-family: 'Bebas Neue', 'Inter', sans-serif; letter-spacing: .015em; font-size: 1.4rem; color: var(--bg); margin-right: .2rem; }
+.camp-score b { font-family: var(--display); font-weight: 900; letter-spacing: -.03em; font-size: 1.4rem; color: var(--bg); margin-right: .2rem; }
 .camp-hero-side .btn-outline { border-color: rgba(255,248,239,.4); color: var(--bg); background: transparent; }
 .camp-hero-side .btn-outline:hover { background: rgba(255,248,239,.1); border-color: var(--bg); }
 
@@ -911,20 +921,15 @@ kbd {
 .sug-body span { font-size: .74rem; color: var(--ink-faint); }
 
 /* =============================================================================
-   BRIGHT PASS — the bg retires. Navy, blue, red, green stay; the
-   ground becomes bright paper with a whisper of blue instead of bg.
+   BRIGHT PASS — the ground is bright paper rather than a tint.
+
+   This block used to redeclare :root with Kindred's lilac ground, which
+   silently won over the palette at the top of the file. The ground now comes
+   from the masterbrand token and this block only carries what is genuinely
+   local to it.
 ============================================================================= */
-:root {
-  --bg: #FAF9FC;      /* page ground — bright, faint blue cast */
-  --bg-2: #F0EEF6;    /* insets and chips */
-  --paper: #FFFFFF;      /* cards */
-  --line: #E8E4F0;
-  --line-soft: #F2F0F8;
-  --shadow: 0 9px 27px rgba(11, 30, 59, .07);
-  --shadow-lift: 0 16.2px 39.6px rgba(11, 30, 59, .13);
-}
 .gate-main { background: var(--bg); }
-.cal-day.weekend, .pl-cal-cell.weekend { background: #F4F2F9; }
+.cal-day.weekend, .pl-cal-cell.weekend { background: var(--bg-2); }
 
 /* =============================================================================
    LABEL CHIPS — the Threadline spec: solid fill, white text, 9.9px/800,
@@ -1172,7 +1177,7 @@ kbd {
 .pipe:hover { border-color: var(--blue); transform: translateY(-1px); }
 .pipe.on { border-color: var(--navy); box-shadow: var(--shadow); }
 .pipe b {
-  font-family: 'Bebas Neue', 'Inter', sans-serif; font-weight: 400;
+  font-family: var(--display); font-weight: 900;
   font-size: 1.7rem; line-height: 1; color: var(--navy);
 }
 .pipe span { font-size: .72rem; font-weight: 600; color: var(--ink-soft); }
@@ -1264,7 +1269,7 @@ kbd {
   font-size: .68rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--red);
 }
 .ed-preview h2 {
-  font-family: 'Bebas Neue', 'Inter', sans-serif; font-weight: 400; letter-spacing: .012em;
+  font-family: var(--display); font-weight: 900; letter-spacing: -.03em;
   font-size: 2.6rem; line-height: 1.02; margin: .5rem 0 .6rem;
 }
 .ed-dek { font-size: 1.02rem; color: var(--ink-soft); line-height: 1.6; margin-bottom: 1.4rem; }
@@ -1720,7 +1725,7 @@ kbd {
   margin: 1.6rem 0; padding: .2rem 0 .2rem 1.1rem; border-left: 3px solid var(--red);
 }
 .b-quote p {
-  font-family: 'Bebas Neue', 'Inter', sans-serif; font-size: 1.6rem; line-height: 1.14;
+  font-family: var(--display); font-weight: 900; letter-spacing: -.03em; font-size: 1.6rem; line-height: 1.14;
   letter-spacing: .012em; color: var(--navy);
 }
 .b-quote cite { display: block; font-style: normal; font-size: .78rem; color: var(--ink-faint); margin-top: .5rem; }
@@ -1771,7 +1776,7 @@ ol.b-list li::marker { color: var(--red); font-weight: 700; }
 .b-product h4 { font-size: 1.1rem; margin: .1rem 0 .25rem; }
 .b-product p { font-size: .85rem; color: var(--ink-soft); line-height: 1.55; }
 .b-product-buy { display: flex; align-items: center; gap: .7rem; }
-.b-price { font-family: 'Bebas Neue', 'Inter', sans-serif; font-size: 1.5rem; color: var(--navy); }
+.b-price { font-family: var(--display); font-weight: 900; letter-spacing: -.03em; font-size: 1.5rem; color: var(--navy); }
 
 .b-offer {
   display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
@@ -1946,7 +1951,7 @@ button.pl-st:hover { filter: brightness(.94); }
 .bf-sec-body p { margin-bottom: .8rem; }
 .bf-sec-body h4 { font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); margin: 1.2rem 0 .5rem; }
 
-.bf-tag { font-family: 'Bebas Neue','Inter',sans-serif; font-size: 1.5rem; color: var(--red); line-height: 1.1; margin-bottom: .8rem !important; }
+.bf-tag { font-family: var(--display); font-weight: 900; letter-spacing: -.03em; font-size: 1.5rem; color: var(--red); line-height: 1.1; margin-bottom: .8rem !important; }
 .bf-primary { background: var(--bg); border-left: 3px solid var(--red); border-radius: 10px; padding: .8rem 1rem; margin-bottom: 1rem; }
 .bf-primary span { font-size: .68rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-faint); }
 .bf-primary p { font-size: 1rem; color: var(--navy); margin: .25rem 0 0 !important; }
@@ -2002,7 +2007,7 @@ button.pl-st:hover { filter: brightness(.94); }
 .bf-asset-purpose { font-size: .84rem; color: var(--ink-soft); line-height: 1.6; margin-bottom: .6rem; }
 .bf-cover { background: var(--navy); color: #fff; border-radius: 10px; padding: .9rem 1rem; margin-bottom: .6rem; }
 .bf-cover span { font-size: .64rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--red); }
-.bf-cover b { display: block; font-family: 'Bebas Neue','Inter',sans-serif; font-size: 1.5rem; line-height: 1.1; margin: .2rem 0; }
+.bf-cover b { display: block; font-family: var(--display); font-weight: 900; letter-spacing: -.03em; font-size: 1.5rem; line-height: 1.1; margin: .2rem 0; }
 .bf-cover i { font-style: normal; font-size: .82rem; color: rgba(255,255,255,.7); }
 .bf-more { margin-top: .4rem; }
 .bf-more summary { cursor: pointer; font-size: .78rem; color: var(--blue-deep); font-weight: 600; }
