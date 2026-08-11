@@ -2315,6 +2315,13 @@ button.pl-st:hover { filter: brightness(.94); }
     border: none !important; background: none !important; padding: 0 !important;
     color: #000 !important; resize: none; -webkit-appearance: none; appearance: none; }
   .ord-in { width: auto !important; }
+  /* On screen a placeholder is a hint. On paper it is indistinguishable from
+     something someone wrote, so "if they have one" reads as the PO number.
+     Blank stays blank. */
+  .ord-sheet ::placeholder { color: transparent !important; opacity: 0 !important; }
+  .ord-sheet input[type=date]::-webkit-datetime-edit { color: transparent; }
+  .ord-sheet input[type=date]:valid::-webkit-datetime-edit { color: #000; }
+  .ord-sheet ::-webkit-calendar-picker-indicator { display: none !important; }
   .ord-msg { white-space: pre-wrap; border: 1px solid #999; padding: .5rem; }
   /* The side rail is UI everywhere else, so the rule above hides it. On an
      order it holds the status and the message the vendor receives, both of
