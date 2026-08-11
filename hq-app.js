@@ -383,7 +383,9 @@ const HQ = (() => {
       open: Store.allTasks().filter(t => t.status !== 'shipped').length,
       content: s.review + s.changes,
       ideas: Store.ideas().filter(d => d.state === 'open').length,
-      orders: Store.orders().filter(o => o.status !== 'complete').length,
+      /* visibleOrders(), or the badge tells a partner how many orders exist
+         in total — a small number, but not theirs to have. */
+      orders: Store.visibleOrders().filter(o => o.status !== 'complete').length,
       /* One badge on Today for "something is waiting on you", covering both
          unread messages and tasks handed over and not yet opened. Two
          separate counts in the same place would just be noise. */
