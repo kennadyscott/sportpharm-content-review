@@ -301,7 +301,7 @@ const HQ = (() => {
 
   /* Project Planning's children are the projects themselves, so the second
      rail is the project list — open one and its own tabs sit under it. That
-     means NAV cannot be a constant: it is rebuilt on each rail render so a
+     means the tree cannot be a constant: it is rebuilt on each rail render so a
      project created a second ago is already in the rail. */
   /* Sections for the narrow rail. Each one owns a set of pages, which the
      second rail lists. This is a real two-rail nav rather than a single rail
@@ -590,7 +590,7 @@ const HQ = (() => {
 
   return {
     $, esc, svg, avatar, initials, areaOf, statusOf, ago, daysSince, dueLabel,
-    toast, copy, view, views, NAV, route, go, render, renderRail,
+    toast, copy, view, views, sections, sectionFor, navFlat, route, go, render, renderRail,
     inlineText, stopRow,
     openSheet, closeSheet, refreshSheet, boot, start
   };
