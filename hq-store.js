@@ -1475,7 +1475,10 @@ const Store = (() => {
      the order, so their cost is invisible in the total. Counting them is the
      only way anyone sees how much is going out the door for nothing. */
   function orderStats() {
-    const all = orders();
+    /* visibleOrders(), not orders() — a partner opening Analytics would
+       otherwise get totals across every company's orders, including the ones
+       addressed to a competitor of theirs. */
+    const all = visibleOrders();
     const done = all.filter(o => o.status === 'complete');
     const open = all.filter(o => o.status !== 'complete');
     const value = o => orderTotal(o);

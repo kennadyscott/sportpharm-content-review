@@ -308,6 +308,23 @@ const HQ = (() => {
      with expanding groups — the strip is where you are in the product, the
      panel is where you are inside that. */
   function sections() {
+    /* A partner company gets the orders addressed to it and nothing else.
+       Marketing, projects, KPIs and the rest are SportPharm's business, and
+       the rail should not even hint at them.
+
+       This is a UI boundary, not a security one — everything still lives in
+       one browser, so a determined partner could read the store directly.
+       When this moves to a server the same rule has to exist there as
+       row-level security. */
+    if (!Store.isOwn()) {
+      const co = Store.myCompany() || {};
+      return [
+        { id: 'orders', icon: 'box', label: co.name || 'Orders',
+          pages: [{ id: 'orders', label: 'Orders for you' }] },
+        { id: 'settings', icon: 'gear', label: 'Settings',
+          pages: [{ id: 'settings', label: 'Settings' }] }
+      ];
+    }
     return [
       { id: 'today', icon: 'today', label: 'Today',
         pages: [{ id: 'today', label: 'My week' }] },
@@ -433,6 +450,11 @@ const HQ = (() => {
 
   function render() {
     const r = route();
+    /* Typing a URL is not authorisation. The rail hides what a partner has no
+       business in; this stops them simply navigating to it anyway. Same
+       caveat as sections(): a UI boundary until the server enforces it. */
+    const allowed = sections().some(sec => sec.pages.some(pg => pg.id === r.view));
+    if (!allowed) { go('#/' + sections()[0].pages[0].id); return; }
     const def = views[r.view];
     const root = $('#view');
     root.innerHTML = def.render(r);

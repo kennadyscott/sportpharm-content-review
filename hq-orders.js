@@ -217,7 +217,7 @@
             ${!ready.ok ? `<p class="w-note">${esc(ready.error)}</p>` : ''}
           </div>
 
-          <div class="side-card">
+          ${Store.isOwn() ? `<div class="side-card">
             <h4>The message</h4>
             <p class="side-sub">Written from the form, so it reads the same every time. It goes to
                ${ORDER_RECIPIENTS.map(r => r.to).join(' and ')}.</p>
@@ -234,7 +234,7 @@
             <p class="side-sub" id="ord-send-note">${HQ.mailer && HQ.mailer.ready()
               ? 'Sends from ' + esc(HQ.mailer.from()) + ' — a real message, with a copy in that mailbox.'
               : 'Sending is not connected yet, so Send will explain what is missing rather than pretend. Copy still works.'}</p>
-          </div>
+          </div>` : ''}
 
           <div class="side-card">
             <h4>Talk to ${esc((Store.company(o.toCompany) || {}).name || 'them')}</h4>
