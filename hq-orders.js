@@ -239,6 +239,115 @@
           </div>` : ''}
         </div>
       </div>
+
+      ${orderDoc(o)}
+    </div>`;
+  }
+
+  /* ---------------------------- the paper copy ----------------------------
+     Print gets its own document rather than the form with its boxes taken
+     off. An order that goes to a vendor and an invoicing team has to read
+     like a purchase order — letterhead, a reference and a date, who it is
+     billed and shipped to, a priced line-item table that foots to a total,
+     and the terms underneath. The form is for filling in; this is the record.
+
+     It is in the DOM the whole time and hidden on screen, so Print/PDF is the
+     browser's own print — no second window to be blocked, no library. */
+  function orderDoc(o) {
+    const st = stOf(o);
+    const items = (o.lines || []).filter(l => l.name);
+    const goods = items.reduce((n, l) => n + (Number(l.price) || 0) * (Number(l.qty) || 0), 0);
+    const shipCost = Number(o.shipCost) || 0;
+    const raised = Store.user(o.raisedBy);
+    const dt = d => d ? new Date(d.length > 10 ? d : d + 'T12:00:00')
+      .toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
+
+    const row = (label, value) => value
+      ? `<tr><th>${esc(label)}</th><td>${esc(value)}</td></tr>` : '';
+
+    return `<div class="ord-doc" aria-hidden="true">
+      <header class="doc-head">
+        <div class="doc-brand">
+          <div class="doc-mark">★</div>
+          <div>
+            <b>SportPharm</b>
+            <span>Sports recovery &amp; performance</span>
+          </div>
+        </div>
+        <div class="doc-title">
+          <h1>Purchase Order</h1>
+          <table class="doc-ref">
+            <tr><th>Order</th><td><b>${esc(o.ref)}</b></td></tr>
+            <tr><th>Date</th><td>${dt(o.createdAt)}</td></tr>
+            <tr><th>Status</th><td>${esc(st.label)}</td></tr>
+            ${o.po ? `<tr><th>PO number</th><td>${esc(o.po)}</td></tr>` : ''}
+          </table>
+        </div>
+      </header>
+
+      <div class="doc-parties">
+        <section>
+          <h2>Vendor</h2>
+          <p><b>Enovachem Pharmaceuticals</b><br>
+             ${ORDER_RECIPIENTS.map(r => esc(r.to)).join('<br>')}</p>
+        </section>
+        <section>
+          <h2>Ship to</h2>
+          <p><b>${esc(o.org || '—')}</b><br>
+             ${o.contactName ? esc(o.contactName) + '<br>' : ''}
+             ${esc(o.shipTo || '').replace(/\n/g, '<br>')}</p>
+          ${o.contactEmail ? `<p class="doc-sm">${esc(o.contactEmail)}${
+            o.contactPhone ? ' · ' + esc(o.contactPhone) : ''}</p>` : ''}
+        </section>
+      </div>
+
+      <table class="doc-lines">
+        <thead><tr>
+          <th class="n">Qty</th><th>Description</th><th class="m">Unit</th><th class="m">Amount</th>
+        </tr></thead>
+        <tbody>
+          ${items.map(l => `<tr>
+            <td class="n">${esc(l.qty)}</td>
+            <td>${esc(l.name)}${l.note ? `<span class="doc-note">${esc(l.note)}</span>` : ''}</td>
+            <td class="m">${money(l.price)}</td>
+            <td class="m">${money((Number(l.price) || 0) * (Number(l.qty) || 0))}</td>
+          </tr>`).join('')}
+          ${(o.freebies || []).map(f => `<tr class="doc-free">
+            <td class="n">${esc(f.qty)}</td>
+            <td>${esc(f.name)}<span class="doc-note">No charge${
+              o.approvedBy ? ' — approved by ' + esc(o.approvedBy) : ''}</span></td>
+            <td class="m">—</td><td class="m">$0.00</td>
+          </tr>`).join('')}
+          ${(o.swag || []).length ? `<tr class="doc-free">
+            <td class="n">—</td>
+            <td>SWAG<span class="doc-note">${(o.swag || []).map(esc).join(' · ')}</span></td>
+            <td class="m">—</td><td class="m">$0.00</td>
+          </tr>` : ''}
+          ${!items.length && !(o.freebies || []).length ? `<tr>
+            <td colspan="4" class="doc-none">Nothing on this order yet.</td></tr>` : ''}
+        </tbody>
+        <tfoot>
+          <tr><th colspan="3">Goods</th><td class="m">${money(goods)}</td></tr>
+          <tr><th colspan="3">Shipping${o.ship ? ' — ' + esc(o.ship) : ''}</th><td class="m">${money(shipCost)}</td></tr>
+          <tr class="doc-total"><th colspan="3">Total</th><td class="m">${money(Store.orderTotal(o))}</td></tr>
+        </tfoot>
+      </table>
+
+      <div class="doc-terms">
+        <table>
+          ${row('Payment', o.pay)}
+          ${row('Shipping method', o.ship)}
+          ${row('Needed by', o.needBy ? dt(o.needBy) : '')}
+          ${row('Tracking', o.tracking)}
+          ${row('Raised by', raised ? raised.name : '')}
+        </table>
+        ${o.notes ? `<div class="doc-notes"><h2>Notes</h2><p>${esc(o.notes).replace(/\n/g, '<br>')}</p></div>` : ''}
+      </div>
+
+      <footer class="doc-foot">
+        ${esc(o.ref)} · raised in SportPharm HQ${raised ? ' by ' + esc(raised.name) : ''} ·
+        questions to ${esc((ORDER_RECIPIENTS[0] || {}).to || 'orders@sportpharm.com')}
+      </footer>
     </div>`;
   }
 
