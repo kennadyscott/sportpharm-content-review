@@ -69,43 +69,113 @@
     return m(a) + ' ' + a.getDate() + ' – ' + (m(a) === m(b) ? '' : m(b) + ' ') + b.getDate();
   };
 
-  /* One line, whether it came from the week or from a project. */
+  /* Which day sections are folded away. Kept in the module rather than the
+     store — it is how one person is looking at the page right now, not a fact
+     about the work. */
+  const wkShut = new Set();
+
+  /* One row of the table. Draggable, because the whole point of the running
+     log is that you pick something up and drop it on a day. */
   function todoRow(t) {
     const ed = Store.can('edit');
-    return `<div class="wk-row ${t.done ? 'done' : ''}">
-      <input type="checkbox" ${t.done ? 'checked' : ''} data-todock="${t.id}"
-             aria-label="${esc(t.title)}" ${ed ? '' : 'disabled'}>
+    return `<div class="wk-row ${t.done ? 'done' : ''}" data-todo="${t.id}"
+      ${ed ? 'draggable="true"' : ''}>
+      <span class="wk-grip" aria-hidden="true">${svg('right')}</span>
       <span class="wk-title" ${ed ? `data-itodo="${t.id}"` : ''}>${esc(t.title)}</span>
       ${t.repeats ? `<span class="wk-rep" title="Repeats ${esc(t.repeats)}">↻</span>` : ''}
       ${t.tag ? `<span class="wk-tag">${esc(t.tag)}</span>` : ''}
+      <span class="wk-ck">
+        <input type="checkbox" ${t.done ? 'checked' : ''} data-todock="${t.id}"
+               aria-label="${esc(t.title)}" ${ed ? '' : 'disabled'}>
+      </span>
       ${ed ? `<button class="wk-x" data-tododel="${t.id}" aria-label="Remove">${svg('close')}</button>` : ''}
     </div>`;
   }
+
+  /* A project task that has been given this date. Not draggable and not
+     deletable here — it belongs to its project, and the week is only showing
+     it. Moving it means changing its due date, which the row does on click. */
   function taskRowInDay(t) {
     return `<div class="wk-row from-task" data-task="${t.project.id}:${t.id}" tabindex="0" role="button">
       <span class="wk-dot t-${areaOf(t.project.area).tone}"></span>
       <span class="wk-title">${esc(t.title)}</span>
       <span class="wk-tag from">${esc(t.project.name)}</span>
+      <span class="wk-ck"><span class="wk-assigned" title="Assigned from a project">${svg('board')}</span></span>
     </div>`;
   }
+
+  const wkHead = `<div class="wk-thead"><span>Item</span><span class="wk-ck">Done</span></div>`;
 
   function daySection(iso, i) {
     const { todos: ts, tasks } = Store.dayItems(iso);
     const total = ts.length + tasks.length;
     const done = ts.filter(t => t.done).length;
     const isToday = iso === Store.today();
-    return `<section class="wk-day t-${DAY_TONE[i % DAY_TONE.length]} ${isToday ? 'now' : ''}">
+    const shut = wkShut.has(iso);
+    return `<section class="wk-day t-${DAY_TONE[i % DAY_TONE.length]} ${isToday ? 'now' : ''} ${shut ? 'shut' : ''}"
+      data-drop="${iso}">
       <div class="wk-day-head">
+        <button class="wk-fold" data-fold="${iso}" aria-expanded="${!shut}"
+                aria-label="${shut ? 'Show' : 'Hide'} ${esc(longDay(iso))}">${svg('down')}</button>
         <h3>${esc(longDay(iso))}</h3>
         ${isToday ? '<span class="wk-today">Today</span>' : ''}
         <span class="wk-count">${done}/${total}</span>
       </div>
-      ${total ? ts.map(todoRow).join('') + tasks.map(taskRowInDay).join('')
-              : '<p class="wk-empty">Nothing planned.</p>'}
+      ${shut ? '' : `<div class="wk-table">
+        ${wkHead}
+        ${total ? ts.map(todoRow).join('') + tasks.map(taskRowInDay).join('')
+                : '<p class="wk-empty">Nothing planned.</p>'}
+      </div>
       ${Store.can('edit') ? `<form class="wk-add" data-addday="${iso}">
         <input placeholder="+ add item" aria-label="Add an item to ${esc(longDay(iso))}">
-      </form>` : ''}
+      </form>` : ''}`}
     </section>`;
+  }
+
+  /* ---- drag and drop: the running log onto a day, or a day onto another ----
+     One handler set, wired over the whole week grid. The row carries the todo
+     id; every day section and the log itself carry the day they represent
+     ("" for the log), so a drop is a one-line update. */
+  let wkDrag = null;
+  function wireWeekDnD(root) {
+    if (!Store.can('edit')) return;
+
+    root.querySelectorAll('[data-todo]').forEach(row => {
+      row.addEventListener('dragstart', e => {
+        wkDrag = row.dataset.todo;
+        row.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        /* Firefox will not start a drag without data on the transfer. */
+        try { e.dataTransfer.setData('text/plain', wkDrag); } catch (err) {}
+      });
+      row.addEventListener('dragend', () => {
+        row.classList.remove('dragging');
+        wkDrag = null;
+        root.querySelectorAll('.drop-on').forEach(z => z.classList.remove('drop-on'));
+      });
+    });
+
+    root.querySelectorAll('[data-drop]').forEach(zone => {
+      zone.addEventListener('dragover', e => {
+        if (!wkDrag) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        zone.classList.add('drop-on');
+      });
+      /* dragleave fires when crossing onto a child, so only clear when the
+         pointer has actually left the zone's box. */
+      zone.addEventListener('dragleave', e => {
+        if (!zone.contains(e.relatedTarget)) zone.classList.remove('drop-on');
+      });
+      zone.addEventListener('drop', e => {
+        if (!wkDrag) return;
+        e.preventDefault();
+        zone.classList.remove('drop-on');
+        Store.updateTodo(wkDrag, { day: zone.dataset.drop || null });
+        wkDrag = null;
+        HQ.render();
+      });
+    });
   }
 
   /* ----------------------------- messages -----------------------------
@@ -206,11 +276,10 @@
         </section>
 
         <div class="td-top">
-          ${msgPanel(me)}
           <section class="panel asg">
             <div class="panel-head"><h2>Assigned to you</h2>
               ${assigned.length ? `<span class="asg-n">${assigned.length}</span>` : ''}</div>
-            ${assigned.length ? `<p class="wk-note">Someone is waiting on these.</p>
+            ${assigned.length ? `<p class="wk-note">From a project — someone is waiting on these.</p>
             ${assigned.map(t => `<div class="asg-row">
               <span class="wk-dot t-${areaOf(t.project.area).tone}"></span>
               <span class="asg-body" data-task="${t.project.id}:${t.id}" tabindex="0" role="button">
@@ -225,6 +294,7 @@
             </div>`).join('')}`
             : '<p class="wk-empty">Nothing is waiting on you.</p>'}
           </section>
+          ${msgPanel(me)}
         </div>
 
         <div class="wk-head">
@@ -243,16 +313,22 @@
         <div class="wk-grid ${weekMode === 'week' ? 'across' : ''}">
           <div class="wk-days">${days.map(daySection).join('')}</div>
 
-          <section class="wk-log">
+          <section class="wk-log" data-drop="">
             <div class="wk-day-head">
+              <button class="wk-fold" data-fold="__log" aria-expanded="${!wkShut.has('__log')}"
+                      aria-label="${wkShut.has('__log') ? 'Show' : 'Hide'} the running task log">${svg('down')}</button>
               <h3>Running task log</h3>
               <span class="wk-count">${logDone}/${log.length}</span>
             </div>
-            <p class="wk-note">Anything without a day. Give one a date and it moves into the week.</p>
-            ${log.length ? log.map(todoRow).join('') : '<p class="wk-empty">Nothing waiting.</p>'}
+            ${wkShut.has('__log') ? '' : `<p class="wk-note">Things you have given yourself to do, with no day yet.
+              Drag one onto a day to plan it — or drag it back here to unplan it.</p>
+            <div class="wk-table">
+              ${wkHead}
+              ${log.length ? log.map(todoRow).join('') : '<p class="wk-empty">Nothing waiting.</p>'}
+            </div>
             ${Store.can('edit') ? `<form class="wk-add" data-addday="">
               <input placeholder="+ add item" aria-label="Add to the running log">
-            </form>` : ''}
+            </form>` : ''}`}
           </section>
         </div>
 
@@ -308,6 +384,14 @@
         const again = HQ.$('#mg-input');
         if (again) again.focus();
       });
+
+      wireWeekDnD(root);
+      root.querySelectorAll('[data-fold]').forEach(b =>
+        b.addEventListener('click', () => {
+          const k = b.dataset.fold;
+          if (wkShut.has(k)) wkShut.delete(k); else wkShut.add(k);
+          HQ.render();
+        }));
 
       root.querySelectorAll('[data-wkmode]').forEach(b =>
         b.addEventListener('click', () => { weekMode = b.dataset.wkmode; HQ.render(); }));

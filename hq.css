@@ -2116,6 +2116,43 @@ button.pl-st:hover { filter: brightness(.94); }
 .wk-x:hover { color: var(--red); }
 .wk-x svg { width: 12px; height: 12px; }
 
+/* ---- the week as a table, the way ClearK12 lays it out ----
+   A header strip over each list, the tick in its own right-hand column so
+   every checkbox sits on the same line down the page, and a grip on the left
+   that says the row can be picked up. */
+.wk-table { border: 1px solid var(--line); border-radius: 9px; overflow: hidden; margin-top: .1rem; }
+.wk-thead {
+  display: flex; align-items: center; gap: .5rem; padding: .3rem .6rem;
+  background: var(--bg); border-bottom: 1px solid var(--line);
+  font-size: .6rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.wk-thead > span:first-child { flex: 1; }
+.wk-table .wk-row { padding: .4rem .6rem; }
+.wk-table .wk-row:last-of-type { border-bottom: none; }
+.wk-table .wk-empty { padding: .5rem .6rem; }
+.wk-ck { flex: none; width: 3.2rem; display: flex; justify-content: center; }
+.wk-thead .wk-ck { justify-content: center; }
+.wk-assigned { color: var(--ink-faint); display: grid; place-items: center; }
+.wk-assigned svg { width: 13px; height: 13px; }
+
+.wk-fold { flex: none; color: var(--ink-faint); display: grid; place-items: center;
+  padding: 0; background: none; border: none; cursor: pointer; }
+.wk-fold svg { width: 14px; height: 14px; transition: transform .15s; }
+.wk-day.shut .wk-fold svg, .wk-log .wk-fold[aria-expanded="false"] svg { transform: rotate(-90deg); }
+.wk-day.shut .wk-day-head { margin-bottom: 0; }
+
+.wk-grip { flex: none; color: var(--line); display: grid; place-items: center; }
+.wk-grip svg { width: 12px; height: 12px; }
+.wk-row[draggable="true"] { cursor: grab; }
+.wk-row[draggable="true"]:hover .wk-grip { color: var(--ink-faint); }
+.wk-row.dragging { opacity: .4; cursor: grabbing; }
+/* The whole day lights up, not just the list — you are dropping onto the day,
+   and on an empty day there is no list to aim at. */
+.wk-day.drop-on, .wk-log.drop-on {
+  border-color: var(--red); box-shadow: 0 0 0 2px rgba(214, 32, 42, .16);
+}
+
 .wk-add { margin-top: .3rem; }
 .wk-add input {
   width: 100%; padding: .35rem .4rem; border: none; border-radius: 7px;
@@ -2194,7 +2231,8 @@ button.pl-st:hover { filter: brightness(.94); }
    Two thirds conversation, one third what is waiting on you. Below 1100px
    they stack, because a chat rail plus a thread plus a task list will not
    read at a third of a laptop each. */
-.td-top { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; align-items: start; margin-bottom: 1.4rem; }
+/* Assigned-to-you on the left third, messages across the remaining two. */
+.td-top { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; align-items: start; margin-bottom: 1.4rem; }
 @media (max-width: 1100px) { .td-top { grid-template-columns: 1fr; } }
 
 .mgs { display: flex; flex-direction: column; min-width: 0; }
