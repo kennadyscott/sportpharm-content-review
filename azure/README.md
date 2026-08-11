@@ -78,6 +78,41 @@ A read/write key in an app setting is a standing risk for no benefit, and
 `api/woo` deliberately calls the `reports/*` endpoints rather than the orders
 list so customer records never cross the boundary in the first place.
 
+## People who do not have an @sportpharm.com address
+
+Most of them will not, and it does not matter. This is what Entra **B2B guest
+accounts** are for, and it is why the tenant pin in `staticwebapp.config.json`
+can stay exactly as it is.
+
+A guest is invited by whatever address they already use — `@enovachem.com`,
+gmail, anything. They become a guest object in *SportPharm's* directory, so
+the app is still single-tenant and `openIdIssuer` stays pinned. How they prove
+who they are depends on what they have:
+
+| What the guest has | How they sign in |
+|---|---|
+| Their own Entra tenant | Their normal work login, SSO |
+| A personal Microsoft account | That account |
+| **Neither** | **Email one-time passcode** — Entra mails them a code |
+
+That last row is the important one. `enovachem.com` has **no Microsoft
+tenant** — `login.microsoftonline.com` returns `AADSTS90002: Tenant not found`
+for it. So one-time passcode is the route for Enovachem, and it needs nothing
+from Enovachem's side: no tenant, no admin, no software. Turn it on under
+External Identities → All identity providers → Email one-time passcode.
+
+**Do not make the app multi-tenant to solve this.** It looks like the obvious
+answer and it means any Microsoft tenant on earth can sign in unless you also
+validate the `tid` claim against an allowlist in every Function. Same class of
+mistake as leaving `ALLOWED_TO` empty on the mailer. Guests into one pinned
+tenant is both simpler and tighter.
+
+**The address never decides what someone can see.** Company is set when you
+invite them, in HQ's own Team page. Domain matching exists as a convenience
+for addresses we recognise, and an unrecognised domain resolves to no company
+at all — which means they see nothing until a person assigns them. That is the
+safe direction to fail.
+
 ## Retiring the public URL
 
 Decided: once Azure is up, the HQ URL goes. Three things have to happen in

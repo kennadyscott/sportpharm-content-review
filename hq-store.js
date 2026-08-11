@@ -93,6 +93,18 @@ const Store = (() => {
         const seedWeb = base.projects.find(p => p.id === 'p-web');
         if (seedWeb) s.projects.unshift(seedWeb);
       }
+    },
+    /* Companies arrived after people already had seats and orders. Everyone
+       who predates them worked for SportPharm, and every order already in the
+       system was going to Enova — that is the only thing Orders has ever
+       done. Filling those in is restating what was already true. */
+    'companies-2026-08': s => {
+      (s.users || []).forEach(u => { if (!u.company) u.company = OWN_COMPANY; });
+      (s.orders || []).forEach(o => {
+        if (!o.fromCompany) o.fromCompany = OWN_COMPANY;
+        if (!o.toCompany) o.toCompany = 'enovachem';
+        if (!Array.isArray(o.thread)) o.thread = [];
+      });
     }
   };
 
@@ -1339,6 +1351,48 @@ const Store = (() => {
   }
 
   /* =========================================================================
+     COMPANIES
+
+     One HQ, several companies. Who you work for decides what you can see:
+     SportPharm staff see everything; a partner company sees only the orders
+     addressed to it, and nothing else in the app at all.
+
+     This scoping is a convenience here, not a security boundary — everything
+     still lives in one browser. When this moves to a server, the same rules
+     have to be enforced there as row-level security, or a partner could read
+     the lot by asking for it directly.
+  ========================================================================= */
+  const companies = () => COMPANIES;
+  const company = id => COMPANIES.find(c => c.id === id) || null;
+  function myCompany() {
+    const me = currentUser();
+    return company((me && me.company) || OWN_COMPANY) || company(OWN_COMPANY);
+  }
+  const isOwn = () => (myCompany() || {}).kind === 'own';
+
+  /* Match a signed-in address to a company by its verified domain. Used when
+     Entra hands us someone we have not seen before — a guest from Enovachem
+     lands in Enovachem rather than defaulting into SportPharm. Unknown
+     domains get no company, which means they see nothing until someone
+     assigns them one. That is the safe direction to fail. */
+  function companyForEmail(email) {
+    const at = String(email || '').split('@')[1];
+    if (!at) return null;
+    const hit = COMPANIES.find(c => (c.domains || []).some(d => d.toLowerCase() === at.toLowerCase()));
+    return hit ? hit.id : null;
+  }
+
+  /* Orders you are allowed to see. Own company: all of them. Partner: only
+     the ones addressed to you, and only once they have actually been sent —
+     a draft is SportPharm thinking out loud and is nobody else's business. */
+  function visibleOrders() {
+    const all = orders();
+    if (isOwn()) return all;
+    const mine = (myCompany() || {}).id;
+    return all.filter(o => o.toCompany === mine && o.status !== 'draft');
+  }
+
+  /* =========================================================================
      ORDERS
 
      One record per order, carrying everything the email used to carry — and
@@ -1354,6 +1408,10 @@ const Store = (() => {
     const o = {
       id: uid('o'), ref: 'SP-' + String(load().orders.length + 1).padStart(4, '0'),
       status: 'draft', raisedBy: me ? me.id : null,
+      /* Who raised it and who fulfils it. Both sides read the same record. */
+      fromCompany: (myCompany() || {}).id || OWN_COMPANY,
+      toCompany: 'enovachem',
+      thread: [],
       org: '', contactName: '', contactEmail: '', contactPhone: '',
       shipTo: '', lines: [], freebies: [], swag: [], approvedBy: '',
       pay: 'Invoice', poNumber: '', ship: 'Ground', shipCost: 0,
@@ -1480,6 +1538,29 @@ const Store = (() => {
         .filter(x => x.n)
     };
   }
+
+  /* The conversation on an order — the thing that lets Julia and Enovachem
+     talk without a separate email chain nobody else can find. Cross-company
+     by design: both sides append to the same list, and each entry carries the
+     company that said it so a reply is never ambiguous about who "we" is. */
+  function addOrderNote(id, text) {
+    const body = (text || '').trim();
+    if (!body) return null;
+    const o = order(id);
+    if (!o) return null;
+    const me = currentUser();
+    if (!Array.isArray(o.thread)) o.thread = [];
+    o.thread.push({
+      id: uid('on'), by: me ? me.id : null,
+      company: (myCompany() || {}).id || null,
+      text: body.slice(0, 2000), at: now()
+    });
+    if (o.thread.length > 80) o.thread.splice(0, o.thread.length - 80);
+    o.updatedAt = now();
+    save();
+    return o;
+  }
+  const orderThread = o => (o && o.thread) || [];
 
   /* Recorded only after the send endpoint confirms it. "Sent" has to mean the
      mail server accepted it, not that someone pressed a button — the whole
@@ -1632,11 +1713,17 @@ const Store = (() => {
   }
 
   /* --------------------------------- team -------------------------------- */
-  function invite(name, email, role) {
+  /* Company is chosen when you invite, not inferred from the address.
+     Partner staff will not have an @sportpharm.com address — Enovachem has no
+     Microsoft tenant at all — so the address cannot be what decides who they
+     work for. Domain matching stays as a convenience for the cases where we
+     do know the domain; the invite is the reliable route. */
+  function invite(name, email, role, companyId) {
     const s = load();
     const code = Math.random().toString(36).slice(2, 8).toUpperCase();
     const u = {
       id: uid('u'), name: name.trim(), email: email.trim(), role,
+      company: companyId || companyForEmail(email) || OWN_COMPANY,
       tone: ['red', 'blue', 'green', 'navy', 'amber'][s.users.length % 5],
       title: '', pass: hash(code), createdAt: now(), order: s.users.length, pending: true
     };
@@ -1647,6 +1734,11 @@ const Store = (() => {
     return { user: u, code };
   }
   function setRole(id, role) { const u = user(id); if (u) { u.role = role; save(); } }
+  function setUserCompany(id, companyId) {
+    const u = user(id);
+    if (u && company(companyId)) { u.company = companyId; save(); }
+    return u || null;
+  }
   function removeUser(id) {
     const s = load();
     s.users = s.users.filter(u => u.id !== id);
@@ -1687,6 +1779,8 @@ const Store = (() => {
     lastReadAt, markThreadRead, unreadIn, unreadTotal, lastInThread,
     orders, order, addOrder, updateOrder, removeOrder, setOrderStatus,
     orderReady, orderTotal, orderMessage, orderStats, markOrderSent,
+    companies, company, myCompany, isOwn, companyForEmail, visibleOrders,
+    addOrderNote, orderThread,
     metricsOf, setMetric, setMargin,
     briefs, brief, reviewState, setReviewState, reviewThread,
     addReviewNote, removeReviewNote, campaignProgress, campaignNoteCount,
@@ -1695,7 +1789,7 @@ const Store = (() => {
     reminders, reminder, addReminder, updateReminder, toggleReminder, removeReminder,
     pieces, piece, planRules, setPlanRules, addPiece, updatePiece, removePieces,
     bulkStatus, bulkMove, bulkSchedule, nextDates, briefBlocks,
-    invite, setRole, removeUser, setPasscode,
+    invite, setRole, setUserCompany, removeUser, setPasscode,
     actionDone, tickAction,
     resetAll
   };

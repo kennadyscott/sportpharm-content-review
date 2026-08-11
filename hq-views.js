@@ -1657,9 +1657,13 @@
                   : '<em class="u-noinvite">no address yet — needs an invite</em>'}${
                   u.title ? ' · ' + esc(u.title) : ''} · ${load} open</span></div>
               <div class="right">
+                ${(() => { const c = Store.company(u.company); return c
+                  ? `<span class="co-chip t-${c.tone}" title="${esc(c.name)}">${esc(c.short)}</span>` : ''; })()}
                 ${u.pending ? '<span class="badge-pending">Invited</span>' : ''}
                 ${canManage && u.id !== me.id
-                  ? `<select data-role="${u.id}">${Object.entries(ROLES).map(([k, v]) => `<option value="${k}" ${u.role === k ? 'selected' : ''}>${v.label}</option>`).join('')}</select>
+                  ? `<select data-usercompany="${u.id}" aria-label="Company for ${esc(u.name)}">${
+                      Store.companies().map(c => `<option value="${c.id}" ${u.company === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
+                     <select data-role="${u.id}">${Object.entries(ROLES).map(([k, v]) => `<option value="${k}" ${u.role === k ? 'selected' : ''}>${v.label}</option>`).join('')}</select>
                      <button class="btn btn-ghost btn-sm" data-remove="${u.id}" aria-label="Remove">${svg('trash')}</button>`
                   : `<span class="msg-use">${esc(ROLES[u.role].label)}</span>`}
               </div>
@@ -1668,10 +1672,15 @@
         </div>
 
         ${canManage ? `<section class="panel" style="margin-top:1.4rem">
-          <div class="panel-head"><h2>Invite someone</h2><span class="note">they get a one-time code</span></div>
+          <div class="panel-head"><h2>Invite someone</h2>
+            <span class="note">any address — it does not have to be @sportpharm.com</span></div>
+          <p class="wk-note">Partner staff sign in with whatever address they already use. Pick their
+             company here: it decides what they can see, and the address does not have to say it.</p>
           <form class="invite-form" id="invite-form">
             <div class="field"><label for="inv-name">Name</label><input id="inv-name" required placeholder="Their name"></div>
-            <div class="field"><label for="inv-email">Email</label><input id="inv-email" type="email" required placeholder="them@sportpharm.care"></div>
+            <div class="field"><label for="inv-email">Email</label><input id="inv-email" type="email" required placeholder="whatever address they actually use"></div>
+            <div class="field"><label for="inv-company">Company</label>
+              <select id="inv-company">${Store.companies().map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></div>
             <div class="field"><label for="inv-role">Role</label>
               <select id="inv-role">${Object.entries(ROLES).map(([k, v]) => `<option value="${k}" ${k === 'editor' ? 'selected' : ''}>${v.label}</option>`).join('')}</select></div>
             <button class="btn btn-dark" type="submit">Invite</button>
@@ -1694,6 +1703,10 @@
       </div>`;
     },
     wire(root) {
+      root.querySelectorAll('[data-usercompany]').forEach(sel =>
+        sel.addEventListener('change', () => {
+          Store.setUserCompany(sel.dataset.usercompany, sel.value); HQ.render();
+        }));
       root.querySelectorAll('[data-role]').forEach(s =>
         s.addEventListener('change', () => { Store.setRole(s.dataset.role, s.value); toast('Role updated.'); HQ.render(); }));
       root.querySelectorAll('[data-remove]').forEach(b =>
@@ -1705,7 +1718,8 @@
       const form = root.querySelector('#invite-form');
       if (form) form.addEventListener('submit', e => {
         e.preventDefault();
-        const r = Store.invite($('#inv-name').value, $('#inv-email').value, $('#inv-role').value);
+        const r = Store.invite($('#inv-name').value, $('#inv-email').value,
+          $('#inv-role').value, $('#inv-company').value);
         HQ.render();
         const host = $('#invite-out');
         if (host) host.innerHTML = `<div class="invite-out">Send ${esc(r.user.name)} the workspace password and this one-time code — they pick their seat and enter the code as their passcode.<code>${esc(r.code)}</code></div>`;

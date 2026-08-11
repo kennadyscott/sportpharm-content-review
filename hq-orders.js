@@ -25,7 +25,7 @@
   let filter = 'open';
 
   function index() {
-    const all = Store.orders();
+    const all = Store.visibleOrders();
     const list = all.filter(o =>
       filter === 'all' ? true : filter === 'open' ? o.status !== 'complete' : o.status === filter);
     const count = k => all.filter(o => o.status === k).length;
@@ -135,7 +135,14 @@
       <div class="editor-grid">
         <div class="ed-main">
           <div class="card-pad">
-            <h3 class="ord-h">Who it is for</h3>
+            <h3 class="ord-h">Who fulfils it</h3>
+            <div class="field"><label for="o-toCompany">Send it to</label>
+              <select id="o-toCompany" data-of="toCompany" ${dis}>
+                ${Store.companies().filter(c => c.kind === 'partner').map(c =>
+                  `<option value="${c.id}" ${o.toCompany === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}
+              </select></div>
+
+            <h3 class="ord-h" style="margin-top:1.1rem">Who it is for</h3>
             <div class="meta-grid">
               ${field('Organisation', 'org', 'Oklahoma State Athletics')}
               ${field('Contact name', 'contactName', 'Kevin Blaske')}
@@ -227,6 +234,28 @@
             <p class="side-sub" id="ord-send-note">${HQ.mailer && HQ.mailer.ready()
               ? 'Sends from ' + esc(HQ.mailer.from()) + ' — a real message, with a copy in that mailbox.'
               : 'Sending is not connected yet, so Send will explain what is missing rather than pretend. Copy still works.'}</p>
+          </div>
+
+          <div class="side-card">
+            <h4>Talk to ${esc((Store.company(o.toCompany) || {}).name || 'them')}</h4>
+            <p class="side-sub">On the order itself, so it is not in an email chain nobody else
+               can find. Both companies see this.</p>
+            <div class="cthread ord-talk">
+              ${Store.orderThread(o).map(n => {
+                const who = Store.user(n.by), co = Store.company(n.company);
+                const mine = n.company === (Store.myCompany() || {}).id;
+                return `<div class="cnote ${mine ? 'mine' : ''}"><div class="cnote-body">
+                  <span class="cnote-who"><b>${esc(who ? who.name.split(' ')[0] : 'Someone')}</b>
+                    ${co ? `<span class="co-chip sm t-${co.tone}">${esc(co.short)}</span>` : ''}
+                    · ${ago(n.at)}</span>
+                  <p>${esc(n.text)}</p>
+                </div></div>`;
+              }).join('') || '<p class="ord-hint">Nothing said yet.</p>'}
+            </div>
+            ${Store.can('edit') ? `<form class="ord-talk-form" id="ord-talk-form">
+              <input id="ord-talk-in" placeholder="Add a note both sides can see…" maxlength="2000">
+              <button class="btn btn-dark btn-sm" type="submit">Post</button>
+            </form>` : ''}
           </div>
 
           ${(o.history || []).length ? `<div class="side-card">
@@ -556,6 +585,15 @@
       });
       const bk = root.querySelector('#ord-back');
       if (bk) bk.addEventListener('click', () => { Store.setOrderStatus(o.id, ORDER_FLOW[i - 1]); HQ.render(); });
+
+      const talk = root.querySelector('#ord-talk-form');
+      if (talk) talk.addEventListener('submit', e => {
+        e.preventDefault();
+        const box = root.querySelector('#ord-talk-in');
+        if (!box.value.trim()) return;
+        Store.addOrderNote(o.id, box.value);
+        HQ.render();
+      });
 
       const snd = root.querySelector('#ord-send');
       if (snd) snd.addEventListener('click', async () => {

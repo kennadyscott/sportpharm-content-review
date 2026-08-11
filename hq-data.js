@@ -37,16 +37,44 @@ const ROLES = {
    (`sportpharm`) was briefly readable in a git history served by a
    misconfigured deploy, so treat it as burned. Each person can set their own
    in Settings. This is still a door, not a lock — Cloudflare Access is the gate. */
+/* -------------------------------- companies -------------------------------
+   Brandon's group is several companies, not one, and an order from SportPharm
+   to Enovachem crosses a real boundary. They are data here rather than
+   separate installations of HQ: one order record that both sides can see and
+   talk on, because the entire reason the Orders form exists is that the same
+   order was being retyped at each handoff. Two synced copies would bring that
+   straight back, with the added treat that they can now disagree.
+
+   `kind` decides what a company can do:
+     own    — the company HQ belongs to. Raises orders, sees everything.
+     partner— fulfils or receives orders. Sees only what is addressed to it.
+
+   `tenant` is the Entra directory, where there is one. Enovachem has no
+   Microsoft tenant (login.microsoftonline.com returns AADSTS90002 for
+   enovachem.com), which is exactly why its people come in as B2B guests
+   rather than through their own directory — see azure/README.md. */
+const COMPANIES = [
+  { id: 'sportpharm', name: 'SportPharm', short: 'SP', kind: 'own', tone: 'red',
+    tenant: 'c18f5ce2-49ee-4bb9-9c5e-9ddab1991d0c', domains: ['sportpharm.com'] },
+  { id: 'enovachem', name: 'Enovachem', short: 'EN', kind: 'partner', tone: 'blue',
+    tenant: null, domains: [],
+    note: 'Pick, pack and fulfilment. No Microsoft tenant found — their people sign in as guests.' },
+  { id: 'pharmco', name: 'Pharmco', short: 'PH', kind: 'partner', tone: 'green',
+    tenant: null, domains: [],
+    note: 'In scope. Confirm the real domain and tenant before wiring sign-in — pharmco.com resolves to a tenant that may belong to someone else entirely.' }
+];
+const OWN_COMPANY = 'sportpharm';
+
 const SEED_USERS = [
-  { id: 'u-brandon', name: 'Brandon Welch', email: 'brandonw@sportpharm.com', role: 'owner',  tone: 'navy',  title: 'President',          pass: 'summit-anchor-40' },
-  { id: 'u-jessie',  name: 'Jessie T',      email: 'jessiet@sportpharm.com',  role: 'editor', tone: 'red',   title: 'Marketing',          pass: 'summit-anchor-40' },
-  { id: 'u-kennady', name: 'Kennady Scott', email: 'kennady.nickell@gmail.com', role: 'owner', tone: 'blue', title: 'Build & web',        pass: 'summit-anchor-40' },
+  { id: 'u-brandon', company: 'sportpharm', name: 'Brandon Welch', email: 'brandonw@sportpharm.com', role: 'owner',  tone: 'navy',  title: 'President',          pass: 'summit-anchor-40' },
+  { id: 'u-jessie', company: 'sportpharm',  name: 'Jessie T',      email: 'jessiet@sportpharm.com',  role: 'editor', tone: 'red',   title: 'Marketing',          pass: 'summit-anchor-40' },
+  { id: 'u-kennady', company: 'sportpharm', name: 'Kennady Scott', email: 'kennady.nickell@gmail.com', role: 'owner', tone: 'blue', title: 'Build & web',        pass: 'summit-anchor-40' },
   /* Julia and Marissa raise the orders, so they need seats to message and to
      fill the form. Nobody has given me their addresses, so the seats exist
      without one and Team shows them as needing an invite rather than my
      guessing an address that silently never reaches them. */
-  { id: 'u-julia',   name: 'Julia',         email: '', role: 'editor', tone: 'amber', title: 'Orders',    pass: 'summit-anchor-40', invite: true },
-  { id: 'u-marissa', name: 'Marissa',       email: '', role: 'editor', tone: 'green', title: 'Orders',    pass: 'summit-anchor-40', invite: true }
+  { id: 'u-julia', company: 'sportpharm',   name: 'Julia',         email: '', role: 'editor', tone: 'amber', title: 'Orders',    pass: 'summit-anchor-40', invite: true },
+  { id: 'u-marissa', company: 'sportpharm', name: 'Marissa',       email: '', role: 'editor', tone: 'green', title: 'Orders',    pass: 'summit-anchor-40', invite: true }
 ];
 
 /* -------------------------------- messages -------------------------------
