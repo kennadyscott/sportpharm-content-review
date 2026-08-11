@@ -2482,3 +2482,77 @@ button.pl-st:hover { filter: brightness(.94); }
 .asg-row { flex-wrap: wrap; align-items: flex-start; }
 .asg-row .wk-dot { margin-top: .42rem; }
 .asg-row .asg-plan { max-width: none; width: 100%; margin-top: .35rem; }
+
+/* =====================================================================
+   TODAY — quieter pass, modelled on the ClearK12 planner
+
+   The version before this shouted: a full-width display hero, big bold
+   panel headings, and a red wash on any row that had been handed over. On
+   a page you open twenty times a day that is exhausting, and it made
+   everything look equally urgent — so nothing read as urgent.
+
+   The rules here: white cards, hairline borders, and the only heading
+   weight is a small uppercase eyebrow. Colour marks one thing at a time —
+   a day's name, a count, the single dot on something you have not opened.
+   ===================================================================== */
+
+/* The hero was a full-width slab with a tinted blob behind it. It is a
+   greeting; it does not need to be a billboard. */
+.today-hero { background: none; border: none; box-shadow: none;
+  padding: 0; margin-bottom: 1.1rem; }
+.today-hero::after { display: none; }
+.today-hero h1 { font-size: 1.35rem; letter-spacing: -.02em; }
+.today-sub { font-size: .84rem; margin-top: .15rem; color: var(--ink-faint); }
+
+/* Panel headings become eyebrows: small, uppercase, tracked, navy. */
+.td-top .panel-head h2,
+.asg-out h3 {
+  font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--navy); font-family: 'Inter', system-ui, sans-serif;
+}
+.td-top .panel-head { align-items: center; gap: .5rem; margin-bottom: .7rem; }
+.td-top .panel { border-radius: 14px; box-shadow: none; border: 1px solid var(--line); }
+.asg-n { background: none; color: var(--red); font-size: .78rem; font-weight: 800; padding: 0; }
+
+/* One row = bold title, grey line under it, and the day picker as a small
+   pill on the right. No wash, no wrap onto three lines. */
+.asg { padding: 1rem 1.1rem; }
+.asg .wk-note { display: none; }             /* the eyebrow already says it */
+.asg-row { flex-wrap: nowrap; align-items: center; gap: .55rem;
+  padding: .6rem 0; border-bottom: 1px solid var(--line-soft); }
+.asg-row.fresh { background: none; margin: 0; padding-left: 0; padding-right: 0; }
+.asg-row .wk-dot { display: none; }
+.asg-title { font-size: .92rem; font-weight: 600; color: var(--navy); line-height: 1.3; }
+.asg-from, .asg-pass { font-size: .78rem; color: var(--ink-faint); margin-top: .12rem; }
+.asg-pass b { color: var(--ink-soft); font-weight: 600; }
+.asg-new { width: 5px; height: 5px; }
+.asg-row .asg-plan { width: auto; max-width: none; margin-top: 0; flex: none;
+  padding: .3rem .55rem; font-size: .78rem; border-radius: 9px; color: var(--ink-soft); }
+@media (max-width: 1180px) {
+  /* Only below this does the picker need its own line. */
+  .asg-row { flex-wrap: wrap; align-items: flex-start; }
+  .asg-row .asg-plan { width: 100%; margin-top: .4rem; }
+}
+
+/* "Your week" gets the same eyebrow treatment as the cards above it. */
+.wk-head h2 { font-size: .72rem; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--navy); font-family: 'Inter', system-ui, sans-serif; }
+.wk-head h2 span { font-size: .8rem; font-weight: 400; letter-spacing: 0;
+  text-transform: none; color: var(--ink-faint); }
+
+/* Day cards: hairline, no coloured top bar, no lift. The day's own name
+   carries its colour — that is enough to tell them apart. */
+.wk-day, .wk-log { border: 1px solid var(--line); border-top: 1px solid var(--line);
+  border-radius: 14px; box-shadow: none; }
+.wk-day.now { box-shadow: none; border-color: var(--line); }
+.wk-day-head h3 { font-size: 1rem; font-weight: 700; }
+.wk-today { background: none; color: var(--blue-deep); border: 1px solid var(--blue-deep);
+  font-size: .58rem; }
+.wk-table { border: none; border-radius: 0; }
+.wk-thead { background: none; border-bottom: 1px solid var(--line); padding-left: 0; padding-right: 0; }
+.wk-table .wk-row { padding-left: 0; padding-right: 0; }
+.wk-log { position: static; }
+
+/* Messages: same card language as everything beside it. */
+.mgs { padding: 1rem 1.1rem; }
+.mg-who-row.on { background: var(--bg); }
