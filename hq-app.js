@@ -397,6 +397,14 @@ const HQ = (() => {
     };
   }
 
+  /* If demo data was seeded by an older build, rebuild it before drawing
+     anything — otherwise the rail and the demo script disagree about who
+     exists, which is a confusing five minutes for whoever is presenting. */
+  function freshenDemo() {
+    try { if (Store.demoStale && Store.demoStale()) Store.refreshDemo(); }
+    catch (e) { /* never block the app for demo data */ }
+  }
+
   function renderRail() {
     const { view: v, id: rid } = route();
     const me = Store.currentUser();
@@ -603,6 +611,7 @@ const HQ = (() => {
   }
 
   function start() {
+    freshenDemo();
     $('#scrim').addEventListener('click', closeSheet);
     $('#tb-search').addEventListener('click', palOpen);
     /* The rail is now two grid cells (display:contents), so the class that

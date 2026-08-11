@@ -1378,7 +1378,22 @@ const Store = (() => {
      already has real work in it without eating any of it.
   ========================================================================= */
   const DEMO_TAG = 'demo:';
+  /* Bump when the demo content changes. A store seeded by an older build
+     keeps its old rows and `loadDemo` returns early because the flag is
+     already set — so "Load it" appears to do nothing and the new content
+     never arrives. That is exactly how Dana went missing after she was
+     added. Version it and rebuild silently instead. */
+  const DEMO_VERSION = 2;
   const isDemoOn = () => !!(load().flags || {}).demoData;
+  const demoStale = () => {
+    const d = (load().flags || {}).demoData;
+    return !!d && d.v !== DEMO_VERSION;
+  };
+  function refreshDemo() {
+    if (!isDemoOn()) return false;
+    clearDemo();
+    return loadDemo();
+  }
 
   function loadDemo() {
     const s = load();
@@ -1462,7 +1477,7 @@ const Store = (() => {
       });
 
     if (!s.flags) s.flags = {};
-    s.flags.demoData = { on: true, at: now(), by: me ? me.id : null };
+    s.flags.demoData = { on: true, v: DEMO_VERSION, at: now(), by: me ? me.id : null };
     save();
     return true;
   }
@@ -2175,7 +2190,7 @@ const Store = (() => {
     recipeOf, setRecipe, bundlesWithoutContents, orderDoubles, allDoubles,
     moneyOf, outstandingOf, setMoney, raiseInvoice, moneyStats,
     companies, company, myCompany, isOwn, companyForEmail, visibleOrders,
-    loadDemo, clearDemo, isDemoOn,
+    loadDemo, clearDemo, isDemoOn, demoStale, refreshDemo,
     addOrderNote, orderThread,
     metricsOf, setMetric, setMargin,
     briefs, brief, reviewState, setReviewState, reviewThread,
