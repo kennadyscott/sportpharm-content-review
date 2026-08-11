@@ -232,9 +232,15 @@ let anyone believe otherwise; there is a launch gate about this too.
 
 ## Conventions
 
-- Brand red `#E0312A`, deep navy `#0B1E3B`. **Bebas Neue for display only** —
-  page titles and big numbers. Inter for everything else, because Bebas is
-  all-caps and loses too much at UI sizes.
+- Brand is the **WasabiRub masterbrand**, read out of `wasabirub-home.html`
+  rather than approximated: red `#D6202A`, deep `#0F1D33`, green `#27865A`,
+  blue `#337FA7`, orange `#C85B38`, paper `#F4F5F6`, ink `#15202B`.
+- Display face is **native heavy Arial/Helvetica** (`var(--display)`, weight
+  900, negative tracking, uppercase) — page titles and big numbers only. Inter
+  for everything else. Bebas is gone; so is its webfont request.
+- **One `:root`.** There used to be a second block further down carrying
+  Kindred's lilac ground, which silently beat the palette at the top of the
+  file. If the ground ever looks wrong again, look for a second `:root`.
 - Bump the `?v=N` query on `hq.css` / the JS tags after edits — the preview
   browser caches hard. Same for any image whose filename you overwrite.
 - `⌘K` (or `/`) opens the command palette anywhere. It searches articles,
@@ -244,6 +250,22 @@ let anyone believe otherwise; there is a launch gate about this too.
   is Kindred HQ's proven layout on purpose. Confirm before changing look/feel.
 - Settled arguments (WasabiRub is red not green; don't redesign the FEEL IT
   WORK page) are listed in the **Branding** tab so they stop being re-litigated.
+
+## Two things that are deliberately not built
+
+**Real KPI numbers.** `Analytics > KPIs` has the full weekly / monthly /
+quarterly grid and the derivations, and no figures. The report it models
+carries customer names, email addresses and order numbers, and this bundle is
+served publicly from GitHub Pages — anyone with the link can read
+`hq-data.js`. Numbers entered in the browser stay in localStorage. Seeding
+them into the repo would publish them. The view says this on its face.
+
+**The WooCommerce pull.** Its REST API needs a consumer key and secret on
+every request, and a public static bundle has nowhere to keep a secret — the
+credentials would be readable by anyone who opened the file, and they are
+read/write against the live store. It needs something server-side holding the
+credentials (a Supabase Edge Function or a Cloudflare Worker) that HQ calls
+instead. That is a decision about infrastructure, so it is not made here.
 
 ## Related
 
