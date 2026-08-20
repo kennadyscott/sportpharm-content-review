@@ -97,7 +97,12 @@ const OWN_COMPANY = 'sportpharm';
 const SEED_USERS = [
   { id: 'u-brandon', company: 'sportpharm', name: 'Brandon Welch', email: 'brandonw@sportpharm.com', role: 'owner',  tone: 'navy',  title: 'President',          pass: 'summit-anchor-40' },
   { id: 'u-jessie', company: 'sportpharm',  name: 'Jessie T',      email: 'jessiet@sportpharm.com',  role: 'editor', tone: 'red',   title: 'Marketing',          pass: 'summit-anchor-40' },
-  { id: 'u-kennady', company: 'sportpharm', name: 'Kennady Scott', email: 'kennady.nickell@gmail.com', role: 'owner', tone: 'blue', title: 'Build & web',        pass: 'summit-anchor-40' },
+  { id: 'u-kennady', company: 'sportpharm', name: 'Kennady Scott', email: 'kennadyn@sportpharm.com',
+    /* The personal address this seat was created under. Kept so the seat
+       still matches after the move to Entra sign-in — otherwise the one
+       person who cannot get in is the one who built it. */
+    altEmails: ['kennady.nickell@gmail.com'],
+    role: 'owner', tone: 'blue', title: 'Build & web',        pass: 'summit-anchor-40' },
   /* Julia and Marissa raise the orders, so they need seats to message and to
      fill the form. Nobody has given me their addresses, so the seats exist
      without one and Team shows them as needing an invite rather than my

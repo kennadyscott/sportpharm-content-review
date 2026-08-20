@@ -32,6 +32,7 @@ const Store = (() => {
       users: SEED_USERS.map((u, i) => ({
         id: u.id, name: u.name, email: u.email, role: u.role, tone: u.tone,
         title: u.title, seed: !!u.seed, invite: !!u.invite,
+        altEmails: u.altEmails || [],
         pass: hash(u.pass), createdAt: now(), order: i
       })),
       messages: SEED_MESSAGES.slice(),
@@ -100,6 +101,18 @@ const Store = (() => {
        who predates them worked for SportPharm, and every order already in the
        system was going to Enova — that is the only thing Orders has ever
        done. Filling those in is restating what was already true. */
+    /* Seats created before altEmails existed carry only the address they were
+       set up with. Top them up from the seed so nobody's sign-in depends on
+       which address happened to be typed first. */
+    'altemails-2026-08': (s, base) => {
+      (s.users || []).forEach(u => {
+        const seeded = base.users.find(b => b.id === u.id);
+        if (!seeded) return;
+        const merged = new Set([].concat(u.altEmails || [], seeded.altEmails || [], [u.email]));
+        if (seeded.email && seeded.email !== u.email) merged.add(u.email), u.email = seeded.email;
+        u.altEmails = [...merged].filter(e => e && e !== u.email);
+      });
+    },
     'companies-2026-08': s => {
       (s.users || []).forEach(u => { if (!u.company) u.company = OWN_COMPANY; });
       (s.orders || []).forEach(o => {
@@ -189,10 +202,20 @@ const Store = (() => {
     localStorage.setItem(KEY, JSON.stringify(state));
     listeners.forEach(fn => fn(state));
   }
+  /* A person can reach HQ under more than one address — a work mailbox and a
+     personal one that predates it, or a guest invited under whatever they
+     already use. Matching on a single `email` field meant whoever set the
+     seat up first decided which address worked forever, and everyone else
+     signing in would land with no seat at all.
+
+     `altEmails` is the other addresses that are still the same person. */
   function findUserByEmail(email) {
     if (!email) return null;
-    return load().users.find(u =>
-      (u.authEmail || '').toLowerCase() === email || (u.email || '').toLowerCase() === email) || null;
+    const want = String(email).toLowerCase().trim();
+    const has = u => [u.authEmail, u.email]
+      .concat(u.altEmails || [])
+      .some(e => String(e || '').toLowerCase().trim() === want);
+    return load().users.find(has) || null;
   }
   function claimSeat(userId, email) {
     const u = load().users.find(x => x.id === userId);

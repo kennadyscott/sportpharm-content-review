@@ -161,6 +161,25 @@ assigned to a company there. A guest who has not been assigned one sees
 nothing at all, which is the safe direction to fail. Partner staff only ever
 see the orders addressed to their own company, and never drafts.
 
+## 5b · Access for Kennady — so she is not dependent on you afterwards
+
+She does **not** need Global Administrator. Two narrower things are enough,
+and both follow least privilege:
+
+| What | Role | Why |
+|---|---|---|
+| Manage the app in Azure | **Owner** on the Static Web App's resource group | Change settings, read logs, redeploy without you |
+| Invite partner staff | **Guest Inviter** in Entra | Onboard Enovachem and Pharmco people herself |
+
+If she is also going to administer the tenant day to day, **User
+Administrator** covers people and passwords without the blast radius of
+Global Admin.
+
+> Whatever you decide: Microsoft's own guidance is that a tenant should have
+> **at least two** accounts able to recover it, and that they are not the same
+> person's daily login. If you are currently the only Global Administrator,
+> that is worth fixing regardless of this project.
+
 ## 6 · Custom domain
 
 
