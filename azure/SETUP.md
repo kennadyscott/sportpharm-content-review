@@ -122,20 +122,54 @@ Static Web App → Configuration → Application settings:
 use the company tenant to email anyone. It is the difference between a send
 button and an open relay.
 
-## 6 · Let the fulfilment vendor in
+## 6 · Sign-in for the other companies — read this carefully
 
-Enovachem staff need access to the orders addressed to them. They are **not**
-on Microsoft — `enovachem.com` returns `AADSTS90002: Tenant not found` — so
-they come in as B2B guests authenticating by emailed code.
+Three companies use this app, and **only one of them is on your tenant**:
 
-Entra ID → External Identities → All identity providers → enable
-**Email one-time passcode**.
+| Company | Addresses | How they sign in |
+|---|---|---|
+| SportPharm | `@sportpharm.com` | Normal work login |
+| Enovachem | whatever they use | **Guest** — emailed one-time code |
+| Pharmco | whatever they use | **Guest** — their own login if they have M365 |
 
-Nothing is required from Enovachem's side: no tenant, no admin, no software.
+**Pinning the app to this tenant does not lock these people out.** That is the
+part worth being sure about before you build it, because it reads as though it
+would. A B2B guest is an object *inside* the SportPharm directory — Entra
+issues their token from your tenant, so `openIdIssuer` pinned to your tenant
+is exactly right and does not need changing. The same is true of "Accounts in
+this organizational directory only" in step 1: guests in the directory are
+covered by it.
 
-> Do **not** make the app multi-tenant to solve this. It looks like the
-> obvious answer and it lets any Microsoft tenant on earth sign in unless the
-> `tid` claim is also validated against an allowlist in every Function.
+**What to enable:**
+
+1. External Identities → External collaboration settings
+   - Guest invite settings must allow invitations. If this is set to
+     "No one in the organization can invite guests", nothing below works.
+2. External Identities → All identity providers → **Email one-time passcode**
+
+Enovachem has **no Microsoft tenant** — `login.microsoftonline.com` returns
+`AADSTS90002: Tenant not found` for `enovachem.com` — so the emailed code is
+their route. It needs nothing from their side: no tenant, no admin, no
+software, no licence. Guests are free at this scale.
+
+**Inviting someone:** Entra ID → Users → New user → Invite external user.
+Their address, and nothing else required.
+
+> **Do not make the app multi-tenant to solve this.** It is the obvious-looking
+> fix and it lets any Microsoft tenant on earth sign in unless the `tid` claim
+> is also validated against an allowlist in every Function. Guests into one
+> pinned tenant is both simpler and tighter.
+
+A note on Pharmco: `pharmco.com` resolves to a Microsoft tenant that is *not*
+SportPharm's. If that tenant is genuinely Pharmco's, their people sign in with
+their own work credentials as guests and nothing extra is needed. If Pharmco
+uses a different domain, confirm which one before inviting anyone.
+
+**What the app does with this:** signing in proves who someone is. What they
+can *see* is set separately, inside HQ, on its Team page — each person is
+assigned to a company there. A guest who has not been assigned one sees
+nothing at all, which is the safe direction to fail. Partner staff only ever
+see the orders addressed to their own company, and never drafts.
 
 ## 7 · WooCommerce key — *store admin*
 
