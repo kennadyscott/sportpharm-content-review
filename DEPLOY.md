@@ -145,3 +145,23 @@ Remediation, all done:
 
 Still outstanding: **Cloudflare Access**. Until it is on, anyone who has the URL
 can read hq-data.js.
+
+## Where the deploy clone lives
+
+`~/.claude-apps/sportpharm-deploy`
+
+**Not `/tmp`.** macOS purges it, and it has now destroyed this clone twice —
+the second time it left the directory and an empty `.git` behind, so `cd`
+succeeded and every git command failed with "not a git repository". If a
+deploy ever reports success but the live site does not move, check that first.
+
+## Deploying
+
+```sh
+./bump.sh                     # ?v= on every asset, HQ_BUILD, build.txt — together
+# copy changed files into ~/.claude-apps/sportpharm-deploy, then commit and push
+```
+
+Then **verify against the served file**, not the local one, and gate the
+success message on the check — an ungated `echo` after `&&` chains will
+happily claim a deploy that never happened.
