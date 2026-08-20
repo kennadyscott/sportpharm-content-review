@@ -117,6 +117,7 @@ Static Web App → Configuration → Application settings:
 | `WOO_URL` | `https://sportpharm.com` |
 | `WOO_KEY` | WooCommerce consumer key — see step 7 |
 | `WOO_SECRET` | WooCommerce consumer secret |
+| `STRIPE_KEY` | Stripe **restricted** key — see step 7b |
 
 **`ALLOWED_TO` is not optional.** Without it, anyone who can sign in to HQ can
 use the company tenant to email anyone. It is the difference between a send
@@ -177,6 +178,27 @@ WordPress → WooCommerce → Settings → Advanced → REST API → Add key.
 
 - Description: `SportPharm HQ`
 - Permissions: **Read** — read-only, deliberately. HQ only ever reads.
+
+## 7b · Stripe key — restricted, not the secret key
+
+Stripe → Developers → API keys → **Create restricted key**.
+
+Name it `SportPharm HQ` and grant **Read** on these, nothing else:
+
+- Charges
+- PaymentIntents
+- Balance transactions
+
+Leave every other resource at **None**. Do **not** use the standard secret key
+(`sk_live_…`): it can issue refunds and move money, and HQ never needs to do
+either. The Function checks for this and refuses to start if it is given one,
+rather than quietly working.
+
+Stripe answers the half WooCommerce cannot — whether a payment actually
+cleared, the processing fee, refunds, disputes, and payments that carry no
+order reference at all (a payment link or a phone order, which will never
+appear in WooCommerce). The two are joined on the WooCommerce order number,
+which the Stripe plugin writes into each payment.
 
 ## 8 · Custom domain
 

@@ -57,8 +57,13 @@
              the source here is WooCommerce, not Stripe. Stripe sees a payment, not a basket —
              no line items, no SKUs, no shipping address — and the checkout also takes Affirm,
              Klarna, Afterpay and Amazon Pay, which may never pass through Stripe. A Stripe-only
-             list would miss those and still look complete. Stripe belongs on Money, for fees,
-             payouts, refunds and disputes.</p>
+             list would miss those and still look complete.</p>
+          <p class="ord-hint" style="margin-top:.6rem"><b>Stripe is wired up too</b>, for the half
+             WooCommerce cannot answer: whether the payment actually cleared, the processing fee,
+             refunds, disputes, and payments with no order attached — a payment link or a phone
+             order that will never appear in WooCommerce at all. The two are joined on the
+             WooCommerce order number, which the Stripe plugin writes into the payment. It needs
+             <code>azure/api/stripe</code> deployed and <code>window.SPHQ_STRIPE</code> set.</p>
         </section>
 
         <section class="panel" style="margin-top:1.1rem">
@@ -100,7 +105,7 @@
           checked ${esc(when(w.at))}</p>
         <div class="a-table-wrap">
           <table class="a-table">
-            <thead><tr><th>Order</th><th>Customer</th><th>Paid with</th><th>Total</th><th></th></tr></thead>
+            <thead><tr><th>Order</th><th>Customer</th><th>Paid with</th><th>Total</th><th>Stripe</th><th></th></tr></thead>
             <tbody>
               ${w.orders.map(o => {
                 const lines = (o.lines || []).map(Store.matchWebLine);
@@ -113,6 +118,14 @@
                     <span class="a-sub">${esc(o.email || '')}</span></td>
                   <td><span class="a-sub">${esc(o.paidWith || '—')}</span></td>
                   <td class="a-date">${money(o.total)}</td>
+                  <td class="a-date">${(() => {
+                    const pay = Store.paymentFor(o.number || o.id);
+                    if (!pay) return '<span class="a-sub">—</span>';
+                    if (pay.disputed) return '<span class="a-pill t-red">disputed</span>';
+                    if (pay.refunded > 0) return `<span class="a-pill t-amber">refunded ${money(pay.refunded)}</span>`;
+                    if (pay.status !== 'succeeded') return `<span class="a-pill t-amber">${esc(pay.status)}</span>`;
+                    return `<span class="a-sub">${pay.fee != null ? 'fee ' + money(pay.fee) : 'paid'}</span>`;
+                  })()}</td>
                   <td class="a-acts">
                     ${done ? '<span class="a-sub">already raised</span>'
                       : Store.can('edit') && Store.isOwn()
@@ -132,7 +145,11 @@
       const rf = root.querySelector('#web-refresh');
       if (rf) rf.addEventListener('click', async () => {
         busy = true; HQ.render();
-        await Store.pullWebOrders();
+        const w = await Store.pullWebOrders();
+        /* Ask Stripe about exactly the orders we just pulled. Failing here is
+           not fatal — an order you cannot see the fee on is still shippable —
+           so the money column just says so. */
+        await Store.pullPayments((w.orders || []).map(o => o.number || o.id));
         busy = false; HQ.render();
       });
 

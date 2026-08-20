@@ -25,3 +25,9 @@ window.SPHQ_CLOUD = {
    are read/write against the live shop and cannot sit in a public bundle.
    Set this once the Function is deployed and "From the website" fills in. */
 window.SPHQ_STORE = { endpoint: '' };
+
+/* The Stripe proxy — azure/api/stripe. Answers the half WooCommerce cannot:
+   did the payment clear, what did it cost in fees, was it refunded or
+   disputed. Read-only, and the Function refuses to run at all if it is given
+   a full secret key instead of a restricted one. */
+window.SPHQ_STRIPE = { endpoint: '' };

@@ -1547,6 +1547,33 @@ const Store = (() => {
     return webCache;
   }
 
+  /* What Stripe says about the money on those website orders. Separate call
+     and separate cache from the orders themselves, because they answer
+     different questions and one failing should not blank the other: an order
+     you cannot see the fee on is still an order you can ship. */
+  let payCache = { at: null, payments: [], unmatched: 0, error: null };
+  const webPayments = () => payCache;
+
+  async function pullPayments(orderIds) {
+    const url = (window.SPHQ_STRIPE || {}).endpoint;
+    if (!url) {
+      payCache = { at: null, payments: [], unmatched: 0, error: 'not-configured' };
+      return payCache;
+    }
+    try {
+      const q = '?resource=payments' +
+        (orderIds && orderIds.length ? '&orders=' + encodeURIComponent(orderIds.join(',')) : '');
+      const r = await fetch(url + q, { credentials: 'include' });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.ok) throw new Error(d.error || ('Stripe returned ' + r.status));
+      payCache = { at: now(), payments: d.payments || [], unmatched: d.unmatched || 0, error: null };
+    } catch (e) {
+      payCache = { at: null, payments: [], unmatched: 0, error: e.message };
+    }
+    return payCache;
+  }
+  const paymentFor = id => payCache.payments.find(p => String(p.orderId) === String(id)) || null;
+
   /* Match a web line to the HQ catalogue. SKU first, then name, then give up
      — and say so. The live store's SKUs do not match HQ's and two products
      have none at all, so an unmatched line is normal, not exceptional. It is
@@ -2291,6 +2318,7 @@ const Store = (() => {
     moneyOf, outstandingOf, setMoney, raiseInvoice, moneyStats,
     companies, company, myCompany, isOwn, companyForEmail, visibleOrders,
     webOrders, pullWebOrders, orderFromWeb, matchWebLine, webAlreadyRaised,
+    webPayments, pullPayments, paymentFor,
     loadDemo, clearDemo, isDemoOn, demoStale, refreshDemo,
     addOrderNote, orderThread,
     metricsOf, setMetric, setMargin,
