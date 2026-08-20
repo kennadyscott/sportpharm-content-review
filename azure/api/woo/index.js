@@ -1,5 +1,6 @@
 /* =============================================================================
-   GET /api/woo?period=week — the WooCommerce numbers for the KPI grid.
+   GET /api/woo?period=week          — totals for the KPI grid
+   GET /api/woo?resource=orders      — the orders placed on sportpharm.com
 
    This function exists so the store credentials never reach the browser. The
    WooCommerce REST API wants a consumer key and secret on every request, and
@@ -58,6 +59,63 @@ module.exports = async function (context, req) {
     if (!r.ok) throw new Error(`Woo ${path} returned ${r.status}`);
     return r.json();
   };
+
+  /* ------------------------------ orders -------------------------------
+     Unlike the KPI path, this one DOES carry customer detail — a name and a
+     shipping address, because an order nobody can ship is not an order. It
+     is only ever returned to a signed-in member of the tenant, and only the
+     fields fulfilment actually needs: no card details, no billing history,
+     no customer account record.
+
+     Stripe is deliberately not the source here. It sees a payment, not a
+     basket — no line items, no SKUs, no shipping address unless someone
+     thought to put them in metadata — and the store also offers Affirm,
+     Klarna, Afterpay and Amazon Pay, which may not pass through Stripe at
+     all. WooCommerce sees every order regardless of how it was paid for. */
+  if (req.query.resource === 'orders') {
+    const status = (req.query.status || 'processing,on-hold,completed')
+      .split(',').map(x => x.trim()).filter(Boolean).join(',');
+    const per = Math.min(Number(req.query.per_page) || 25, 100);
+    try {
+      const rows = await get(`orders?status=${encodeURIComponent(status)}&per_page=${per}&orderby=date&order=desc`);
+      context.res = {
+        status: 200,
+        jsonBody: {
+          ok: true,
+          orders: (Array.isArray(rows) ? rows : []).map(o => ({
+            id: o.id,
+            number: o.number,
+            status: o.status,
+            date: o.date_created,
+            total: Number(o.total) || 0,
+            currency: o.currency,
+            /* Which gateway actually took the money. Worth surfacing: it is
+               how you tell a Stripe order from a Klarna one at a glance. */
+            paidWith: o.payment_method_title || o.payment_method || '',
+            customer: [o.billing && o.billing.first_name, o.billing && o.billing.last_name]
+              .filter(Boolean).join(' '),
+            email: (o.billing || {}).email || '',
+            shipTo: o.shipping && o.shipping.address_1 ? [
+              [o.shipping.first_name, o.shipping.last_name].filter(Boolean).join(' '),
+              o.shipping.company, o.shipping.address_1, o.shipping.address_2,
+              [o.shipping.city, o.shipping.state, o.shipping.postcode].filter(Boolean).join(', '),
+              o.shipping.country
+            ].filter(Boolean).join('\n') : '',
+            lines: (o.line_items || []).map(l => ({
+              sku: l.sku || '', name: l.name, qty: l.quantity,
+              price: Number(l.price) || 0, total: Number(l.total) || 0
+            })),
+            shipping: Number((o.shipping_lines || []).reduce((n, l) => n + (Number(l.total) || 0), 0)) || 0,
+            note: o.customer_note || ''
+          }))
+        }
+      };
+    } catch (e) {
+      context.log.error(e);
+      fail(502, e.message);
+    }
+    return;
+  }
 
   try {
     /* The reports endpoints return aggregates, which is exactly what is

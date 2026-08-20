@@ -336,6 +336,7 @@ const HQ = (() => {
       { id: 'orders', icon: 'box', label: 'Orders',
         pages: [{ id: 'orders', label: 'All orders' },
                 { id: 'neworder', label: 'Raise an order' },
+                { id: 'weborders', label: 'From the website' },
                 { id: 'inventory', label: 'Inventory' },
                 { id: 'money', label: 'Money' },
                 { id: 'ordstats', label: 'Analytics' }] },

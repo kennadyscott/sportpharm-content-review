@@ -19,3 +19,9 @@ window.SPHQ_CLOUD = {
   url: '',
   anonKey: ''
 };
+
+/* The WooCommerce proxy — azure/api/woo. Empty here because GitHub Pages has
+   no server to run it, which is the honest state: the store's key and secret
+   are read/write against the live shop and cannot sit in a public bundle.
+   Set this once the Function is deployed and "From the website" fills in. */
+window.SPHQ_STORE = { endpoint: '' };

@@ -1514,6 +1514,106 @@ const Store = (() => {
   }
 
   /* =========================================================================
+     THE WEB STORE
+
+     Orders placed on sportpharm.com. They are NOT HQ orders: an HQ order is
+     SportPharm asking Enovachem to pick and pack, a web order is a customer
+     who has already paid. The useful move is turning one into the other, so
+     a website sale reaches the warehouse through the same handoff as
+     everything else rather than through somebody's inbox.
+
+     Held in memory only. These are live records on the store and the store
+     stays the source of truth — caching them into localStorage would mean a
+     stale customer address in a browser nobody has opened for a week, and
+     puts customer data somewhere it does not need to be.
+  ========================================================================= */
+  let webCache = { at: null, orders: [], error: null };
+  const webOrders = () => webCache;
+
+  async function pullWebOrders() {
+    const url = (window.SPHQ_STORE || {}).endpoint;
+    if (!url) {
+      webCache = { at: null, orders: [], error: 'not-configured' };
+      return webCache;
+    }
+    try {
+      const r = await fetch(url + '?resource=orders', { credentials: 'include' });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.ok) throw new Error(d.error || ('The store returned ' + r.status));
+      webCache = { at: now(), orders: d.orders || [], error: null };
+    } catch (e) {
+      webCache = { at: null, orders: [], error: e.message };
+    }
+    return webCache;
+  }
+
+  /* Match a web line to the HQ catalogue. SKU first, then name, then give up
+     — and say so. The live store's SKUs do not match HQ's and two products
+     have none at all, so an unmatched line is normal, not exceptional. It is
+     kept with its own name and price and flagged, because a guessed match
+     silently corrupts stock counts and nobody would ever notice. */
+  function matchWebLine(l) {
+    const bySku = l.sku && WEB_SKU_MAP[l.sku];
+    const byName = !bySku && WEB_NAME_MAP[String(l.name || '').toLowerCase().trim()];
+    const sku = bySku || byName || null;
+    return {
+      sku: sku || l.sku || '',
+      name: l.name,
+      qty: Number(l.qty) || 1,
+      price: Number(l.price) || 0,
+      matched: !!sku,
+      via: bySku ? 'sku' : byName ? 'name' : null
+    };
+  }
+
+  /* Raise a fulfilment order from a web order. The customer has paid, so it
+     is marked prepaid — sending it out as "Invoice" would have Enovachem
+     billing someone who has already been charged. */
+  function orderFromWeb(w) {
+    const lines = (w.lines || []).map(matchWebLine);
+    const o = addOrder({
+      org: w.customer || 'Website order',
+      contactName: w.customer || '',
+      contactEmail: w.email || '',
+      shipTo: w.shipTo || '',
+      lines: lines.map(l => ({ sku: l.sku, name: l.name, qty: l.qty, price: l.price })),
+      pay: 'Prepaid',
+      shipCost: Number(w.shipping) || 0,
+      notes: [
+        'From the website — order ' + (w.number || w.id) + ', paid with ' + (w.paidWith || 'unknown'),
+        w.note ? 'Customer note: ' + w.note : '',
+        lines.filter(l => !l.matched).length
+          ? 'Not matched to the catalogue: ' + lines.filter(l => !l.matched)
+              .map(l => l.name + (l.sku ? ' (' + l.sku + ')' : ' (no SKU on the store)')).join('; ')
+          : ''
+      ].filter(Boolean).join('\n'),
+      webId: w.id,
+      webNumber: w.number
+    });
+
+    /* Tax and discounts are not carried onto the fulfilment order — the
+       warehouse does not need them and HQ's totals are what SportPharm owes
+       Enovachem, not what the customer paid. But the two numbers will differ
+       whenever there is tax or a coupon, and an unexplained gap is the kind
+       of thing that gets queried a month later. Say it on the record. */
+    const computed = orderTotal(o);
+    const paid = Number(w.total) || 0;
+    const gap = Math.round((paid - computed) * 100) / 100;
+    if (paid && Math.abs(gap) >= 0.01) {
+      o.notes += (o.notes ? '\n' : '') +
+        'Customer paid ' + paid.toFixed(2) + '; these lines come to ' + computed.toFixed(2) +
+        ' (difference ' + gap.toFixed(2) + ' — tax or a discount, not carried across).';
+      save();
+    }
+
+    return { order: o, unmatched: lines.filter(l => !l.matched), gap };
+  }
+
+  /* Already pulled through, so the list can say so instead of letting
+     somebody raise the same order twice. */
+  const webAlreadyRaised = id => orders().some(o => String(o.webId) === String(id));
+
+  /* =========================================================================
      COMPANIES
 
      One HQ, several companies. Who you work for decides what you can see:
@@ -2190,6 +2290,7 @@ const Store = (() => {
     recipeOf, setRecipe, bundlesWithoutContents, orderDoubles, allDoubles,
     moneyOf, outstandingOf, setMoney, raiseInvoice, moneyStats,
     companies, company, myCompany, isOwn, companyForEmail, visibleOrders,
+    webOrders, pullWebOrders, orderFromWeb, matchWebLine, webAlreadyRaised,
     loadDemo, clearDemo, isDemoOn, demoStale, refreshDemo,
     addOrderNote, orderThread,
     metricsOf, setMetric, setMargin,

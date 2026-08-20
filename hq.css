@@ -2812,3 +2812,7 @@ button.pl-st:hover { filter: brightness(.94); }
 @media (max-width: 1080px) {
   .editor-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* A website order with lines that could not be matched to the catalogue. */
+.web-warn { display: inline-block; margin-left: .45rem; font-size: .68rem; font-weight: 700;
+  color: var(--amber); background: rgba(200,91,56,.12); padding: .1rem .4rem; border-radius: 999px; }

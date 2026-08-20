@@ -37,6 +37,35 @@ const ROLES = {
    (`sportpharm`) was briefly readable in a git history served by a
    misconfigured deploy, so treat it as burned. Each person can set their own
    in Settings. This is still a door, not a lock — Cloudflare Access is the gate. */
+/* --------------------------- the web store --------------------------------
+   Orders come from sportpharm.com, which is WordPress + WooCommerce. There is
+   no separate WasabiRub store: wasabirub.com is a static marketing site on
+   GitHub Pages that links across to sportpharm.com.
+
+   Checkout offers Stripe, Affirm, Klarna, Afterpay and Amazon Pay. That is
+   why WooCommerce is the source for ORDERS and Stripe only for money —
+   Stripe sees a payment, not a basket, and depending on how the gateways are
+   configured some of those methods may not pass through it at all.
+
+   SKU MAP. The live store's SKUs do not match HQ's catalogue, and two
+   products carry no SKU whatsoever — including WasabiRub, the flagship. An
+   imported line that cannot be matched is kept and flagged rather than
+   guessed at, because guessing here silently corrupts stock counts. */
+const WEB_SKU_MAP = {
+  'TEAM-BUNDLE-1':           'BUNDLE-TRIFECTA',
+  'TEAM-BUNDLE':             'BUNDLE-WASABI-TEAM',
+  'superhot and icetra':     'BUNDLE-FIREICE',
+  'wasabirub and Icestra':   'BUNDLE-RECOVERY',
+  'OG-Wasabirub-DUO-BUNDLE': 'BUNDLE-OGHEAT',
+  'Icetrarub':               'ICETRARUB',
+  'SP-WASABIRUB-SUPER-HOT':  'SUPERHOT'
+};
+/* Matched on name when the store has no SKU at all. Last resort, and only
+   for products whose names are unambiguous on the live store today. */
+const WEB_NAME_MAP = {
+  'wasabirub (otc) sports recovery': 'WASABIRUB'
+};
+
 /* -------------------------------- companies -------------------------------
    Brandon's group is several companies, not one, and an order from SportPharm
    to Enovachem crosses a real boundary. They are data here rather than
