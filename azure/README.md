@@ -113,6 +113,42 @@ for addresses we recognise, and an unrecognised domain resolves to no company
 at all — which means they see nothing until a person assigns them. That is the
 safe direction to fail.
 
+## The domain — hq.sportpharm.com
+
+Do this as part of the Azure move, **not before it.**
+
+A custom domain on the current GitHub Pages hosting changes nothing that
+matters — it would still be public, and still have no server, so KPIs,
+WooCommerce orders and sending as the company all stay blocked. It also makes
+one thing actively worse: `kennadyscott.github.io/sportpharm-content-review`
+is obscure, while `hq.sportpharm.com` is the first address anyone would try.
+Putting the company's own name on a publicly readable internal tool is the
+wrong direction.
+
+**What is already known (checked 2026-08-11):**
+
+| | |
+|---|---|
+| DNS for both domains | `ns1/ns2.v2640474.hostpapavps.net` — a HostPapa VPS |
+| sportpharm.com | `192.0.78.x` — Automattic/WordPress.com, where WooCommerce runs |
+| wasabirub.com | `185.199.10x.153` — GitHub Pages, static marketing site |
+| `hq.sportpharm.com` | **free** — nothing resolves there today |
+
+Whoever administers that VPS already knows how to do this: they pointed
+wasabirub.com at GitHub Pages. It is two records and about fifteen minutes.
+
+**Steps, once the Static Web App exists:**
+
+1. Custom domains → Add → `hq.sportpharm.com`.
+2. Azure gives a validation token. Add the `TXT` record it asks for.
+3. Add a `CNAME` for `hq` pointing at the SWA's `*.azurestaticapps.net` host.
+4. Wait for validation. TLS is issued and renewed by Azure — nothing to buy
+   and no certificate to remember to renew.
+
+Use a **subdomain, not the apex**. The apex is the WooCommerce store and must
+not move, and apex domains on Static Web Apps need an ALIAS/ANAME record that
+not every DNS host supports — HostPapa's may not.
+
 ## Retiring the public URL
 
 Decided: once Azure is up, the HQ URL goes. Three things have to happen in
