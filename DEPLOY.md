@@ -15,66 +15,24 @@ inside HQ is a door, not a lock; it is not the gate.
 
 ## Live URL
 
-**https://sphq-47ae9b.kennady.workers.dev**
+**https://kennadyscott.github.io/sportpharm-content-review/** — served by
+GitHub Pages from the deploy clone (repo `kennadyscott/sportpharm-content-review`).
 
-The name is deliberately non-obvious. `*.kennady.workers.dev` is a wildcard in
-certificate transparency, so the account subdomain is public knowledge but the
-worker name is not — and an unguessable one means the URL is not discoverable
-while Access is being set up. Access is still the actual gate; this is only
-belt-and-braces.
+An earlier plan hosted HQ on Cloudflare Workers at a deliberately unguessable
+`*.kennady.workers.dev` address gated by Cloudflare Access. That worker is gone
+(it now returns 404) and was never the live site — ignore any `workers.dev` URL.
 
-An earlier deploy at `sportpharm-hq.kennady.workers.dev` served the repo's
-`.git` directory for about 14 minutes on 2026-07-28. That worker has been
-deleted and the seat passcode rotated. See the note at the bottom.
-
-## The 10-minute setup — Cloudflare Access
-
-Free, and it gates the whole site behind an emailed one-time code. Up to 50
-people at no cost.
-
-### 1. Connect the repo
-
-1. Sign in at <https://dash.cloudflare.com> (create a free account if needed).
-2. **Workers & Pages → Create → Pages → Connect to Git**.
-3. Authorise Cloudflare for GitHub and pick **kennadyscott/sportpharm-hq**.
-4. Build settings — there is no build step, this is static files:
-   - Framework preset: **None**
-   - Build command: *leave empty*
-   - Build output directory: **`/`**
-5. **Save and Deploy.** You get a URL like `sportpharm-hq.pages.dev`.
-
-At this point the site is live but **open to anyone with the link**. Do step 2
-before sending it to anybody.
-
-### 2. Put Access in front of it
-
-1. **Zero Trust** in the left sidebar → complete the one-time team setup
-   (pick a team name; choose the **Free** plan — it asks for a card and does
-   not charge).
-2. **Access → Applications → Add an application → Self-hosted**.
-3. Application name: `SportPharm HQ`. Session duration: 24 hours or a week.
-4. Subdomain: `sphq-47ae9b` · Domain: `kennady.workers.dev`
-5. **Add a policy** → Action **Allow** → Include → **Emails**, and list:
-   - `kennady.nickell@gmail.com`
-   - `brandonw@sportpharm.com`
-   - `jessiet@sportpharm.com`
-6. Save.
-
-Now anyone hitting the URL is asked for their email, gets a one-time code, and
-only those three addresses get in. Adding a fourth person is one line in that
-policy.
-
-### 3. Check it
-
-Open the URL in a private window. You should see the Cloudflare code prompt
-*before* HQ's seat picker. If HQ loads without the prompt, the Access policy
-is not attached to the right hostname — recheck step 2.4.
+> ⚠️ **The live site is public and ungated.** `sportpharm-content-review` is a
+> **public** repo, so `hq-data.js` — internal reasoning, spend figures, offer
+> codes, and the seat passcode — is readable by anyone who has the URL. HQ's
+> seat picker is a door, not a lock. Putting a real gate in front (and rotating
+> the passcode) is still open.
 
 ---
 
 ## Deploying after this
 
-`git push` to `main`. Cloudflare rebuilds in under a minute.
+The live site is the **deploy clone**, not this repo — see **Deploying** below. Pushing this repo alone does not move the live site.
 
 ```bash
 cd ~/Documents/Claude/sportpharm-hq

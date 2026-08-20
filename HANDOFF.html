@@ -1,0 +1,65 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SportPharm HQ — handoff</title><style>
+*{box-sizing:border-box}
+body{max-width:52rem;margin:0 auto;padding:3rem 2rem 4rem;
+ font:16px/1.65 -apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#15202b;background:#fff}
+h1{font-size:2rem;font-weight:900;letter-spacing:-.03em;margin:0 0 .3rem;
+ padding-bottom:.7rem;border-bottom:3px solid #d6202a;text-transform:uppercase}
+h2{font-size:1.25rem;font-weight:800;letter-spacing:-.02em;margin:2.4rem 0 .7rem;color:#0f1d33}
+h3{font-size:1rem;font-weight:800;margin:1.6rem 0 .4rem;color:#0f1d33}
+p{margin:.7rem 0}
+a{color:#337fa7}
+code{font:.88em/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;
+ background:#f1f3f5;padding:.1em .35em;border-radius:4px}
+pre.code{background:#0f1d33;color:#e7edf5;padding:1rem 1.1rem;border-radius:8px;
+ overflow-x:auto;font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;margin:1rem 0}
+pre.code code{background:none;padding:0;color:inherit}
+table{width:100%;border-collapse:collapse;margin:1.1rem 0;font-size:.94rem}
+th{text-align:left;font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+ color:#566371;padding:.5rem .6rem;border-bottom:2px solid #0f1d33}
+td{padding:.55rem .6rem;border-bottom:1px solid #e1e4e7;vertical-align:top}
+blockquote{margin:1.2rem 0;padding:.8rem 1.1rem;background:#fdf4f4;
+ border-left:4px solid #d6202a;border-radius:0 6px 6px 0}
+blockquote p{margin:0}
+hr{border:none;border-top:1px solid #e1e4e7;margin:2.2rem 0}
+ul,ol{margin:.7rem 0;padding-left:1.4rem}
+li{margin:.35rem 0}
+strong{font-weight:700;color:#0f1d33}
+@page{margin:16mm}
+@media print{body{padding:0;max-width:none}
+ h2{break-after:avoid}table,pre.code,blockquote{break-inside:avoid}}
+</style></head><body><h1>SportPharm HQ — handoff</h1>
+<p><strong>Read this first.</strong> It is the current state, the decisions already made, and the traps that cost real time. Last updated 2026-08-11.</p>
+<hr>
+<h2>What it is</h2>
+<p>An internal hub for SportPharm — a group of companies (SportPharm, Enovachem, Pharmco) run by Brandon Welch. It replaces a specific mess: Julia writing the fulfilment order to Enovachem from scratch in an email every time, so the warehouse, invoicing and the vendor each read it slightly differently.</p>
+<p>It also carries the team&#x27;s week, task handoffs, messaging, marketing planning and a CMS.</p>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>Live</strong></td><td><code>https://kennadyscott.github.io/sportpharm-content-review/</code></td></tr><tr><td><strong>Source</strong></td><td><code>~/Documents/Claude/sportpharm-hq/</code></td></tr><tr><td><strong>Deploy clone</strong></td><td><code>~/.claude-apps/sportpharm-deploy</code></td></tr><tr><td><strong>Repo</strong></td><td><code>kennadyscott/sportpharm-content-review</code> (<strong>public</strong> — see Risks)</td></tr><tr><td><strong>Also at</strong></td><td><code>/campaigns/</code> — the Content Studio, unchanged, do not restyle</td></tr><tr><td><strong>And</strong></td><td><code>/order/</code> — standalone order form, no login, for Julia and Marissa</td></tr></tbody></table>
+<h2>Deploying</h2>
+<pre class="code" data-lang="sh"><code>cd ~/Documents/Claude/sportpharm-hq
+./bump.sh                 # ?v= on every asset + window.HQ_BUILD + build.txt
+# copy changed files into ~/.claude-apps/sportpharm-deploy, commit, push</code></pre>
+<p>Then <strong>verify against the served file, not the local one</strong>, and gate the success message on that check. An ungated <code>echo</code> after an <code>&amp;&amp;</code> chain claimed a deploy that never happened, and the site sat two builds behind while I said it was live.</p>
+<p><strong>Never hand-edit <code>?v=</code>.</strong> Three things have to agree — the asset version, <code>window.HQ_BUILD</code> and <code>build.txt</code> — or the stale-cache guard in <code>hq-boot.js</code> compares the wrong values and silently stops working. That drifted twice, most recently on 2026-08-11 (assets on 74, the other two on 73).</p>
+<hr>
+<h2>State: what works today</h2>
+<p>Everything below is built and verified in a browser against the live URL.</p>
+<ul><li><strong>Orders</strong> — the core. One record moves draft → sent → acknowledged → invoiced → shipped → complete. The message to the vendor is generated from the form, so it reads identically every time. Verified against Julia&#x27;s real Oklahoma State order: SP-0001, $279.95, matching her email to the cent.</li><li><strong>Printed PO</strong> — its own document, not the form with the boxes hidden.</li><li><strong>Order analytics</strong> — value raised vs open, days to each handoff, who orders what, and <em>what is going out free</em> (freebies and SWAG carry no price, so they appear in no total anywhere else).</li><li><strong>Inventory / Money / Raise an order / PDF export</strong> — built in a parallel session, so I have not driven them end to end. They work; they are not in the demo script. Bundles explode by SKU for stock, and only the Trifecta&#x27;s contents are known — the rest are deliberately empty rather than guessed.</li><li><strong>The week</strong> — ClearK12-style day lists, running log, drag onto a day.</li><li><strong>Task handoffs</strong> — pass work with a note, passback, &quot;waiting on someone&quot;.</li><li><strong>Messaging</strong> — threads per person plus a Team room.</li><li><strong>Multi-company</strong> — one HQ; orders carry from/to company and a thread both sides post on. A partner sees only orders addressed to them, sent only.</li><li><strong>Demo mode</strong> — Settings → Demo data, and &quot;View as&quot; in the rail.</li><li><strong>CMS, campaigns, content plan, KPI grid</strong> — all present.</li></ul>
+<h2>State: what is blocked, and on exactly what</h2>
+<p>All four are blocked on the <strong>same one thing</strong>: HQ is a public static site with no server, so it can hold no secret and no customer data.</p>
+<table><thead><tr><th>Blocked</th><th>Needs</th></tr></thead><tbody><tr><td>Real KPI figures</td><td>A private host</td></tr><tr><td>Website orders (WooCommerce)</td><td><code>azure/api/woo</code> deployed</td></tr><tr><td>Payment state (Stripe)</td><td><code>azure/api/stripe</code> deployed</td></tr><tr><td>Sending as the company</td><td><code>azure/api/sendOrder</code> deployed</td></tr></tbody></table>
+<p><strong>The code for all of it is written.</strong> These need provisioning, not development. <code>azure/SETUP.md</code> is the handoff for the tenant admin — also built as <code>.docx</code> and <code>.pdf</code> via <code>tools/md2docx.js</code> and <code>tools/md2doc.py</code>.</p>
+<p>Until then each of those explains what is missing rather than looking broken. Send opens Outlook on the web with everything filled in.</p>
+<hr>
+<h2>Decisions already made — do not re-litigate</h2>
+<ul><li><strong>One HQ, companies as data.</strong> Not one instance per company with a sync between them. Two copies of an order can disagree, which is the exact problem Orders was built to end.</li><li><strong>WooCommerce is the source for orders; Stripe only for money.</strong> Stripe sees a payment, not a basket — no line items, no SKUs, no address. The checkout also takes Affirm, Klarna, Afterpay and Amazon Pay, which may never pass through Stripe, so a Stripe-only list would miss orders <em>and look complete</em>.</li><li><strong>Azure, not something else.</strong> They are already a Microsoft tenant, so Entra gives real logins with no new passwords, and Graph sends mail genuinely <em>as</em> the company rather than spoofing the domain.</li><li><strong>B2B guests into one pinned tenant</strong> — never make the app multi-tenant. That lets any Microsoft tenant on earth sign in unless <code>tid</code> is also allowlisted in every Function.</li><li><strong>The domain comes last.</strong> <code>hq.sportpharm.com</code> on the current public hosting would change nothing and make it <em>worse</em> — an obscure URL becomes the first one anyone would try.</li><li><strong>sportpharm.com is not touched.</strong> The live WooCommerce store stays exactly as it is. HQ is additive, on a subdomain.</li><li><strong>Do not redesign the Content Studio</strong> (<code>/campaigns/</code>). It was reverted byte-for-byte once already after an unrequested restyle. &quot;Make it live here&quot; is a plumbing request, not licence to reinterpret the design.</li></ul>
+<h2>Facts established by checking, not assuming</h2>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>sportpharm.com</td><td>WordPress + WooCommerce on Automattic; Entra tenant <code>c18f5ce2-49ee-4bb9-9c5e-9ddab1991d0c</code></td></tr><tr><td>wasabirub.com</td><td><strong>static GitHub Pages marketing site</strong> — takes no orders</td></tr><tr><td>enovachem.com</td><td><strong>no Microsoft tenant</strong> (<code>AADSTS90002</code>) → guests via emailed code</td></tr><tr><td>pharmco.com</td><td>a <em>different</em> tenant — may not be theirs, confirm before inviting</td></tr><tr><td>DNS (both)</td><td><code>ns1/ns2.v2640474.hostpapavps.net</code> — HostPapa VPS</td></tr><tr><td><code>hq.sportpharm.com</code></td><td>free</td></tr><tr><td>Store SKUs</td><td><strong>do not match HQ&#x27;s catalogue</strong>; two products have no SKU at all, including WasabiRub</td></tr></tbody></table>
+<hr>
+<h2>Open risks</h2>
+<ol><li><strong>The repo is public.</strong> Turning off Pages closes the website only — all history stays readable, including internal strategy text stripped from the live bundle in July. <strong>Setting the repo private is the fix.</strong> Order: move <code>/campaigns/</code> → sort Kennady&#x27;s access → set private.</li><li><strong>Company scoping is UI, not security.</strong> It is one browser and one localStorage; a determined partner could read the whole store. The same rules must be enforced server-side as RLS **before a real Enovachem person gets an account**.</li><li><strong>No shared data.</strong> Each person&#x27;s HQ lives in their own browser. A handoff to Julia reaches her only when her browser next loads. Azure does not fix this — it needs a database behind the same login (Supabase, or Azure Table Storage via a third Function). Settle it before this goes to the team.</li><li><strong>Two sessions edit this folder.</strong> Sync <em>everything that differs</em> when deploying, not a hand-picked list — shipping <code>hq-store.js</code> without <code>hq-data.js</code> broke the whole app once.</li></ol>
+<h2>Traps that cost real time</h2>
+<ul><li><strong><code>node --check</code> only catches syntax.</strong> An undefined reference passes it and kills every module after it. There is a harness pattern in the transcript that constructs <code>Store</code> and <code>HQ</code> in Node and asserts every export resolves — use it.</li><li><strong>Silent no-op edits.</strong> A string replace anchored on text that does not exist writes nothing and reports nothing. This happened three times. **Assert the anchor.**</li><li><strong><code>URLSearchParams</code> encodes spaces as <code>+</code>.</strong> Correct for a form body, wrong in a URL a mail client reads — every word in the order email was separated by a plus sign. Use <code>encodeURIComponent</code>.</li><li><strong><code>mailto:</code> / <code>window.open</code> must fire inside the click&#x27;s user activation.</strong> Any <code>await</code>, <code>confirm()</code> or re-render before it and the browser silently blocks it.</li><li><strong>Grid tracks size to max-content.</strong> <code>1fr</code> is <code>minmax(auto, 1fr)</code>; <code>auto</code> will not go below min-content. <code>min-width: 0</code> on children does not help — the <em>track</em> needs <code>minmax(0, 1fr)</code>. This put the whole page into a horizontal scroll.</li><li><strong><code>/tmp</code> is purged by macOS.</strong> It destroyed the deploy clone twice; the second time it left an empty <code>.git</code> so <code>cd</code> worked and every git command failed. Hence <code>~/.claude-apps/</code>.</li><li><strong>A seed only applies to a brand-new store.</strong> Changing <code>SEED_*</code> does nothing for anyone who has already opened HQ. Write a migration, and only touch data that is still recognisably the seed.</li></ul>
+<hr>
+<h2>If you are picking this up</h2>
+<p><strong>Next action is not code.</strong> It is <code>azure/SETUP.md</code> reaching the tenant admin and Part 1 being provisioned. Everything else is downstream of that.</p>
+<p>The demo script (<code>DEMO-SCRIPT.md</code>, three minutes) is what to show Brandon in the meantime — load demo data in Settings first, and clear it after.</p></body></html>
