@@ -137,10 +137,25 @@ Send opens Outlook on the web with everything filled in.
    localStorage; a determined partner could read the whole store. The same
    rules must be enforced server-side as RLS **before a real Enovachem person
    gets an account**.
-3. **No shared data.** Each person's HQ lives in their own browser. A handoff
-   to Julia reaches her only when her browser next loads. Azure does not fix
-   this — it needs a database behind the same login (Supabase, or Azure Table
-   Storage via a third Function). Settle it before this goes to the team.
+3. **No shared data — but the adapter is already written.** Each person's HQ
+   lives in their own browser, so a handoff to Julia reaches her only when her
+   browser next loads. Azure does not fix this on its own.
+
+   `hq-cloud.js` is a **complete Supabase adapter** — per-key sync into
+   `hq_kv`, realtime merge, real Supabase accounts — and `supabase/hq.sql` is
+   the schema. It is switched off: `SPHQ_CLOUD` in `hq-config.js` is empty on
+   both the source and the served bundle. Filling in two values turns live mode
+   on. This is a decision, not a build.
+
+   One gotcha already fixed but worth knowing: `hq-cloud.js` synced 13 keys
+   while the store had 18 — `orders`, `messages`, `todos`, `kpis` and
+   `campReview` were added later and were missing, so live mode would have
+   shared the CMS and silently stranded every order. **Keep `KEYS` in step with
+   `seed()`.** The Content Studio keeps its own separate Supabase project and
+   its own sign-in, deliberately.
+
+   Settle this before it goes to the team — it changes nothing visible and
+   everything about whether handoffs actually work.
 4. **Two sessions edit this folder.** Sync *everything that differs* when
    deploying, not a hand-picked list — shipping `hq-store.js` without
    `hq-data.js` broke the whole app once.
