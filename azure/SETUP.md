@@ -11,38 +11,52 @@ already paid for as part of Microsoft 365.
 
 SportPharm HQ is an internal web app — orders to the fulfilment vendor, the
 team's week, marketing planning. It works today, but it is hosted as a public
-static site, which means three things are impossible:
+static site, so anyone with the link can read it and there is nowhere to keep
+a credential.
 
-1. **It is readable by anyone with the link.** No customer data or revenue
-   figures can be put in it.
-2. **There is nowhere to keep a secret**, so it cannot call the WooCommerce
-   store or Stripe.
-3. **It cannot send email as the company** — orders to the vendor currently
-   open in Outlook for someone to press send.
+This puts it on Azure Static Web Apps behind Entra ID, so only SportPharm
+people and named partners can open it. The application code is already written,
+including the Azure Functions; this is provisioning, not development.
 
-Moving it to Azure Static Web Apps behind Entra ID fixes all three. The
-application code is already written for this, including the two Azure
-Functions; it needs provisioning, not development.
+### What this does NOT touch
 
----
+**sportpharm.com stays exactly as it is.** The live WordPress/WooCommerce store
+is not moved, modified, migrated or taken offline at any point. No plugin, no
+theme change, no downtime, no DNS change to the apex.
+
+HQ is added *alongside* it on a subdomain. The only contact between the two is
+that HQ later reads the store's order list through a **read-only** API key —
+and even that is Part 2 and can wait.
+
+### Two parts
+
+**Part 1 gets HQ running with real logins.** That is all most people need, and
+it involves nobody outside your own admin access. HQ is fully usable at the end
+of it — the parts that need Part 2 explain what is missing rather than breaking.
+
+**Part 2 connects the store and mail** when someone wants it. It needs a person
+with WordPress admin and a person with Stripe access, so it will move slower.
+Nothing in Part 1 has to wait for it.
 
 ## Who does what
 
-The work splits cleanly by who has access:
+Split by who has access, so no secret has to pass through anyone who does not
+need it:
 
 | Part | Who | Why |
 |---|---|---|
-| App registration, Graph permission, guest access | **You** | Needs Entra admin |
-| Creating the Static Web App, linking the repo | **Kennady** | She owns the GitHub repo |
-| App settings (the secrets) | **You** | They should not pass through anyone else |
-| DNS records | **You** | HostPapa VPS |
-| WooCommerce API key | **Whoever admins the store** | WordPress admin |
+| **Part 1** — app registration, guest access, DNS | **You** | Entra admin, HostPapa DNS |
+| **Part 1** — creating the Static Web App | **Kennady** | She owns the GitHub repo |
+| **Part 1** — the two auth settings | **You** | Secret should not pass through anyone else |
+| Part 2 — Mail.Send and its restriction | **You** | Entra admin |
+| Part 2 — WooCommerce key | **Store admin** | WordPress admin |
+| Part 2 — Stripe key | **Whoever has Stripe** | Stripe dashboard |
 
 **Do not send any secret back to Kennady or paste it into a chat.** Put the
 values straight into Azure's Configuration blade. She only needs to know when
 each step is done.
 
----
+# PART 1 — HQ and login
 
 ## 1 · App registration (Entra ID)
 
@@ -59,26 +73,10 @@ it matches.
 Certificates & secrets → New client secret. Copy the value now; it is not
 shown again.
 
-API permissions → Add → Microsoft Graph → **Application permissions** →
-`Mail.Send` → **Grant admin consent**.
+API permissions are **not needed for Part 1** — sign-in does not require any.
+`Mail.Send` is added in Part 2, when HQ starts sending orders itself.
 
-## 2 · Restrict Mail.Send — do not skip this
-
-By default `Mail.Send` as an application permission lets this app send as
-**any mailbox in the tenant**. Scope it to one:
-
-```powershell
-Connect-ExchangeOnline
-New-ApplicationAccessPolicy -AppId <CLIENT_ID> `
-  -PolicyScopeGroupId orders@sportpharm.com `
-  -AccessRight RestrictAccess `
-  -Description "SportPharm HQ may only send as the orders mailbox"
-```
-
-Verify with `Test-ApplicationAccessPolicy -Identity someone.else@sportpharm.com
--AppId <CLIENT_ID>` — it should come back **denied**.
-
-## 3 · Static Web App — *Kennady*
+## 2 · Static Web App — *Kennady*
 
 Azure → Create → Static Web App.
 
@@ -89,7 +87,7 @@ Azure → Create → Static Web App.
   - Api location: `azure/api`
   - Output location: leave blank
 
-## 4 · Pin sign-in to this tenant
+## 3 · Pin sign-in to this tenant
 
 In the repo, `azure/staticwebapp.config.json` contains:
 
@@ -101,29 +99,20 @@ Replace `<TENANT_ID>` with the real tenant ID. **This one value is what stops
 any Microsoft account in the world from signing in** — the default Entra
 provider is multi-tenant.
 
-## 5 · Application settings
+## 4 · Application settings
 
 Static Web App → Configuration → Application settings:
+
+For Part 1, two settings:
 
 | Name | Value |
 |---|---|
 | `AAD_CLIENT_ID` | Application (client) ID from step 1 |
 | `AAD_CLIENT_SECRET` | The client secret from step 1 |
-| `TENANT_ID` | Directory (tenant) ID |
-| `CLIENT_ID` | Same as `AAD_CLIENT_ID` |
-| `CLIENT_SECRET` | Same as `AAD_CLIENT_SECRET` |
-| `SEND_AS` | `orders@sportpharm.com` |
-| `ALLOWED_TO` | `orders@sportpharm.com,AdminUnit@sportpharm.com` |
-| `WOO_URL` | `https://sportpharm.com` |
-| `WOO_KEY` | WooCommerce consumer key — see step 7 |
-| `WOO_SECRET` | WooCommerce consumer secret |
-| `STRIPE_KEY` | Stripe **restricted** key — see step 7b |
 
-**`ALLOWED_TO` is not optional.** Without it, anyone who can sign in to HQ can
-use the company tenant to email anyone. It is the difference between a send
-button and an open relay.
+Part 2 adds the rest.
 
-## 6 · Sign-in for the other companies — read this carefully
+## 5 · Sign-in for the other companies — read this carefully
 
 Three companies use this app, and **only one of them is on your tenant**:
 
@@ -172,14 +161,81 @@ assigned to a company there. A guest who has not been assigned one sees
 nothing at all, which is the safe direction to fail. Partner staff only ever
 see the orders addressed to their own company, and never drafts.
 
-## 7 · WooCommerce key — *store admin*
+## 6 · Custom domain
+
+
+Use a **subdomain**, not the apex. The apex is the live store and must not
+move, and apex domains on Static Web Apps need ALIAS/ANAME support the DNS
+host may not have.
+
+DNS for `sportpharm.com` is on `ns1/ns2.v2640474.hostpapavps.net`.
+`hq.sportpharm.com` is currently unused.
+
+1. Static Web App → Custom domains → Add → `hq.sportpharm.com`
+2. Add the validation `TXT` record Azure asks for
+3. Add a `CNAME` for `hq` → the app's `*.azurestaticapps.net` hostname
+
+TLS is issued and renewed by Azure. Nothing to buy, nothing to diarise.
+
+---
+
+# PART 2 — the store and mail
+
+Everything below is optional and can happen weeks later. HQ works without it;
+the pages that need it say what is missing rather than appearing broken.
+
+**None of this changes sportpharm.com.** The WooCommerce step generates an API
+key from the store's admin screen — it does not install anything, alter the
+site, or require downtime.
+
+## P2.1 · Mail.Send, and restricting it
+
+This is what lets HQ send orders to the vendor as `orders@sportpharm.com`
+instead of opening Outlook for someone to press send.
+
+App registration → API permissions → Microsoft Graph → **Application
+permissions** → `Mail.Send` → **Grant admin consent**.
+
+Then restrict it. By default `Mail.Send` as an application permission lets the
+app send as **any mailbox in the tenant**:
+
+```powershell
+Connect-ExchangeOnline
+New-ApplicationAccessPolicy -AppId <CLIENT_ID> `
+  -PolicyScopeGroupId orders@sportpharm.com `
+  -AccessRight RestrictAccess `
+  -Description "SportPharm HQ may only send as the orders mailbox"
+```
+
+Verify with `Test-ApplicationAccessPolicy -Identity someone.else@sportpharm.com
+-AppId <CLIENT_ID>` — it should come back **denied**.
+
+## P2.2 · The remaining app settings
+
+| Name | Value |
+|---|---|
+| `TENANT_ID` | Directory (tenant) ID |
+| `CLIENT_ID` | Same as `AAD_CLIENT_ID` |
+| `CLIENT_SECRET` | Same as `AAD_CLIENT_SECRET` |
+| `SEND_AS` | `orders@sportpharm.com` |
+| `ALLOWED_TO` | `orders@sportpharm.com,AdminUnit@sportpharm.com` |
+| `WOO_URL` | `https://sportpharm.com` |
+| `WOO_KEY` | WooCommerce consumer key |
+| `WOO_SECRET` | WooCommerce consumer secret |
+| `STRIPE_KEY` | Stripe **restricted** key |
+
+**`ALLOWED_TO` is not optional.** Without it, anyone who can sign in to HQ can
+use the company tenant to email anyone. It is the difference between a send
+button and an open relay.
+
+## P2.3 · WooCommerce key — *store admin*
 
 WordPress → WooCommerce → Settings → Advanced → REST API → Add key.
 
 - Description: `SportPharm HQ`
 - Permissions: **Read** — read-only, deliberately. HQ only ever reads.
 
-## 7b · Stripe key — restricted, not the secret key
+## P2.4 · Stripe key — restricted, not the secret key
 
 Stripe → Developers → API keys → **Create restricted key**.
 
@@ -200,39 +256,28 @@ order reference at all (a payment link or a phone order, which will never
 appear in WooCommerce). The two are joined on the WooCommerce order number,
 which the Stripe plugin writes into each payment.
 
-## 8 · Custom domain
-
-Use a **subdomain**, not the apex. The apex is the live store and must not
-move, and apex domains on Static Web Apps need ALIAS/ANAME support the DNS
-host may not have.
-
-DNS for `sportpharm.com` is on `ns1/ns2.v2640474.hostpapavps.net`.
-`hq.sportpharm.com` is currently unused.
-
-1. Static Web App → Custom domains → Add → `hq.sportpharm.com`
-2. Add the validation `TXT` record Azure asks for
-3. Add a `CNAME` for `hq` → the app's `*.azurestaticapps.net` hostname
-
-TLS is issued and renewed by Azure. Nothing to buy, nothing to diarise.
-
 ---
 
-## When you are done
+## When Part 1 is done
 
 Send Kennady:
 
-- The Static Web App's URL
-- Confirmation that steps 2 and 6 are done
+- The Static Web App's URL (and the custom domain, if you did step 6)
+- Confirmation that step 5 is done — guest invitations permitted, email
+  one-time passcode enabled
 - Nothing else — **no secrets**
 
-She sets two values in the app's config to point it at the endpoints, and it
-goes live.
+That is HQ live with real logins. Part 2 can follow whenever there is time.
 
 ## Afterwards
 
-The public GitHub Pages site should be taken down and the repository set to
-private. Turning off Pages closes the website only; the repository history
-stays readable while it is public.
+Once Part 1 is live, the **public GitHub Pages copy of HQ** should be taken
+down and its repository set to private. That is the temporary public host HQ
+runs on today — not sportpharm.com, which is untouched throughout.
+
+Turning off Pages closes that website only; the repository history stays
+readable while the repository is public, so the private setting is the one
+that matters.
 
 ---
 

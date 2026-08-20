@@ -31,41 +31,38 @@ strong{font-weight:700;color:#0f1d33}
 <p><strong>For:</strong> whoever administers SportPharm&#x27;s Microsoft 365 tenant and DNS. <strong>Time:</strong> about half a day, most of it waiting for admin consent and DNS. <strong>Cost:</strong> ~$9/month (Azure Static Web Apps, Standard tier). Everything else is already paid for as part of Microsoft 365.</p>
 <hr>
 <h2>What this is</h2>
-<p>SportPharm HQ is an internal web app — orders to the fulfilment vendor, the team&#x27;s week, marketing planning. It works today, but it is hosted as a public static site, which means three things are impossible:</p>
-<ol><li><strong>It is readable by anyone with the link.</strong> No customer data or revenue figures can be put in it.</li><li><strong>There is nowhere to keep a secret</strong>, so it cannot call the WooCommerce store or Stripe.</li><li><strong>It cannot send email as the company</strong> — orders to the vendor currently open in Outlook for someone to press send.</li></ol>
-<p>Moving it to Azure Static Web Apps behind Entra ID fixes all three. The application code is already written for this, including the two Azure Functions; it needs provisioning, not development.</p>
-<hr>
+<p>SportPharm HQ is an internal web app — orders to the fulfilment vendor, the team&#x27;s week, marketing planning. It works today, but it is hosted as a public static site, so anyone with the link can read it and there is nowhere to keep a credential.</p>
+<p>This puts it on Azure Static Web Apps behind Entra ID, so only SportPharm people and named partners can open it. The application code is already written, including the Azure Functions; this is provisioning, not development.</p>
+<h3>What this does NOT touch</h3>
+<p><strong>sportpharm.com stays exactly as it is.</strong> The live WordPress/WooCommerce store is not moved, modified, migrated or taken offline at any point. No plugin, no theme change, no downtime, no DNS change to the apex.</p>
+<p>HQ is added <em>alongside</em> it on a subdomain. The only contact between the two is that HQ later reads the store&#x27;s order list through a <strong>read-only</strong> API key — and even that is Part 2 and can wait.</p>
+<h3>Two parts</h3>
+<p><strong>Part 1 gets HQ running with real logins.</strong> That is all most people need, and it involves nobody outside your own admin access. HQ is fully usable at the end of it — the parts that need Part 2 explain what is missing rather than breaking.</p>
+<p><strong>Part 2 connects the store and mail</strong> when someone wants it. It needs a person with WordPress admin and a person with Stripe access, so it will move slower. Nothing in Part 1 has to wait for it.</p>
 <h2>Who does what</h2>
-<p>The work splits cleanly by who has access:</p>
-<table><thead><tr><th>Part</th><th>Who</th><th>Why</th></tr></thead><tbody><tr><td>App registration, Graph permission, guest access</td><td><strong>You</strong></td><td>Needs Entra admin</td></tr><tr><td>Creating the Static Web App, linking the repo</td><td><strong>Kennady</strong></td><td>She owns the GitHub repo</td></tr><tr><td>App settings (the secrets)</td><td><strong>You</strong></td><td>They should not pass through anyone else</td></tr><tr><td>DNS records</td><td><strong>You</strong></td><td>HostPapa VPS</td></tr><tr><td>WooCommerce API key</td><td><strong>Whoever admins the store</strong></td><td>WordPress admin</td></tr></tbody></table>
+<p>Split by who has access, so no secret has to pass through anyone who does not need it:</p>
+<table><thead><tr><th>Part</th><th>Who</th><th>Why</th></tr></thead><tbody><tr><td><strong>Part 1</strong> — app registration, guest access, DNS</td><td><strong>You</strong></td><td>Entra admin, HostPapa DNS</td></tr><tr><td><strong>Part 1</strong> — creating the Static Web App</td><td><strong>Kennady</strong></td><td>She owns the GitHub repo</td></tr><tr><td><strong>Part 1</strong> — the two auth settings</td><td><strong>You</strong></td><td>Secret should not pass through anyone else</td></tr><tr><td>Part 2 — Mail.Send and its restriction</td><td><strong>You</strong></td><td>Entra admin</td></tr><tr><td>Part 2 — WooCommerce key</td><td><strong>Store admin</strong></td><td>WordPress admin</td></tr><tr><td>Part 2 — Stripe key</td><td><strong>Whoever has Stripe</strong></td><td>Stripe dashboard</td></tr></tbody></table>
 <p><strong>Do not send any secret back to Kennady or paste it into a chat.</strong> Put the values straight into Azure&#x27;s Configuration blade. She only needs to know when each step is done.</p>
-<hr>
+<h1>PART 1 — HQ and login</h1>
 <h2>1 · App registration (Entra ID)</h2>
 <p>Entra ID → App registrations → New registration.</p>
 <ul><li>Name: <code>SportPharm HQ</code></li><li>Supported account types: <strong>this organizational directory only</strong></li><li>Redirect URI: leave blank for now</li></ul>
 <p>Note the <strong>Application (client) ID</strong> and the <strong>Directory (tenant) ID</strong>. The tenant ID should be <code>c18f5ce2-49ee-4bb9-9c5e-9ddab1991d0c</code> — worth confirming it matches.</p>
 <p>Certificates &amp; secrets → New client secret. Copy the value now; it is not shown again.</p>
-<p>API permissions → Add → Microsoft Graph → <strong>Application permissions</strong> → <code>Mail.Send</code> → <strong>Grant admin consent</strong>.</p>
-<h2>2 · Restrict Mail.Send — do not skip this</h2>
-<p>By default <code>Mail.Send</code> as an application permission lets this app send as <strong>any mailbox in the tenant</strong>. Scope it to one:</p>
-<pre class="code" data-lang="powershell"><code>Connect-ExchangeOnline
-New-ApplicationAccessPolicy -AppId &lt;CLIENT_ID&gt; `
-  -PolicyScopeGroupId orders@sportpharm.com `
-  -AccessRight RestrictAccess `
-  -Description &quot;SportPharm HQ may only send as the orders mailbox&quot;</code></pre>
-<p>Verify with <code>Test-ApplicationAccessPolicy -Identity someone.else@sportpharm.com -AppId &lt;CLIENT_ID&gt;</code> — it should come back <strong>denied</strong>.</p>
-<h2>3 · Static Web App — <em>Kennady</em></h2>
+<p>API permissions are <strong>not needed for Part 1</strong> — sign-in does not require any. <code>Mail.Send</code> is added in Part 2, when HQ starts sending orders itself.</p>
+<h2>2 · Static Web App — <em>Kennady</em></h2>
 <p>Azure → Create → Static Web App.</p>
 <ul><li><strong>Plan: Standard.</strong> Free does not support a custom Entra registration.</li><li>Source: GitHub → <code>kennadyscott/sportpharm-content-review</code>, branch <code>main</code></li><li>Build presets: <strong>Custom</strong></li><li>App location: <code>/</code></li><li>Api location: <code>azure/api</code></li><li>Output location: leave blank</li></ul>
-<h2>4 · Pin sign-in to this tenant</h2>
+<h2>3 · Pin sign-in to this tenant</h2>
 <p>In the repo, <code>azure/staticwebapp.config.json</code> contains:</p>
 <pre class="code" data-lang="json"><code>&quot;openIdIssuer&quot;: &quot;https://login.microsoftonline.com/&lt;TENANT_ID&gt;/v2.0&quot;</code></pre>
 <p>Replace <code>&lt;TENANT_ID&gt;</code> with the real tenant ID. <strong>This one value is what stops any Microsoft account in the world from signing in</strong> — the default Entra provider is multi-tenant.</p>
-<h2>5 · Application settings</h2>
+<h2>4 · Application settings</h2>
 <p>Static Web App → Configuration → Application settings:</p>
-<table><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody><tr><td><code>AAD_CLIENT_ID</code></td><td>Application (client) ID from step 1</td></tr><tr><td><code>AAD_CLIENT_SECRET</code></td><td>The client secret from step 1</td></tr><tr><td><code>TENANT_ID</code></td><td>Directory (tenant) ID</td></tr><tr><td><code>CLIENT_ID</code></td><td>Same as <code>AAD_CLIENT_ID</code></td></tr><tr><td><code>CLIENT_SECRET</code></td><td>Same as <code>AAD_CLIENT_SECRET</code></td></tr><tr><td><code>SEND_AS</code></td><td><code>orders@sportpharm.com</code></td></tr><tr><td><code>ALLOWED_TO</code></td><td><code>orders@sportpharm.com,AdminUnit@sportpharm.com</code></td></tr><tr><td><code>WOO_URL</code></td><td><code>https://sportpharm.com</code></td></tr><tr><td><code>WOO_KEY</code></td><td>WooCommerce consumer key — see step 7</td></tr><tr><td><code>WOO_SECRET</code></td><td>WooCommerce consumer secret</td></tr><tr><td><code>STRIPE_KEY</code></td><td>Stripe <strong>restricted</strong> key — see step 7b</td></tr></tbody></table>
-<p><strong><code>ALLOWED_TO</code> is not optional.</strong> Without it, anyone who can sign in to HQ can use the company tenant to email anyone. It is the difference between a send button and an open relay.</p>
-<h2>6 · Sign-in for the other companies — read this carefully</h2>
+<p>For Part 1, two settings:</p>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody><tr><td><code>AAD_CLIENT_ID</code></td><td>Application (client) ID from step 1</td></tr><tr><td><code>AAD_CLIENT_SECRET</code></td><td>The client secret from step 1</td></tr></tbody></table>
+<p>Part 2 adds the rest.</p>
+<h2>5 · Sign-in for the other companies — read this carefully</h2>
 <p>Three companies use this app, and <strong>only one of them is on your tenant</strong>:</p>
 <table><thead><tr><th>Company</th><th>Addresses</th><th>How they sign in</th></tr></thead><tbody><tr><td>SportPharm</td><td><code>@sportpharm.com</code></td><td>Normal work login</td></tr><tr><td>Enovachem</td><td>whatever they use</td><td><strong>Guest</strong> — emailed one-time code</td></tr><tr><td>Pharmco</td><td>whatever they use</td><td><strong>Guest</strong> — their own login if they have M365</td></tr></tbody></table>
 <p><strong>Pinning the app to this tenant does not lock these people out.</strong> That is the part worth being sure about before you build it, because it reads as though it would. A B2B guest is an object <em>inside</em> the SportPharm directory — Entra issues their token from your tenant, so <code>openIdIssuer</code> pinned to your tenant is exactly right and does not need changing. The same is true of &quot;Accounts in this organizational directory only&quot; in step 1: guests in the directory are covered by it.</p>
@@ -76,27 +73,45 @@ New-ApplicationAccessPolicy -AppId &lt;CLIENT_ID&gt; `
 <blockquote><strong>Do not make the app multi-tenant to solve this.</strong> It is the obvious-looking fix and it lets any Microsoft tenant on earth sign in unless the <code>tid</code> claim is also validated against an allowlist in every Function. Guests into one pinned tenant is both simpler and tighter.</blockquote>
 <p>A note on Pharmco: <code>pharmco.com</code> resolves to a Microsoft tenant that is <em>not</em> SportPharm&#x27;s. If that tenant is genuinely Pharmco&#x27;s, their people sign in with their own work credentials as guests and nothing extra is needed. If Pharmco uses a different domain, confirm which one before inviting anyone.</p>
 <p><strong>What the app does with this:</strong> signing in proves who someone is. What they can <em>see</em> is set separately, inside HQ, on its Team page — each person is assigned to a company there. A guest who has not been assigned one sees nothing at all, which is the safe direction to fail. Partner staff only ever see the orders addressed to their own company, and never drafts.</p>
-<h2>7 · WooCommerce key — <em>store admin</em></h2>
-<p>WordPress → WooCommerce → Settings → Advanced → REST API → Add key.</p>
-<ul><li>Description: <code>SportPharm HQ</code></li><li>Permissions: <strong>Read</strong> — read-only, deliberately. HQ only ever reads.</li></ul>
-<h2>7b · Stripe key — restricted, not the secret key</h2>
-<p>Stripe → Developers → API keys → <strong>Create restricted key</strong>.</p>
-<p>Name it <code>SportPharm HQ</code> and grant <strong>Read</strong> on these, nothing else:</p>
-<ul><li>Charges</li><li>PaymentIntents</li><li>Balance transactions</li></ul>
-<p>Leave every other resource at <strong>None</strong>. Do <strong>not</strong> use the standard secret key (<code>sk_live_…</code>): it can issue refunds and move money, and HQ never needs to do either. The Function checks for this and refuses to start if it is given one, rather than quietly working.</p>
-<p>Stripe answers the half WooCommerce cannot — whether a payment actually cleared, the processing fee, refunds, disputes, and payments that carry no order reference at all (a payment link or a phone order, which will never appear in WooCommerce). The two are joined on the WooCommerce order number, which the Stripe plugin writes into each payment.</p>
-<h2>8 · Custom domain</h2>
+<h2>6 · Custom domain</h2>
 <p>Use a <strong>subdomain</strong>, not the apex. The apex is the live store and must not move, and apex domains on Static Web Apps need ALIAS/ANAME support the DNS host may not have.</p>
 <p>DNS for <code>sportpharm.com</code> is on <code>ns1/ns2.v2640474.hostpapavps.net</code>. <code>hq.sportpharm.com</code> is currently unused.</p>
 <ol><li>Static Web App → Custom domains → Add → <code>hq.sportpharm.com</code></li><li>Add the validation <code>TXT</code> record Azure asks for</li><li>Add a <code>CNAME</code> for <code>hq</code> → the app&#x27;s <code>*.azurestaticapps.net</code> hostname</li></ol>
 <p>TLS is issued and renewed by Azure. Nothing to buy, nothing to diarise.</p>
 <hr>
-<h2>When you are done</h2>
+<h1>PART 2 — the store and mail</h1>
+<p>Everything below is optional and can happen weeks later. HQ works without it; the pages that need it say what is missing rather than appearing broken.</p>
+<p><strong>None of this changes sportpharm.com.</strong> The WooCommerce step generates an API key from the store&#x27;s admin screen — it does not install anything, alter the site, or require downtime.</p>
+<h2>P2.1 · Mail.Send, and restricting it</h2>
+<p>This is what lets HQ send orders to the vendor as <code>orders@sportpharm.com</code> instead of opening Outlook for someone to press send.</p>
+<p>App registration → API permissions → Microsoft Graph → <strong>Application permissions</strong> → <code>Mail.Send</code> → <strong>Grant admin consent</strong>.</p>
+<p>Then restrict it. By default <code>Mail.Send</code> as an application permission lets the app send as <strong>any mailbox in the tenant</strong>:</p>
+<pre class="code" data-lang="powershell"><code>Connect-ExchangeOnline
+New-ApplicationAccessPolicy -AppId &lt;CLIENT_ID&gt; `
+  -PolicyScopeGroupId orders@sportpharm.com `
+  -AccessRight RestrictAccess `
+  -Description &quot;SportPharm HQ may only send as the orders mailbox&quot;</code></pre>
+<p>Verify with <code>Test-ApplicationAccessPolicy -Identity someone.else@sportpharm.com -AppId &lt;CLIENT_ID&gt;</code> — it should come back <strong>denied</strong>.</p>
+<h2>P2.2 · The remaining app settings</h2>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody><tr><td><code>TENANT_ID</code></td><td>Directory (tenant) ID</td></tr><tr><td><code>CLIENT_ID</code></td><td>Same as <code>AAD_CLIENT_ID</code></td></tr><tr><td><code>CLIENT_SECRET</code></td><td>Same as <code>AAD_CLIENT_SECRET</code></td></tr><tr><td><code>SEND_AS</code></td><td><code>orders@sportpharm.com</code></td></tr><tr><td><code>ALLOWED_TO</code></td><td><code>orders@sportpharm.com,AdminUnit@sportpharm.com</code></td></tr><tr><td><code>WOO_URL</code></td><td><code>https://sportpharm.com</code></td></tr><tr><td><code>WOO_KEY</code></td><td>WooCommerce consumer key</td></tr><tr><td><code>WOO_SECRET</code></td><td>WooCommerce consumer secret</td></tr><tr><td><code>STRIPE_KEY</code></td><td>Stripe <strong>restricted</strong> key</td></tr></tbody></table>
+<p><strong><code>ALLOWED_TO</code> is not optional.</strong> Without it, anyone who can sign in to HQ can use the company tenant to email anyone. It is the difference between a send button and an open relay.</p>
+<h2>P2.3 · WooCommerce key — <em>store admin</em></h2>
+<p>WordPress → WooCommerce → Settings → Advanced → REST API → Add key.</p>
+<ul><li>Description: <code>SportPharm HQ</code></li><li>Permissions: <strong>Read</strong> — read-only, deliberately. HQ only ever reads.</li></ul>
+<h2>P2.4 · Stripe key — restricted, not the secret key</h2>
+<p>Stripe → Developers → API keys → <strong>Create restricted key</strong>.</p>
+<p>Name it <code>SportPharm HQ</code> and grant <strong>Read</strong> on these, nothing else:</p>
+<ul><li>Charges</li><li>PaymentIntents</li><li>Balance transactions</li></ul>
+<p>Leave every other resource at <strong>None</strong>. Do <strong>not</strong> use the standard secret key (<code>sk_live_…</code>): it can issue refunds and move money, and HQ never needs to do either. The Function checks for this and refuses to start if it is given one, rather than quietly working.</p>
+<p>Stripe answers the half WooCommerce cannot — whether a payment actually cleared, the processing fee, refunds, disputes, and payments that carry no order reference at all (a payment link or a phone order, which will never appear in WooCommerce). The two are joined on the WooCommerce order number, which the Stripe plugin writes into each payment.</p>
+<hr>
+<h2>When Part 1 is done</h2>
 <p>Send Kennady:</p>
-<ul><li>The Static Web App&#x27;s URL</li><li>Confirmation that steps 2 and 6 are done</li><li>Nothing else — <strong>no secrets</strong></li></ul>
-<p>She sets two values in the app&#x27;s config to point it at the endpoints, and it goes live.</p>
+<ul><li>The Static Web App&#x27;s URL (and the custom domain, if you did step 6)</li><li>Confirmation that step 5 is done — guest invitations permitted, email one-time passcode enabled</li><li>Nothing else — <strong>no secrets</strong></li></ul>
+<p>That is HQ live with real logins. Part 2 can follow whenever there is time.</p>
 <h2>Afterwards</h2>
-<p>The public GitHub Pages site should be taken down and the repository set to private. Turning off Pages closes the website only; the repository history stays readable while it is public.</p>
+<p>Once Part 1 is live, the <strong>public GitHub Pages copy of HQ</strong> should be taken down and its repository set to private. That is the temporary public host HQ runs on today — not sportpharm.com, which is untouched throughout.</p>
+<p>Turning off Pages closes that website only; the repository history stays readable while the repository is public, so the private setting is the one that matters.</p>
 <hr>
 <h2>Questions you may reasonably have</h2>
 <p><strong>Why not App Service or a VM?</strong> Nothing here needs one. It is static files plus two small HTTP functions, and Static Web Apps gives Entra auth, managed TLS and CI from the repo without configuration.</p>
