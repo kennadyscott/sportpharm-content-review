@@ -133,6 +133,17 @@ const Store = (() => {
           sentAt: null, paidAt: null, amountPaid: 0, terms: REMIT_TO.terms, note: '' };
         if (!Array.isArray(o.moves)) o.moves = [];
       });
+    },
+    /* HQ shipped with 12 prototype/demo articles (the consumer "Push Through
+       or Stop?" cluster plus standalone placeholders). The real content is the
+       nine athlete-hub pieces from sportpharm.com/news (LIVE_ARTICLES). Remove
+       the demo set from existing stores; SEED_ARTICLES is now empty so new
+       stores never get them. */
+    'articles-demo-cleanup-2026-08': (s) => {
+      const DEMO = ['a-soreness', 'a-habits', 'a-nsaids', 'a-return', 'a-pharmacy',
+        'a-trushield', 'a-ptos-soreness', 'a-ptos-recurring', 'a-ptos-train',
+        'a-ptos-mindset', 'a-ptos-modify', 'a-ptos-checked'];
+      if (Array.isArray(s.articles)) s.articles = s.articles.filter(a => !DEMO.includes(a.id));
     }
   };
 
